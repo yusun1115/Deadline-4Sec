@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 #if ENABLE_INPUT_SYSTEM
@@ -11,10 +12,12 @@ namespace Deadline4Sec
     {
         [Header("Forward movement")]
         [SerializeField, Min(0f)] private float forwardSpeed = 8f;
+        private float runForwardSpeed = -1f;
 
         [Header("Lanes")]
         [SerializeField, Min(0.1f)] private float laneWidth = 2.5f;
         [SerializeField, Min(0.1f)] private float laneChangeSpeed = 12f;
+        [SerializeField, Min(10f)] private float horizontalSwipeMinPixels = 60f;
 
         [Header("Jump")]
         [SerializeField, Min(0.1f)] private float jumpHeight = 1.6f;
@@ -32,13 +35,14 @@ namespace Deadline4Sec
         [SerializeField, Range(0.05f, 0.4f)] private float airHomingDuration = 0.12f;
         [SerializeField] private Vector3 airHomingTargetOffset = new Vector3(0f, 0f, -0.5f);
         [SerializeField, Min(0.1f)] private float airHomingHitRadius = 1.2f;
-        [SerializeField, Min(0f)] private float airTargetSideBias = 3f;
+        [SerializeField, Min(0f)] private float airTargetSideBias = 10f;
         [SerializeField, Min(0f)] private float airTargetHeightWeight = 0.5f;
-        [SerializeField, Min(0.1f)] private float airComboBouncePower = 5f;
+        [SerializeField, Min(0.1f)] private float airComboBouncePower = 2.5f;
         [SerializeField, Min(0f)] private float airEnemyKillBoost = 2.5f;
 
         [Header("Lane attack")]
         [SerializeField] private GameTimer gameTimer;
+        [SerializeField] private RunManager runManager;
         [SerializeField, Min(0.01f)] private float attackDuration = 0.3f;
         [SerializeField] private Vector3 attackBoxSize = new Vector3(1.5f, 1.8f, 2.4f);
         [SerializeField, Min(0f)] private float attackSideOffset = 1.5f;
@@ -48,6 +52,7 @@ namespace Deadline4Sec
         [Header("Slide")]
         [SerializeField, Min(0.01f)] private float slideDuration = 0.6f;
         [SerializeField, Range(0.1f, 1f)] private float slideHeightRatio = 0.5f;
+        [SerializeField, Range(0.2f, 1f)] private float slideRadiusRatio = 0.65f;
         [SerializeField] private Vector3 slideAttackBoxSize = new Vector3(1.2f, 1f, 2.2f);
         [SerializeField, Min(0f)] private float slideAttackForwardOffset = 1.2f;
         [SerializeField, Min(0.1f)] private float fastFallSpeed = 18f;
@@ -61,11 +66,15 @@ namespace Deadline4Sec
         private bool jumpInputHeld;
         private int lastJumpActionFrame = -1;
         private int laneIndex; // -1: left, 0: center, 1: right
+        private Vector2 swipeStartPosition;
+        private bool swipeTracking;
+        private bool swipeConsumed;
         private float attackTimeRemaining;
         private int attackDirection;
         private float jumpAttackTimeRemaining;
         private Enemy airDashTarget;
         private bool isHomingDash;
+        private bool airComboReady;
         private float airHomingElapsed;
         private float lastAirJumpTime = float.NegativeInfinity;
         private int preferredAirDashDirection;
@@ -74,13 +83,18 @@ namespace Deadline4Sec
         private bool isSliding;
         private bool isFastFalling;
         private bool pendingGroundSlide;
+        private readonly Dictionary<Obstacle, bool> obstacleContacts = new Dictionary<Obstacle, bool>();
+        private float obstacleMoveStartFeet;
+        private float obstacleMoveY;
         private float standingHeight;
+        private float standingRadius;
         private Vector3 standingCenter;
         private BoxCollider boxCollider;
         private Vector3 standingBoxSize;
         private Vector3 standingBoxCenter;
         private CapsuleCollider capsuleCollider;
         private float standingCapsuleHeight;
+        private float standingCapsuleRadius;
         private Vector3 standingCapsuleCenter;
         private Quaternion standingVisualRotation;
         private Vector3 standingVisualPosition;
@@ -89,6 +103,7 @@ namespace Deadline4Sec
         {
             characterController = GetComponent<CharacterController>();
             standingHeight = characterController.height;
+            standingRadius = characterController.radius;
             standingCenter = characterController.center;
             boxCollider = GetComponent<BoxCollider>();
             if (boxCollider != null)
@@ -100,12 +115,15 @@ namespace Deadline4Sec
             if (capsuleCollider != null)
             {
                 standingCapsuleHeight = capsuleCollider.height;
+                standingCapsuleRadius = capsuleCollider.radius;
                 standingCapsuleCenter = capsuleCollider.center;
             }
             SetupVisual();
             centerX = transform.position.x;
             if (gameTimer == null)
                 gameTimer = FindFirstObjectByType<GameTimer>();
+            if (runManager == null)
+                runManager = FindFirstObjectByType<RunManager>();
         }
 
         private void Start()
@@ -134,6 +152,7 @@ namespace Deadline4Sec
         private void Update()
         {
             ReadKeyboardInput();
+            ReadHorizontalSwipeInput();
 
             // Homing owns the only movement call for this frame. Normal forward,
             // lane movement, gravity and jump velocity resume after it ends.
@@ -155,10 +174,15 @@ namespace Deadline4Sec
             float nextX = Mathf.MoveTowards(transform.position.x, targetX, laneChangeSpeed * Time.deltaTime);
             Bounds contactBounds = characterController.bounds;
             Vector3 movement = new Vector3(nextX - transform.position.x,
-                verticalSpeed * Time.deltaTime, forwardSpeed * Time.deltaTime);
+                verticalSpeed * Time.deltaTime,
+                (runForwardSpeed >= 0f ? runForwardSpeed : forwardSpeed) * Time.deltaTime);
 
-            CollisionFlags collisions = characterController.Move(movement);
+            CollisionFlags collisions = MoveWithObstacleCheck(movement, out _);
+            if (gameTimer != null && gameTimer.IsGameOver)
+                return;
             isGrounded = (collisions & CollisionFlags.Below) != 0;
+            if (isGrounded)
+                airComboReady = false;
             if ((collisions & CollisionFlags.Above) != 0 && verticalSpeed > 0f)
                 verticalSpeed = 0f;
 
@@ -211,17 +235,20 @@ namespace Deadline4Sec
             if (isSliding)
             {
                 slideTimeRemaining -= Time.deltaTime;
-                if (slideTimeRemaining <= 0f)
+                if (slideTimeRemaining <= 0f && CanStandUp())
                     EndSlide();
             }
         }
 
         private void OnDisable()
         {
+            swipeTracking = false;
+            swipeConsumed = false;
             attackTimeRemaining = 0f;
             attackDirection = 0;
             jumpAttackTimeRemaining = 0f;
             StopAirDash();
+            airComboReady = false;
             lastAirJumpTime = float.NegativeInfinity;
             isFastFalling = false;
             pendingGroundSlide = false;
@@ -259,6 +286,55 @@ namespace Deadline4Sec
 #endif
         }
 
+        private void ReadHorizontalSwipeInput()
+        {
+#if ENABLE_INPUT_SYSTEM
+            Touchscreen screen = Touchscreen.current;
+            if (screen == null)
+                return;
+
+            bool pressed = screen.primaryTouch.press.isPressed;
+            Vector2 position = screen.primaryTouch.position.ReadValue();
+#elif ENABLE_LEGACY_INPUT_MANAGER
+            if (Input.touchCount == 0)
+            {
+                swipeTracking = false;
+                return;
+            }
+            Touch touch = Input.GetTouch(0);
+            bool pressed = touch.phase != TouchPhase.Ended && touch.phase != TouchPhase.Canceled;
+            Vector2 position = touch.position;
+#else
+            return;
+#endif
+            if (!pressed)
+            {
+                swipeTracking = false;
+                return;
+            }
+            if (!swipeTracking)
+            {
+                swipeStartPosition = position;
+                swipeTracking = true;
+                swipeConsumed = false;
+            }
+            if (swipeConsumed)
+                return;
+
+            Vector2 delta = position - swipeStartPosition;
+            if (Mathf.Abs(delta.x) < horizontalSwipeMinPixels ||
+                Mathf.Abs(delta.x) <= Mathf.Abs(delta.y))
+                return;
+
+            swipeConsumed = true;
+            ChangeLane(delta.x > 0f ? 1 : -1);
+        }
+
+        public void SetRunForwardSpeed(float speed)
+        {
+            runForwardSpeed = Mathf.Max(0f, speed);
+        }
+
         public void ChangeLane(int direction)
         {
             if (!isActiveAndEnabled || (gameTimer != null && gameTimer.IsGameOver))
@@ -271,12 +347,17 @@ namespace Deadline4Sec
             lastLaneInputTime = Time.time;
 
             int nextLane = Mathf.Clamp(laneIndex + direction, -1, 1);
-            if (nextLane == laneIndex)
-                return;
+            if (nextLane != laneIndex)
+            {
+                laneIndex = nextLane;
+                attackDirection = direction > 0 ? 1 : -1;
+                attackTimeRemaining = attackDuration;
+            }
 
-            laneIndex = nextLane;
-            attackDirection = direction > 0 ? 1 : -1;
-            attackTimeRemaining = attackDuration;
+            // After an airborne kill, a directional swipe chains directly to the
+            // next Air Enemy on that side. Without a target it remains a lane move.
+            if (airComboReady && !isGrounded && !isHomingDash)
+                TryStartHomingDash(preferredAirDashDirection);
         }
 
         private void CheckLaneAttack()
@@ -326,6 +407,8 @@ namespace Deadline4Sec
 
             gameTimer.ResetTimer();
             Debug.Log("Timer Reset by Kill");
+            if (runManager != null)
+                runManager.RecordEnemyKill(enemy, attackName == "Stomp Attack");
             if (attackName == "Homing Dash Attack")
             {
                 StopAirDash();
@@ -340,6 +423,11 @@ namespace Deadline4Sec
                 isGrounded = false;
                 verticalSpeed = Mathf.Max(0f, verticalSpeed) + airEnemyKillBoost;
             }
+            // A stomp bounce needs free lateral movement to set up the next
+            // head-first fast fall. Only regular Air kills enable swipe homing.
+            if (enemy.Type == Enemy.EnemyType.Air && !isGrounded &&
+                attackName != "Stomp Attack")
+                airComboReady = true;
             return true;
         }
 
@@ -364,6 +452,7 @@ namespace Deadline4Sec
 
                 isFastFalling = false;
                 pendingGroundSlide = false;
+                airComboReady = false;
                 isGrounded = false;
                 verticalSpeed = stompBouncePower;
                 jumpAttackTimeRemaining = 0f;
@@ -374,7 +463,7 @@ namespace Deadline4Sec
             return false;
         }
 
-        private Enemy FindAirTarget()
+        private Enemy FindAirTarget(int requiredSide = 0)
         {
             Vector3 origin = characterController.bounds.center;
             Enemy[] candidates = FindObjectsByType<Enemy>(FindObjectsSortMode.None);
@@ -393,13 +482,15 @@ namespace Deadline4Sec
                 Vector3 delta = GetAirTargetPoint(enemy) - origin;
                 if (delta.z < -0.5f || delta.sqrMagnitude > airTargetSearchRange * airTargetSearchRange)
                     continue;
+                if (requiredSide != 0 && delta.x * requiredSide <= 0.25f)
+                    continue;
                 eligibleCount++;
 
                 float score = delta.magnitude + Mathf.Abs(delta.y) * airTargetHeightWeight;
                 if (delta.z < 0f)
                     score += 2f;
                 if (side != 0)
-                    score += Mathf.Sign(delta.x) == side ? -airTargetSideBias : airTargetSideBias;
+                    score += delta.x * side > 0.25f ? -airTargetSideBias : airTargetSideBias;
 
                 if (score >= bestScore)
                     continue;
@@ -409,6 +500,32 @@ namespace Deadline4Sec
             }
             Debug.Log($"Air Target Scan: {airCount} Air Enemy, {eligibleCount} in front/range");
             return best;
+        }
+
+        private bool TryStartHomingDash(int requiredSide = 0)
+        {
+            if (isHomingDash || Time.time - lastAirJumpTime < airJumpMinInterval)
+                return false;
+
+            Enemy target = FindAirTarget(requiredSide);
+            if (target == null)
+            {
+                Debug.Log("No Air Target Found");
+                return false;
+            }
+
+            Debug.Log("Air Target Found: " + target.name);
+            lastAirJumpTime = Time.time;
+            isFastFalling = false;
+            pendingGroundSlide = false;
+            verticalSpeed = 0f;
+            jumpAttackTimeRemaining = 0f;
+            airDashTarget = target;
+            laneIndex = Mathf.Clamp(Mathf.RoundToInt((target.transform.position.x - centerX) / laneWidth), -1, 1);
+            airHomingElapsed = 0f;
+            isHomingDash = true;
+            Debug.Log("Homing Dash Started");
+            return true;
         }
 
         private Vector3 GetAirTargetPoint(Enemy enemy)
@@ -431,7 +548,16 @@ namespace Deadline4Sec
             Vector3 requestedMove = (targetPoint - before) * Mathf.Clamp01(Time.deltaTime / remaining);
 
             // This is the only CharacterController.Move call while homing.
-            characterController.Move(requestedMove);
+            CollisionFlags dashCollisions = MoveWithObstacleCheck(requestedMove, out bool landedOnObstacle);
+            if (gameTimer != null && gameTimer.IsGameOver)
+                return;
+            if (landedOnObstacle && (dashCollisions & CollisionFlags.Below) != 0)
+            {
+                StopAirDash();
+                isGrounded = true;
+                verticalSpeed = -2f;
+                return;
+            }
             Vector3 after = characterController.bounds.center;
             isGrounded = false;
             verticalSpeed = 0f;
@@ -483,6 +609,54 @@ namespace Deadline4Sec
             isHomingDash = false;
             airDashTarget = null;
             airHomingElapsed = 0f;
+        }
+
+        private CollisionFlags MoveWithObstacleCheck(Vector3 movement, out bool landedOnObstacle)
+        {
+            obstacleContacts.Clear();
+            obstacleMoveStartFeet = characterController.bounds.min.y;
+            obstacleMoveY = movement.y;
+            CollisionFlags flags = characterController.Move(movement);
+            landedOnObstacle = false;
+
+            foreach (KeyValuePair<Obstacle, bool> contact in obstacleContacts)
+            {
+                if (contact.Key == null)
+                    continue;
+                if (contact.Value)
+                {
+                    landedOnObstacle = true;
+                    continue;
+                }
+
+                if (gameTimer != null && !gameTimer.IsGameOver)
+                {
+                    Debug.Log("Game Over: Hit Obstacle " + contact.Key.name);
+                    gameTimer.TriggerGameOver();
+                }
+                break;
+            }
+            return flags;
+        }
+
+        private void OnControllerColliderHit(ControllerColliderHit hit)
+        {
+            if (gameTimer == null || gameTimer.IsGameOver)
+                return;
+
+            Obstacle obstacle = hit.collider.GetComponentInParent<Obstacle>();
+            if (obstacle == null)
+                return;
+
+            obstacle.RegisterPhysicalContact();
+
+            // A genuine landing must be descending onto the upper face from above.
+            bool landedOnTop = obstacleMoveY <= 0f && hit.normal.y >= 0.7f &&
+                obstacleMoveStartFeet >= hit.collider.bounds.max.y - 0.12f;
+            if (obstacleContacts.TryGetValue(obstacle, out bool alreadyLanded))
+                obstacleContacts[obstacle] = alreadyLanded || landedOnTop;
+            else
+                obstacleContacts.Add(obstacle, landedOnTop);
         }
 
         private Vector3 GetAttackBoxCenter(int direction)
@@ -599,6 +773,8 @@ namespace Deadline4Sec
         {
             if (!isActiveAndEnabled || (gameTimer != null && gameTimer.IsGameOver))
                 return;
+            if (isHomingDash)
+                return;
             if (lastJumpActionFrame == Time.frameCount)
                 return;
 
@@ -612,26 +788,8 @@ namespace Deadline4Sec
             }
             else
             {
-                if (Time.time - lastAirJumpTime < airJumpMinInterval)
+                if (!TryStartHomingDash())
                     return;
-
-                Enemy target = FindAirTarget();
-                if (target == null)
-                {
-                    Debug.Log("No Air Target Found");
-                    return;
-                }
-
-                Debug.Log("Air Target Found: " + target.name);
-                lastAirJumpTime = Time.time;
-                isFastFalling = false;
-                pendingGroundSlide = false;
-                verticalSpeed = 0f;
-                jumpAttackTimeRemaining = 0f;
-                airDashTarget = target;
-                airHomingElapsed = 0f;
-                isHomingDash = true;
-                Debug.Log("Homing Dash Started");
             }
             lastJumpActionFrame = Time.frameCount;
             isGrounded = false;
@@ -649,6 +807,7 @@ namespace Deadline4Sec
             else
             {
                 StopAirDash();
+                airComboReady = false;
                 pendingGroundSlide = true;
                 isFastFalling = true;
                 verticalSpeed = Mathf.Min(verticalSpeed, -fastFallSpeed);
@@ -710,8 +869,7 @@ namespace Deadline4Sec
             visualTransform.localRotation = sliding
                 ? standingVisualRotation * Quaternion.Euler(-90f, 0f, 0f)
                 : standingVisualRotation;
-            float slideHeight = Mathf.Max(characterController.radius * 2f,
-                standingHeight * slideHeightRatio);
+            float slideHeight = characterController.height;
             visualTransform.localPosition = sliding
                 ? standingVisualPosition - Vector3.up * ((standingHeight - slideHeight) * 0.5f)
                 : standingVisualPosition;
@@ -719,10 +877,16 @@ namespace Deadline4Sec
 
         private void SetSlideColliders(bool sliding)
         {
+            float radius = sliding ? standingRadius * slideRadiusRatio : standingRadius;
             float height = sliding
-                ? Mathf.Max(characterController.radius * 2f, standingHeight * slideHeightRatio)
+                ? Mathf.Max(radius * 2f, standingHeight * slideHeightRatio)
                 : standingHeight;
+            // Shrink radius before height; restore height before radius.
+            if (sliding)
+                characterController.radius = radius;
             characterController.height = height;
+            if (!sliding)
+                characterController.radius = radius;
             characterController.center = standingCenter - Vector3.up * ((standingHeight - height) * 0.5f);
 
             if (boxCollider != null)
@@ -735,12 +899,36 @@ namespace Deadline4Sec
 
             if (capsuleCollider != null)
             {
+                float capsuleRadius = sliding
+                    ? standingCapsuleRadius * slideRadiusRatio : standingCapsuleRadius;
                 float capsuleHeight = sliding
-                    ? Mathf.Max(capsuleCollider.radius * 2f, standingCapsuleHeight * slideHeightRatio)
+                    ? Mathf.Max(capsuleRadius * 2f, standingCapsuleHeight * slideHeightRatio)
                     : standingCapsuleHeight;
+                if (sliding)
+                    capsuleCollider.radius = capsuleRadius;
                 capsuleCollider.height = capsuleHeight;
+                if (!sliding)
+                    capsuleCollider.radius = capsuleRadius;
                 capsuleCollider.center = standingCapsuleCenter - Vector3.up * ((standingCapsuleHeight - capsuleHeight) * 0.5f);
             }
+        }
+
+        private bool CanStandUp()
+        {
+            Vector3 center = transform.TransformPoint(standingCenter);
+            float halfSegment = Mathf.Max(0f, standingHeight * 0.5f - standingRadius);
+            Collider[] nearby = Physics.OverlapCapsule(
+                center + Vector3.down * halfSegment,
+                center + Vector3.up * halfSegment,
+                standingRadius, ~0, QueryTriggerInteraction.Ignore);
+            foreach (Collider hit in nearby)
+            {
+                // A platform under the feet is fine; only overhead clearance matters.
+                if (hit.GetComponentInParent<Obstacle>() != null &&
+                    hit.bounds.max.y > characterController.bounds.max.y + 0.05f)
+                    return false;
+            }
+            return true;
         }
 
         private void OnValidate()
