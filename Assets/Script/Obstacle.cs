@@ -10,20 +10,18 @@ namespace Deadline4Sec
 
         [SerializeField] private ObstacleType obstacleType;
         [Header("Near miss zone (extra space outside the solid collider)")]
-        [SerializeField] private Vector2 nearMissMargin = new Vector2(0.95f, 0.65f);
+        [SerializeField] private Vector3 nearMissMargin = new Vector3(0.95f, 0.65f, 1.25f);
 
         private BoxCollider hazard;
         private CharacterController playerCollider;
         private GameTimer gameTimer;
         private RunManager runManager;
+        private CameraFeedbackController cameraFeedback;
         private Bounds previousPlayerBounds;
         private bool hasPreviousBounds;
         private bool wasNearWhilePassing;
         private bool physicallyTouched;
         private bool resolved;
-
-        private static Obstacle debugMessageOwner;
-        private static float debugMessageUntil;
 
         private void Awake()
         {
@@ -73,8 +71,8 @@ namespace Deadline4Sec
                         runManager = FindFirstObjectByType<RunManager>();
                     if (runManager != null)
                         runManager.RecordNearMiss();
-                    debugMessageOwner = this;
-                    debugMessageUntil = Time.unscaledTime + 0.75f;
+                    if (cameraFeedback != null)
+                        cameraFeedback.PlayNearMiss();
                 }
             }
 
@@ -95,6 +93,8 @@ namespace Deadline4Sec
                 gameTimer = FindFirstObjectByType<GameTimer>();
             if (runManager == null)
                 runManager = FindFirstObjectByType<RunManager>();
+            if (cameraFeedback == null)
+                cameraFeedback = FindFirstObjectByType<CameraFeedbackController>();
             if (playerCollider != null)
             {
                 previousPlayerBounds = playerCollider.bounds;
@@ -112,7 +112,9 @@ namespace Deadline4Sec
             Vector3 playerExtents = Vector3.Max(before.extents, after.extents);
             float enter = 0f;
             float exit = 1f;
-            return ClipAxis(start.z, movement.z, obstacleBounds.min.z, obstacleBounds.max.z,
+            return ClipAxis(start.z, movement.z,
+                       obstacleBounds.min.z - nearMissMargin.z - playerExtents.z,
+                       obstacleBounds.max.z + nearMissMargin.z + playerExtents.z,
                        ref enter, ref exit) &&
                    ClipAxis(start.x, movement.x,
                        obstacleBounds.min.x - nearMissMargin.x - playerExtents.x,
@@ -143,26 +145,11 @@ namespace Deadline4Sec
             return enter <= exit;
         }
 
-        private void OnGUI()
-        {
-            if (debugMessageOwner != this || Time.unscaledTime >= debugMessageUntil ||
-                (gameTimer != null && gameTimer.IsGameOver))
-                return;
-
-            GUIStyle style = new GUIStyle(GUI.skin.label)
-            {
-                alignment = TextAnchor.MiddleCenter,
-                fontSize = 26,
-                fontStyle = FontStyle.Bold
-            };
-            GUI.Label(new Rect(Screen.width * 0.5f - 140f, Screen.height * 0.2f,
-                280f, 50f), "NEAR MISS!", style);
-        }
-
         private void OnValidate()
         {
             nearMissMargin.x = Mathf.Max(0f, nearMissMargin.x);
             nearMissMargin.y = Mathf.Max(0f, nearMissMargin.y);
+            nearMissMargin.z = Mathf.Max(0f, nearMissMargin.z);
         }
 
         private void OnDrawGizmosSelected()
@@ -173,7 +160,7 @@ namespace Deadline4Sec
 
             Bounds nearZone = hazard.bounds;
             nearZone.Expand(new Vector3(nearMissMargin.x * 2f,
-                nearMissMargin.y * 2f, 0f));
+                nearMissMargin.y * 2f, nearMissMargin.z * 2f));
             Gizmos.color = new Color(1f, 0f, 1f, 0.8f);
             Gizmos.DrawWireCube(nearZone.center, nearZone.size);
 
