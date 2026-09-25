@@ -1,0 +1,14 @@
+{
+  "name": "Deadline4Sec.AcceptanceTests",
+  "rootNamespace": "Deadline4Sec.AcceptanceTests",
+  "references": [],
+  "includePlatforms": ["Editor"],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "optionalUnityReferences": ["TestAssemblies"]
+}

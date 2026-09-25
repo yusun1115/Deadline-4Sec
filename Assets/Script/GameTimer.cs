@@ -2,10 +2,6 @@ using System.Globalization;
 using UnityEngine;
 using UnityEngine.UI;
 
-#if ENABLE_INPUT_SYSTEM
-using UnityEngine.InputSystem;
-#endif
-
 namespace Deadline4Sec
 {
     public sealed class GameTimer : MonoBehaviour
@@ -14,56 +10,91 @@ namespace Deadline4Sec
         [SerializeField] private Text timeText;
         [SerializeField] private Text gameOverText;
 
+        [Header("Timer urgency")]
+        [SerializeField] private Color normalTimeColor = new Color(0.94f, 0.96f, 1f);
+        [SerializeField] private Color warningTimeColor = new Color(1f, 0.7f, 0.16f);
+        [SerializeField] private Color criticalTimeColor = new Color(1f, 0.16f, 0.31f);
+        [SerializeField, Min(0f)] private float warningAtSeconds = 2.5f;
+        [SerializeField, Min(0f)] private float criticalAtSeconds = 1f;
+
         private const float Duration = 4f;
         private float remainingTime;
         private bool isGameOver;
+        private bool isRunning;
+        private int runStartedFrame = -1;
+        private GameFlowManager gameFlow;
+        private CameraFeedbackController cameraFeedback;
+        private bool warningPlayed;
 
         public float RemainingTime => remainingTime;
         public bool IsGameOver => isGameOver;
+        public bool IsRunning => isRunning && !isGameOver;
 
-        private void Start()
+        private void Awake()
         {
-            ResetTimer();
+            remainingTime = Duration;
+            gameFlow = GetComponent<GameFlowManager>();
+            cameraFeedback = FindFirstObjectByType<CameraFeedbackController>();
+            if (gameOverText != null)
+                gameOverText.gameObject.SetActive(false);
+            UpdateTimeText();
         }
 
         private void Update()
         {
-            if (ResetKeyPressed())
-            {
-                ResetTimer();
-                return;
-            }
+            Tick(Time.deltaTime);
+        }
 
-            if (isGameOver)
+        private void Tick(float deltaTime)
+        {
+            if (!IsRunning || Time.frameCount == runStartedFrame)
                 return;
 
-            remainingTime = Mathf.Max(0f, remainingTime - Time.deltaTime);
+            remainingTime = Mathf.Max(0f, remainingTime - deltaTime);
             UpdateTimeText();
+
+            if (!warningPlayed && remainingTime > 0f &&
+                remainingTime <= criticalAtSeconds)
+            {
+                warningPlayed = true;
+                if (cameraFeedback != null)
+                    cameraFeedback.PlayTimerWarning();
+            }
 
             if (remainingTime <= 0f)
                 TriggerGameOver();
         }
 
-        // Enemy kills and near misses can call this later.
+        public void BeginRun()
+        {
+            if (isGameOver || isRunning)
+                return;
+
+            remainingTime = Duration;
+            warningPlayed = false;
+            isRunning = true;
+            runStartedFrame = Time.frameCount;
+            UpdateTimeText();
+        }
+
+        // Enemy kills and near misses reset only an active run.
         public void ResetTimer()
         {
+            if (!IsRunning)
+                return;
+
             remainingTime = Duration;
-            isGameOver = false;
-
-            if (playerController != null)
-                playerController.enabled = true;
-            if (gameOverText != null)
-                gameOverText.gameObject.SetActive(false);
-
+            warningPlayed = false;
             UpdateTimeText();
         }
 
         public void TriggerGameOver()
         {
-            if (isGameOver)
+            if (isGameOver || !isRunning)
                 return;
 
             isGameOver = true;
+            isRunning = false;
             remainingTime = 0f;
             UpdateTimeText();
 
@@ -74,23 +105,28 @@ namespace Deadline4Sec
                 gameOverText.text = "GAME OVER";
                 gameOverText.gameObject.SetActive(true);
             }
+            if (gameFlow != null)
+                gameFlow.HandleGameOver();
         }
 
         private void UpdateTimeText()
         {
             if (timeText != null)
+            {
                 timeText.text = remainingTime.ToString("F2", CultureInfo.InvariantCulture);
+                timeText.color = remainingTime <= criticalAtSeconds
+                    ? criticalTimeColor
+                    : remainingTime <= warningAtSeconds
+                        ? warningTimeColor
+                        : normalTimeColor;
+            }
         }
 
-        private static bool ResetKeyPressed()
+        private void OnValidate()
         {
-#if ENABLE_INPUT_SYSTEM
-            return Keyboard.current != null && Keyboard.current.rKey.wasPressedThisFrame;
-#elif ENABLE_LEGACY_INPUT_MANAGER
-            return Input.GetKeyDown(KeyCode.R);
-#else
-            return false;
-#endif
+            warningAtSeconds = Mathf.Max(0f, warningAtSeconds);
+            criticalAtSeconds = Mathf.Clamp(criticalAtSeconds, 0f, warningAtSeconds);
         }
+
     }
 }

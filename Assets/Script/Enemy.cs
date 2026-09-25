@@ -15,6 +15,25 @@ namespace Deadline4Sec
         public bool IsKilled => isKilled;
         public EnemyType Type => enemyType;
 
+        public bool IsInStompPath(Bounds playerBounds, float projectedZ)
+        {
+            Collider body = GetComponent<Collider>();
+            if (isKilled || body == null || !body.enabled)
+                return false;
+
+            Bounds enemyBounds = body.bounds;
+            if (playerBounds.min.y < enemyBounds.max.y - 0.1f ||
+                playerBounds.center.y <= enemyBounds.max.y)
+                return false;
+
+            float halfWidth = enemyBounds.extents.x * stompDetectionWidthMultiplier +
+                playerBounds.extents.x;
+            float halfDepth = enemyBounds.extents.z * stompDetectionWidthMultiplier +
+                playerBounds.extents.z;
+            return Mathf.Abs(playerBounds.center.x - enemyBounds.center.x) <= halfWidth &&
+                Mathf.Abs(projectedZ - enemyBounds.center.z) <= halfDepth;
+        }
+
         public bool IsValidStomp(Bounds beforePlayer, Bounds afterPlayer)
         {
             if (isKilled)
@@ -42,12 +61,54 @@ namespace Deadline4Sec
                 Mathf.Abs(centerAtZone.z - enemyBounds.center.z) <= halfDepth;
         }
 
+        public bool IsValidGroundSlamStomp(Bounds beforePlayer, Bounds afterPlayer)
+        {
+            if (isKilled)
+                return false;
+
+            Collider body = GetComponent<Collider>();
+            if (body == null)
+                return false;
+
+            Bounds enemyBounds = body.bounds;
+            float top = enemyBounds.max.y;
+            float previousFeet = beforePlayer.min.y;
+            float currentFeet = afterPlayer.min.y;
+            if (currentFeet >= previousFeet || beforePlayer.center.y <= top ||
+                previousFeet < top - 0.25f || currentFeet > top + stompDetectionHeight)
+                return false;
+
+            // Ground Slam can cross the complete head zone in one frame. Test the
+            // swept feet segment at the actual top plane and include the player's
+            // footprint so a visible edge landing is not lost to tunnelling.
+            float denominator = previousFeet - currentFeet;
+            float crossingTime = denominator > Mathf.Epsilon
+                ? Mathf.Clamp01((previousFeet - top) / denominator)
+                : 0f;
+            Vector3 centerAtTop = Vector3.Lerp(beforePlayer.center,
+                afterPlayer.center, crossingTime);
+            float halfWidth = enemyBounds.extents.x * stompDetectionWidthMultiplier +
+                Mathf.Min(beforePlayer.extents.x, afterPlayer.extents.x);
+            float halfDepth = enemyBounds.extents.z * stompDetectionWidthMultiplier +
+                Mathf.Min(beforePlayer.extents.z, afterPlayer.extents.z);
+            return Mathf.Abs(centerAtTop.x - enemyBounds.center.x) <= halfWidth &&
+                Mathf.Abs(centerAtTop.z - enemyBounds.center.z) <= halfDepth;
+        }
+
         public bool TryKill(string attackName = "Lane Attack")
         {
             if (isKilled)
                 return false;
 
             isKilled = true;
+            EnemyAttackZone[] attackZones = GetComponentsInChildren<EnemyAttackZone>(true);
+            foreach (EnemyAttackZone attackZone in attackZones)
+                attackZone.DisableImmediately();
+
+            Collider[] colliders = GetComponentsInChildren<Collider>(true);
+            foreach (Collider enemyCollider in colliders)
+                enemyCollider.enabled = false;
+
             Debug.Log("Enemy Killed by " + attackName);
             Destroy(gameObject);
             return true;

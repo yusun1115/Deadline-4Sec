@@ -111,8 +111,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 1, y: 1, z: 1.0098051}
+  m_Center: {x: 0, y: 0, z: -0.004902646}
 --- !u!114 &9117646262326835809
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -126,4 +126,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Deadline4Sec.Obstacle
   obstacleType: 1
-  nearMissMargin: {x: 0.95, y: 0.65}
+  nearMissMargin: {x: 0.96, y: 0.22, z: 0.25}

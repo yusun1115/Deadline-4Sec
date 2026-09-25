@@ -126,4 +126,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Deadline4Sec.Obstacle
   obstacleType: 2
-  nearMissMargin: {x: 0.95, y: 0.43}
+  nearMissMargin: {x: 0.95, y: 0.3, z: 0.48}

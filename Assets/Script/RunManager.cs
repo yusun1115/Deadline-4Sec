@@ -1,4 +1,5 @@
 using System.Globalization;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -18,6 +19,7 @@ namespace Deadline4Sec
         [SerializeField, Min(0)] private int groundEnemyPoints = 100;
         [SerializeField, Min(0)] private int airEnemyPoints = 100;
         [SerializeField, Min(0)] private int stompPoints = 150;
+        [SerializeField, Min(0)] private int groundSlamEnemyPoints = 150;
         [SerializeField, Min(0)] private int nearMissPoints = 150;
 
         [Header("Combo")]
@@ -36,6 +38,8 @@ namespace Deadline4Sec
 
         private float startZ;
         private float lastSuccessTime = float.NegativeInfinity;
+        private TMP_Text nearMissText;
+        private float nearMissVisibleUntil;
 
         public int CurrentScore { get; private set; }
         public int CurrentCombo { get; private set; }
@@ -43,6 +47,8 @@ namespace Deadline4Sec
         public float Distance { get; private set; }
         public float CurrentRunTime { get; private set; }
         public float CurrentForwardSpeed { get; private set; }
+        public float BaseForwardSpeed => baseForwardSpeed;
+        public float MaxForwardSpeed => maxForwardSpeed;
         public int ScoreMultiplier => CurrentCombo >= quadrupleComboAt ? quadrupleMultiplier :
             CurrentCombo >= tripleComboAt ? tripleMultiplier :
             CurrentCombo >= doubleComboAt ? doubleMultiplier : 1;
@@ -62,12 +68,17 @@ namespace Deadline4Sec
             CurrentForwardSpeed = baseForwardSpeed;
             if (playerController != null)
                 playerController.SetRunForwardSpeed(CurrentForwardSpeed);
+            CreateNearMissFeedback();
             UpdateDebugUI();
         }
 
         private void Update()
         {
-            if (playerController == null || gameTimer == null || gameTimer.IsGameOver)
+            if (nearMissText != null && nearMissText.gameObject.activeSelf &&
+                (gameTimer == null || !gameTimer.IsRunning ||
+                 Time.unscaledTime >= nearMissVisibleUntil))
+                nearMissText.gameObject.SetActive(false);
+            if (playerController == null || gameTimer == null || !gameTimer.IsRunning)
                 return;
 
             CurrentRunTime += Time.deltaTime;
@@ -84,7 +95,7 @@ namespace Deadline4Sec
 
         public void RecordEnemyKill(Enemy enemy, bool isStomp)
         {
-            if (enemy == null || gameTimer == null || gameTimer.IsGameOver)
+            if (enemy == null || gameTimer == null || !gameTimer.IsRunning)
                 return;
 
             int points = isStomp ? stompPoints :
@@ -94,10 +105,43 @@ namespace Deadline4Sec
 
         public void RecordNearMiss()
         {
-            if (gameTimer == null || gameTimer.IsGameOver)
+            if (gameTimer == null || !gameTimer.IsRunning)
                 return;
 
             RecordSuccess(nearMissPoints);
+            if (nearMissText != null)
+            {
+                nearMissText.text = "NEAR MISS +" + nearMissPoints;
+                nearMissText.gameObject.SetActive(true);
+                nearMissVisibleUntil = Time.unscaledTime + 0.75f;
+            }
+        }
+
+        private void CreateNearMissFeedback()
+        {
+            if (scoreText == null)
+                return;
+            GameObject label = new GameObject("NearMissFeedback",
+                typeof(RectTransform), typeof(TextMeshProUGUI));
+            label.transform.SetParent(scoreText.transform.parent, false);
+            RectTransform rect = label.GetComponent<RectTransform>();
+            rect.anchorMin = rect.anchorMax = new Vector2(0.5f, 0.72f);
+            rect.anchoredPosition = Vector2.zero;
+            rect.sizeDelta = new Vector2(460f, 80f);
+            nearMissText = label.GetComponent<TextMeshProUGUI>();
+            nearMissText.alignment = TextAlignmentOptions.Center;
+            nearMissText.fontSize = 38f;
+            nearMissText.color = new Color(1f, 0.28f, 0.5f);
+            nearMissText.raycastTarget = false;
+            label.SetActive(false);
+        }
+
+        public void RecordGroundSlamKill(Enemy enemy)
+        {
+            if (enemy == null || gameTimer == null || !gameTimer.IsRunning)
+                return;
+
+            RecordSuccess(groundSlamEnemyPoints);
         }
 
         private void RecordSuccess(int basePoints)

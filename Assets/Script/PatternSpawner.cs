@@ -32,14 +32,19 @@ namespace Deadline4Sec
         [SerializeField, Min(1f)] private float floorWidth = 8.6f;
         [SerializeField, Min(0.05f)] private float floorThickness = 0.2f;
         [SerializeField] private float floorTopY;
+        [SerializeField] private Material floorMaterial;
+        [SerializeField] private Renderer[] existingFloorRenderers;
+        [SerializeField] private bool showFloorDebugLogs;
 
         private readonly Queue<SpawnedPattern> activePatterns = new Queue<SpawnedPattern>();
         private readonly List<CoursePattern> candidates = new List<CoursePattern>();
+        private readonly List<float> opportunityPositions = new List<float>();
         private System.Random random;
         private CoursePattern previousPrefab;
         private CoursePattern.PatternCategory previousCategory;
         private int categoryStreak;
         private float nextStartZ;
+        private bool floorMaterialWarningShown;
 
         private struct SpawnedPattern
         {
@@ -57,16 +62,18 @@ namespace Deadline4Sec
                 gameTimer = FindFirstObjectByType<GameTimer>();
             random = useFixedSeed ? new System.Random(fixedSeed) : new System.Random();
             nextStartZ = transform.position.z;
+            ApplyExistingFloorMaterials();
         }
 
         private void Start()
         {
-            EnsurePatternsAhead();
+            if (gameTimer != null && gameTimer.IsRunning)
+                EnsurePatternsAhead();
         }
 
         private void Update()
         {
-            if (player == null || (gameTimer != null && gameTimer.IsGameOver))
+            if (player == null || gameTimer == null || !gameTimer.IsRunning)
                 return;
 
             CleanupPassedPatterns();
@@ -120,13 +127,6 @@ namespace Deadline4Sec
                 arrivalTime >= mediumStartsAtSeconds ? 1 : 0;
 
             CollectCandidates(minimumDifficulty, maximumDifficulty, true);
-            if (candidates.Count == 0)
-                CollectCandidates(minimumDifficulty, maximumDifficulty, false);
-            // A misconfigured set should still keep the course going when a
-            // compatible lower-tier Pattern exists.
-            if (candidates.Count == 0)
-                CollectCandidates(0, maximumDifficulty, false);
-
             return candidates.Count == 0 ? null : candidates[random.Next(candidates.Count)];
         }
 
@@ -157,14 +157,27 @@ namespace Deadline4Sec
 
         private bool OpportunityGapIsSafe(CoursePattern next)
         {
-            if (previousPrefab == null ||
-                !previousPrefab.TryGetOpportunityRange(out _, out float previousLast) ||
-                !next.TryGetOpportunityRange(out float nextFirst, out _))
-                return true;
-
+            next.CollectOpportunityPositions(opportunityPositions);
+            if (opportunityPositions.Count == 0)
+                return false;
             float speed = runManager != null ? Mathf.Max(0.1f, runManager.CurrentForwardSpeed) : 10.2f;
-            float gap = previousPrefab.PatternLength - previousLast + nextFirst;
-            return gap / speed <= maxOpportunityGapSeconds;
+            float maximumGap = maxOpportunityGapSeconds * speed;
+            if (previousPrefab != null)
+            {
+                if (!previousPrefab.TryGetOpportunityRange(out _, out float previousLast) ||
+                    previousPrefab.PatternLength - previousLast + opportunityPositions[0] > maximumGap)
+                    return false;
+            }
+            else if (Mathf.Max(0f, nextStartZ - player.transform.position.z) +
+                     opportunityPositions[0] > maximumGap)
+            {
+                return false;
+            }
+
+            for (int i = 1; i < opportunityPositions.Count; i++)
+                if (opportunityPositions[i] - opportunityPositions[i - 1] > maximumGap)
+                    return false;
+            return true;
         }
 
         private static bool StatesConnect(CoursePattern.TravelState exitState,
@@ -207,6 +220,35 @@ namespace Deadline4Sec
             floor.transform.localScale = new Vector3(floorWidth, floorThickness,
                 instance.PatternLength);
             floor.transform.SetParent(instance.transform, true);
+            ApplyFloorMaterial(floor.GetComponent<Renderer>());
+        }
+
+        private void ApplyExistingFloorMaterials()
+        {
+            if (existingFloorRenderers == null)
+                return;
+            foreach (Renderer floorRenderer in existingFloorRenderers)
+                ApplyFloorMaterial(floorRenderer);
+        }
+
+        private void ApplyFloorMaterial(Renderer floorRenderer)
+        {
+            if (floorRenderer == null)
+                return;
+            if (floorMaterial == null)
+            {
+                if (!floorMaterialWarningShown)
+                {
+                    floorMaterialWarningShown = true;
+                    Debug.LogWarning("Floor Material Missing");
+                }
+                return;
+            }
+
+            floorRenderer.sharedMaterial = floorMaterial;
+            if (showFloorDebugLogs)
+                Debug.Log("Floor Material Applied: " + floorMaterial.name +
+                    " -> [" + floorRenderer.gameObject.name + "]");
         }
 
         private void OnValidate()
