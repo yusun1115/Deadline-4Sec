@@ -260,16 +260,109 @@ namespace Deadline4Sec.AcceptanceTests
             Component run = new GameObject("Run").AddComponent(Find("RunManager"));
             Component player = CreatePlayer(Vector3.zero);
             Component inRange = CreateGroundEnemy(new Vector3(2.5f, 0.5f, 0f));
-            Component outOfRange = CreateGroundEnemy(new Vector3(10f, 0.5f, 0f));
+            Component bodyContact = CreateGroundEnemy(new Vector3(0f, 0.5f, 0f));
             Physics.SyncTransforms();
             Invoke(timer, "BeginRun");
-            object contacts = player.GetType().GetField("groundSlamContacts",
-                BindingFlags.NonPublic | BindingFlags.Instance).GetValue(player);
-            contacts.GetType().GetMethod("Add").Invoke(contacts, new object[] { outOfRange });
-            Invoke(player, "ResolveGroundSlamImpact");
+            player.GetType().GetField("isGroundSlamming",
+                BindingFlags.NonPublic | BindingFlags.Instance).SetValue(player, true);
+            Invoke(player, "ResolveEnemyContact", bodyContact.GetComponent<Collider>(), false, false, false);
             Assert.IsTrue(IsGameOver(timer));
             Assert.IsFalse((bool)inRange.GetType().GetProperty("IsKilled").GetValue(inRange));
             Assert.AreEqual(0, (int)run.GetType().GetProperty("CurrentScore").GetValue(run));
+            yield return new ExitPlayMode();
+        }
+
+        [UnityTest]
+        public IEnumerator HighSlamHeadLandingStompsWithoutPassingThroughOrAoe()
+        {
+            yield return new EnterPlayMode();
+            CreateFloor();
+            Component timer = new GameObject("Timer").AddComponent(Find("GameTimer"));
+            Component run = new GameObject("Run").AddComponent(Find("RunManager"));
+            Component player = CreatePlayer(new Vector3(0f, 7f, 0f));
+            Component head = CreateGroundEnemy(new Vector3(0f, 0.5f, 2f));
+            Component nearby = CreateGroundEnemy(new Vector3(2.5f, 0.5f, 2f));
+            Physics.SyncTransforms();
+            float top = head.GetComponent<Collider>().bounds.max.y;
+            Invoke(timer, "BeginRun");
+            Invoke(player, "RequestSlide");
+            Assert.IsTrue((bool)player.GetType().GetField("isGroundSlamming",
+                BindingFlags.NonPublic | BindingFlags.Instance).GetValue(player));
+            int frames = 0;
+            while (!(bool)head.GetType().GetProperty("IsKilled").GetValue(head) && frames++ < 1000)
+            {
+                yield return null;
+                Assert.IsFalse(IsGameOver(timer));
+                Assert.GreaterOrEqual(player.GetComponent<CharacterController>().bounds.min.y, top - 0.01f,
+                    "The descending feet must never pass through the head.");
+            }
+            Assert.Less(frames, 1000);
+            Assert.IsFalse((bool)nearby.GetType().GetProperty("IsKilled").GetValue(nearby),
+                "Head landing must cancel the floor AOE.");
+            Assert.AreEqual(150, (int)run.GetType().GetProperty("CurrentScore").GetValue(run));
+            Assert.Greater((float)player.GetType().GetField("verticalSpeed",
+                BindingFlags.NonPublic | BindingFlags.Instance).GetValue(player), 0f);
+            Assert.IsFalse((bool)player.GetType().GetField("isGroundSlamming",
+                BindingFlags.NonPublic | BindingFlags.Instance).GetValue(player));
+            yield return new ExitPlayMode();
+        }
+
+        [UnityTest]
+        public IEnumerator LargeSlamStepStopsAtFirstHeadIncludingFootprintEdge()
+        {
+            yield return new EnterPlayMode();
+            CreateFloor();
+            Component timer = new GameObject("Timer").AddComponent(Find("GameTimer"));
+            Component run = new GameObject("Run").AddComponent(Find("RunManager"));
+            Component player = CreatePlayer(new Vector3(0.95f, 7f, 0f));
+            Component lower = CreateGroundEnemy(new Vector3(0f, 0.5f, 0f));
+            Component upper = CreateGroundEnemy(new Vector3(0f, 3f, 0f));
+            Physics.SyncTransforms();
+            Invoke(timer, "BeginRun");
+            Invoke(player, "RequestSlide");
+            Bounds before = player.GetComponent<CharacterController>().bounds;
+            Bounds after = before;
+            after.center += Vector3.down * 10f;
+            float upperTop = upper.GetComponent<Collider>().bounds.max.y;
+            Assert.IsTrue((bool)Invoke(player, "TryStompEnemy", before, after));
+            Assert.IsTrue((bool)upper.GetType().GetProperty("IsKilled").GetValue(upper));
+            Assert.IsFalse((bool)lower.GetType().GetProperty("IsKilled").GetValue(lower));
+            Assert.GreaterOrEqual(player.GetComponent<CharacterController>().bounds.min.y, upperTop);
+            Assert.AreEqual(150, (int)run.GetType().GetProperty("CurrentScore").GetValue(run));
+            Assert.IsFalse(IsGameOver(timer));
+            yield return new ExitPlayMode();
+        }
+
+        [UnityTest]
+        public IEnumerator ObstacleAboveEnemyHeadStopsSlamWithoutStompOrShockwave()
+        {
+            yield return new EnterPlayMode();
+            CreateFloor();
+            Component timer = new GameObject("Timer").AddComponent(Find("GameTimer"));
+            Component run = new GameObject("Run").AddComponent(Find("RunManager"));
+            Component player = CreatePlayer(new Vector3(0f, 7f, 0f));
+            Component enemy = CreateGroundEnemy(new Vector3(0f, 0.5f, 0f));
+            Component platform = CreateObstacle(new Vector3(0f, 3f, 0f));
+            platform.transform.localScale = new Vector3(4f, 2f, 12f);
+            Physics.SyncTransforms();
+            Invoke(timer, "BeginRun");
+            Invoke(player, "RequestSlide");
+            Bounds before = player.GetComponent<CharacterController>().bounds;
+            Bounds after = before;
+            after.center += Vector3.down * 10f;
+            Assert.IsTrue((bool)Invoke(player, "TryStompEnemy", before, after));
+            Assert.IsFalse(IsGameOver(timer));
+            Assert.IsFalse((bool)enemy.GetType().GetProperty("IsKilled").GetValue(enemy));
+            Assert.IsFalse((bool)player.GetType().GetField("isGroundSlamming",
+                BindingFlags.NonPublic | BindingFlags.Instance).GetValue(player));
+            Assert.IsFalse((bool)player.GetType().GetField("hasGroundSlamImpacted",
+                BindingFlags.NonPublic | BindingFlags.Instance).GetValue(player));
+            Assert.IsTrue((bool)player.GetType().GetField("isGrounded",
+                BindingFlags.NonPublic | BindingFlags.Instance).GetValue(player));
+            Assert.GreaterOrEqual(player.GetComponent<CharacterController>().bounds.min.y, 3.9f);
+            Assert.AreEqual(0, (int)run.GetType().GetProperty("CurrentScore").GetValue(run));
+            yield return AdvanceSeconds(0.1f);
+            Assert.IsFalse(IsGameOver(timer));
             yield return new ExitPlayMode();
         }
 
@@ -408,6 +501,13 @@ namespace Deadline4Sec.AcceptanceTests
                 Invoke(run, "RecordEnemyKill", enemy, false);
             Assert.AreEqual(600, (int)run.GetType().GetProperty("CurrentScore").GetValue(run));
             Assert.AreEqual(5, (int)run.GetType().GetProperty("CurrentCombo").GetValue(run));
+            for (int i = 0; i < 5; i++) Invoke(run, "RecordEnemyKill", enemy, false);
+            Assert.AreEqual(1700, (int)run.GetType().GetProperty("CurrentScore").GetValue(run));
+            Assert.AreEqual(3, (int)run.GetType().GetProperty("ScoreMultiplier").GetValue(run));
+            for (int i = 0; i < 10; i++) Invoke(run, "RecordEnemyKill", enemy, false);
+            Assert.AreEqual(4800, (int)run.GetType().GetProperty("CurrentScore").GetValue(run));
+            Assert.AreEqual(20, (int)run.GetType().GetProperty("CurrentCombo").GetValue(run));
+            Assert.AreEqual(4, (int)run.GetType().GetProperty("ScoreMultiplier").GetValue(run));
             Assert.That((float)timer.GetType().GetProperty("RemainingTime").GetValue(timer),
                 Is.EqualTo(2.5f).Within(0.001f), "Score must not change survival time.");
             Invoke(timer, "ResetTimer");
@@ -415,7 +515,7 @@ namespace Deadline4Sec.AcceptanceTests
             Invoke(timer, "Tick", 4f);
             Assert.IsTrue(IsGameOver(timer));
             Invoke(run, "RecordEnemyKill", enemy, false);
-            Assert.AreEqual(600, (int)run.GetType().GetProperty("CurrentScore").GetValue(run),
+            Assert.AreEqual(4800, (int)run.GetType().GetProperty("CurrentScore").GetValue(run),
                 "Scoring must stop after Game Over.");
             yield return new ExitPlayMode();
         }
@@ -494,7 +594,7 @@ namespace Deadline4Sec.AcceptanceTests
             spawner.GetType().GetField("patternPrefabs",
                 BindingFlags.NonPublic | BindingFlags.Instance).SetValue(spawner, prefabs);
             Assert.AreEqual(0, spawner.transform.childCount,
-                "Pattern generation must wait until GO.");
+                "Title must wait for an explicit Start/intro preparation.");
             Invoke(timer, "BeginRun");
             yield return null;
             Assert.AreEqual(4, spawner.transform.childCount);

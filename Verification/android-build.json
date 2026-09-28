@@ -1,0 +1,15 @@
+{
+    "timestampUtc": "2026-09-27T14:38:29.2879069Z",
+    "unityVersion": "6000.3.7f1",
+    "result": "Succeeded",
+    "apk": "C:\\UnityProjects\\Deadline-4Sec\\Builds\\Android\\Deadline4Sec-Development.apk",
+    "applicationIdentifier": "com.UnityTechnologies.com.unity.template.urpblank",
+    "scenes": [
+        "Assets/Scenes/EndlessRun.unity"
+    ],
+    "apkSizeBytes": 123947220,
+    "totalBuildOutputSizeBytes": 2039321893,
+    "durationSeconds": 147.4537774,
+    "warnings": 3,
+    "errors": 0
+}

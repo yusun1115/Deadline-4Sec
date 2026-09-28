@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db023063c89efd14992d0ecf358a18f4, type: 3}
+  m_Name: TutorialCourse
+  m_EditorClassIdentifier: Assembly-CSharp::Deadline4Sec.TutorialCourseAssets
+  groundEnemy: {fileID: 2097064668027320917, guid: d0fd0ff4beb2a8c49b29319ab3972691, type: 3}
+  airEnemy: {fileID: 6018150547170071618, guid: 81341ad3c2f0725459e4f316d052e721, type: 3}
+  jumpObstacle: {fileID: 8406721521335497708, guid: 6fccb001f4daf874ca7dd7c5a22b47c6, type: 3}
+  slideObstacle: {fileID: 455918065397298697, guid: 5cf34877ff063b64e82140e062f18a22, type: 3}
+  laneObstacle: {fileID: 6534274263350961315, guid: 0e125d2dadc216b4e89791b16a6a5d8f, type: 3}
+  floorMaterial: {fileID: 2100000, guid: 94390fe198dbf1e4fb684990cb3ab5f5, type: 2}

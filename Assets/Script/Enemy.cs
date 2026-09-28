@@ -15,7 +15,7 @@ namespace Deadline4Sec
         public bool IsKilled => isKilled;
         public EnemyType Type => enemyType;
 
-        public bool IsInStompPath(Bounds playerBounds, float projectedZ)
+        public bool IsInStompPath(Bounds playerBounds, float projectedX, float projectedZ)
         {
             Collider body = GetComponent<Collider>();
             if (isKilled || body == null || !body.enabled)
@@ -30,59 +30,38 @@ namespace Deadline4Sec
                 playerBounds.extents.x;
             float halfDepth = enemyBounds.extents.z * stompDetectionWidthMultiplier +
                 playerBounds.extents.z;
-            return Mathf.Abs(playerBounds.center.x - enemyBounds.center.x) <= halfWidth &&
+            return Mathf.Abs(projectedX - enemyBounds.center.x) <= halfWidth &&
                 Mathf.Abs(projectedZ - enemyBounds.center.z) <= halfDepth;
         }
 
         public bool IsValidStomp(Bounds beforePlayer, Bounds afterPlayer)
         {
-            if (isKilled)
-                return false;
-
-            Collider body = GetComponent<Collider>();
-            if (body == null)
-                return false;
-
-            Bounds enemyBounds = body.bounds;
-            float top = enemyBounds.max.y;
-            float previousFeet = beforePlayer.min.y;
-            float currentFeet = afterPlayer.min.y;
-            float lowerTolerance = Mathf.Min(0.15f, stompDetectionHeight * 0.25f);
-            if (beforePlayer.center.y <= top || previousFeet < top - lowerTolerance ||
-                currentFeet > top + stompDetectionHeight || currentFeet >= previousFeet)
-                return false;
-
-            float crossingTime = Mathf.Clamp01(
-                (previousFeet - (top + stompDetectionHeight)) / (previousFeet - currentFeet));
-            Vector3 centerAtZone = Vector3.Lerp(beforePlayer.center, afterPlayer.center, crossingTime);
-            float halfWidth = enemyBounds.extents.x * stompDetectionWidthMultiplier;
-            float halfDepth = enemyBounds.extents.z * stompDetectionWidthMultiplier;
-            return Mathf.Abs(centerAtZone.x - enemyBounds.center.x) <= halfWidth &&
-                Mathf.Abs(centerAtZone.z - enemyBounds.center.z) <= halfDepth;
+            return TryGetStompContact(beforePlayer, afterPlayer, out _, out _);
         }
 
-        public bool IsValidGroundSlamStomp(Bounds beforePlayer, Bounds afterPlayer)
+        public bool TryGetStompContact(Bounds beforePlayer, Bounds afterPlayer,
+            out float crossingTime, out float top)
         {
+            crossingTime = 0f;
+            top = 0f;
             if (isKilled)
                 return false;
 
             Collider body = GetComponent<Collider>();
-            if (body == null)
+            if (body == null || !body.enabled)
                 return false;
 
             Bounds enemyBounds = body.bounds;
-            float top = enemyBounds.max.y;
+            top = enemyBounds.max.y;
             float previousFeet = beforePlayer.min.y;
             float currentFeet = afterPlayer.min.y;
             if (currentFeet >= previousFeet || beforePlayer.center.y <= top ||
-                previousFeet < top - 0.25f || currentFeet > top + stompDetectionHeight)
+                previousFeet < top - 0.1f || currentFeet > top + 0.02f)
                 return false;
 
-            // Ground Slam can cross the complete head zone in one frame. Test the
-            // swept feet segment at the actual top plane and include the player's
-            // footprint so a visible edge landing is not lost to tunnelling.
+            // Both Fast Fall and Slam use the same swept head plane and footprint.
             float denominator = previousFeet - currentFeet;
-            float crossingTime = denominator > Mathf.Epsilon
+            crossingTime = denominator > Mathf.Epsilon
                 ? Mathf.Clamp01((previousFeet - top) / denominator)
                 : 0f;
             Vector3 centerAtTop = Vector3.Lerp(beforePlayer.center,

@@ -51,6 +51,11 @@ namespace Deadline4Sec
         [SerializeField, Min(0.01f)] private float homingFovDuration = 0.12f;
 
         private Vector3 baseLocalPosition;
+        private Quaternion baseLocalRotation;
+        private bool introActive;
+        private float introElapsed;
+        private float introDuration;
+        private readonly Vector3 introSidePosition = new Vector3(6f, 2.4f, -0.5f);
         private float shakeIntensity;
         private float shakeTimeRemaining;
         private float shakeInitialDuration;
@@ -73,6 +78,7 @@ namespace Deadline4Sec
         private AudioClip warningClip;
         private AudioClip gameOverClip;
         private AudioClip uiClip;
+        private CombatVisualFeedback visualFeedback;
 
         private void Awake()
         {
@@ -84,11 +90,15 @@ namespace Deadline4Sec
                 gameFlow = FindFirstObjectByType<GameFlowManager>();
 
             baseLocalPosition = transform.localPosition;
+            baseLocalRotation = transform.localRotation;
             noiseSeedX = 17.31f;
             noiseSeedY = 93.77f;
             if (targetCamera != null)
                 targetCamera.fieldOfView = baseSpeedFov;
             SetupAudio();
+            visualFeedback = GetComponent<CombatVisualFeedback>();
+            if (visualFeedback == null)
+                visualFeedback = gameObject.AddComponent<CombatVisualFeedback>();
         }
 
         private void Update()
@@ -123,6 +133,17 @@ namespace Deadline4Sec
 
         private void LateUpdate()
         {
+            if (introActive)
+            {
+                introElapsed += Mathf.Min(Time.unscaledDeltaTime, 0.05f);
+                float blend = Mathf.SmoothStep(0f, 1f,
+                    Mathf.Clamp01(introElapsed / introDuration));
+                Quaternion sideRotation = Quaternion.LookRotation(
+                    new Vector3(0f, 1f, 0f) - introSidePosition, Vector3.up);
+                transform.localPosition = Vector3.Lerp(introSidePosition, baseLocalPosition, blend);
+                transform.localRotation = Quaternion.Slerp(sideRotation, baseLocalRotation, blend);
+                return;
+            }
             if (gameFlow == null || !gameFlow.IsPlaying || shakeTimeRemaining <= 0f)
             {
                 transform.localPosition = baseLocalPosition;
@@ -137,10 +158,30 @@ namespace Deadline4Sec
                 new Vector3(x, y, 0f) * shakeIntensity * fade;
         }
 
-        public void PlayEnemyKill(string attackName)
+        public void BeginRunIntro(float duration)
+        {
+            introActive = true;
+            introElapsed = 0f;
+            introDuration = Mathf.Max(0.1f, duration);
+            transform.localPosition = introSidePosition;
+            transform.localRotation = Quaternion.LookRotation(
+                new Vector3(0f, 1f, 0f) - introSidePosition, Vector3.up);
+        }
+
+        public void CompleteRunIntro()
+        {
+            introActive = false;
+            transform.localPosition = baseLocalPosition;
+            transform.localRotation = baseLocalRotation;
+        }
+
+        public void PlayEnemyKill(string attackName, Vector3 impactPoint)
         {
             if (!CanPlayFeedback())
                 return;
+
+            visualFeedback.PlayKill(impactPoint, attackName == "Stomp Attack",
+                attackName == "Homing Dash Attack");
 
             if (attackName == "Stomp Attack")
             {
@@ -165,31 +206,34 @@ namespace Deadline4Sec
             }
         }
 
-        public void PlayHomingStart()
+        public void PlayHomingStart(Vector3 start, Vector3 target)
         {
             if (!CanPlayFeedback())
                 return;
             PlayFovPulse(homingFovBoost, homingFovDuration);
+            visualFeedback.PlayHoming(start, target);
             PlaySound(homingClip);
         }
 
-        public void PlayGroundSlamImpact()
+        public void PlayGroundSlamImpact(Vector3 point, float radius)
         {
             if (!CanPlayFeedback())
                 return;
 
             PlayShake(groundSlamShake);
+            visualFeedback.PlaySlam(point, radius);
             PlayHitStop(groundSlamHitStop);
             PlayFovPulse(groundSlamFovKick, groundSlamFovDuration);
             PlaySound(slamClip);
             Vibrate(90, 220);
         }
 
-        public void PlayNearMiss()
+        public void PlayNearMiss(Vector3 point)
         {
             if (CanPlayFeedback())
             {
                 PlayShake(nearMissShake);
+                visualFeedback.PlayNearMiss(point);
                 PlaySound(nearMissClip);
                 Vibrate(15, 45);
             }
@@ -297,6 +341,9 @@ namespace Deadline4Sec
 
         public void StopAllFeedback()
         {
+            if (visualFeedback != null)
+                visualFeedback.Clear();
+            CompleteRunIntro();
             shakeTimeRemaining = 0f;
             shakeIntensity = 0f;
             shakeInitialDuration = 0f;

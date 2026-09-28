@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -10,6 +11,15 @@ namespace Deadline4Sec
     [RequireComponent(typeof(CharacterController))]
     public sealed class PlayerController : MonoBehaviour
     {
+        public enum PlayerAction { Left, Right, Jump, Slide, Homing, FastFall, SlamStart, SlamImpact }
+        public event Action<PlayerAction> ActionPerformed;
+        public event Action<Enemy, string> EnemyKilled;
+        public event Action<int> SlamResolved;
+        public int LaneIndex => laneIndex;
+        public bool IsGrounded => isGrounded;
+        public bool IsSliding => isSliding;
+        public bool IsHoming => isHomingDash;
+        public bool IsFastFalling => isFastFalling;
         [Header("Forward movement")]
         [SerializeField, Min(0f)] private float forwardSpeed = 11.2f;
         private float runForwardSpeed = -1f;
@@ -98,7 +108,6 @@ namespace Deadline4Sec
         private readonly RaycastHit[] groundDetectionHits = new RaycastHit[24];
         private readonly Collider[] groundSlamHits = new Collider[64];
         private readonly HashSet<Enemy> groundSlamEnemies = new HashSet<Enemy>();
-        private readonly HashSet<Enemy> groundSlamContacts = new HashSet<Enemy>();
         private readonly Dictionary<Obstacle, bool> obstacleContacts = new Dictionary<Obstacle, bool>();
         private float obstacleMoveStartFeet;
         private float obstacleMoveY;
@@ -115,6 +124,7 @@ namespace Deadline4Sec
         private Quaternion standingVisualRotation;
         private Vector3 standingVisualPosition;
         private CameraFeedbackController cameraFeedback;
+        private GameFlowManager gameFlow;
 
         private void Awake()
         {
@@ -142,6 +152,7 @@ namespace Deadline4Sec
             if (runManager == null)
                 runManager = FindFirstObjectByType<RunManager>();
             cameraFeedback = FindFirstObjectByType<CameraFeedbackController>();
+            gameFlow = gameTimer != null ? gameTimer.GetComponent<GameFlowManager>() : null;
         }
 
         private void Start()
@@ -194,6 +205,14 @@ namespace Deadline4Sec
                 verticalSpeed * Time.deltaTime,
                 (runForwardSpeed >= 0f ? runForwardSpeed : forwardSpeed) * Time.deltaTime);
 
+            // Intercept the swept feet before moving through trigger-only bodies.
+            // Head contact has priority even when this descent began as a Slam.
+            Bounds projectedBounds = contactBounds;
+            projectedBounds.center += movement;
+            if (isFastFalling && movement.y < 0f &&
+                TryStompEnemy(contactBounds, projectedBounds))
+                return;
+
             CollisionFlags collisions = MoveWithObstacleCheck(movement, out bool landedOnObstacle);
             if (gameTimer != null && gameTimer.IsGameOver)
                 return;
@@ -203,12 +222,6 @@ namespace Deadline4Sec
             if ((collisions & CollisionFlags.Above) != 0 && verticalSpeed > 0f)
                 verticalSpeed = 0f;
 
-            // A committed Ground Slam resolves at the floor so all enemies in its
-            // impact area are handled together. Only a regular Fast Fall stomps.
-            if (isFastFalling && !isGroundSlamming && movement.y < 0f &&
-                TryStompEnemy(contactBounds, characterController.bounds))
-                return;
-
             if (isGroundSlamming && isGrounded && !hasGroundSlamImpacted)
             {
                 if (landedOnObstacle)
@@ -216,9 +229,13 @@ namespace Deadline4Sec
                     isGroundSlamming = false;
                     isFastFalling = false;
                     pendingGroundSlide = false;
-                    groundSlamContacts.Clear();
                     return;
                 }
+                CheckEnemyContact(contactBounds,
+                    characterController.bounds.center - contactBounds.center,
+                    false, false, false);
+                if (gameTimer != null && gameTimer.IsGameOver)
+                    return;
                 ResolveGroundSlamImpact();
                 return;
             }
@@ -284,7 +301,6 @@ namespace Deadline4Sec
             pendingGroundSlide = false;
             isGroundSlamming = false;
             hasGroundSlamImpacted = false;
-            groundSlamContacts.Clear();
             EndSlide();
         }
 
@@ -324,6 +340,48 @@ namespace Deadline4Sec
             runForwardSpeed = Mathf.Max(0f, speed);
         }
 
+        public void AdvanceRunIntro(float delta, float speed, float progress)
+        {
+            // Controller stays disabled for gameplay; only the cinematic moves it.
+            characterController.Move(new Vector3(0f, -2f * delta, speed * delta));
+            if (visualTransform != null)
+            {
+                float fade = 1f - Mathf.SmoothStep(0f, 1f, Mathf.Clamp01((progress - 0.8f) / 0.2f));
+                visualTransform.localRotation = standingVisualRotation * Quaternion.Euler(8f * fade, 0f, 0f);
+                visualTransform.localPosition = standingVisualPosition +
+                    Vector3.up * (Mathf.Abs(Mathf.Sin(Time.unscaledTime * 16f)) * 0.035f * fade);
+            }
+        }
+
+        public void EndRunIntro()
+        {
+            if (visualTransform != null)
+            {
+                visualTransform.localRotation = standingVisualRotation;
+                visualTransform.localPosition = standingVisualPosition;
+            }
+        }
+
+        public void ResetPracticePose(Vector3 position, int initialLane = 0)
+        {
+            enabled = false;
+            characterController.enabled = false;
+            laneIndex = Mathf.Clamp(initialLane, -1, 1);
+            position.x = centerX + laneIndex * laneWidth;
+            transform.position = position;
+            characterController.enabled = true;
+            verticalSpeed = -2f;
+            isGrounded = true;
+            lastJumpActionFrame = lastLaneRequestFrame = lastSlideRequestFrame = -1;
+            lastLaneInputTime = lastAirJumpTime = float.NegativeInfinity;
+            preferredAirDashDirection = 0;
+            EndRunIntro();
+        }
+
+        private bool CanReceiveInput => isActiveAndEnabled &&
+            (gameTimer == null || !gameTimer.IsGameOver) &&
+            (gameFlow == null || gameFlow.CanReceiveInput);
+
         public void RequestMoveLeft()
         {
             RequestLaneChange(-1);
@@ -357,7 +415,7 @@ namespace Deadline4Sec
 
         public void ChangeLane(int direction)
         {
-            if (!isActiveAndEnabled || (gameTimer != null && gameTimer.IsGameOver))
+            if (!CanReceiveInput)
                 return;
 
             if (direction == 0)
@@ -374,6 +432,7 @@ namespace Deadline4Sec
                 attackTimeRemaining = attackDuration;
                 if (cameraFeedback != null)
                     cameraFeedback.PlayMovement();
+                ActionPerformed?.Invoke(direction > 0 ? PlayerAction.Right : PlayerAction.Left);
             }
 
             // After an airborne kill, a directional swipe chains directly to the
@@ -453,7 +512,8 @@ namespace Deadline4Sec
                 attackName != "Stomp Attack")
                 airComboReady = true;
             if (cameraFeedback != null)
-                cameraFeedback.PlayEnemyKill(attackName);
+                cameraFeedback.PlayEnemyKill(attackName, enemy.transform.position);
+            EnemyKilled?.Invoke(enemy, attackName);
             return true;
         }
 
@@ -484,31 +544,56 @@ namespace Deadline4Sec
                 sweptBounds.extents + new Vector3(2f, 1f, 2f),
                 Quaternion.identity, ~0, QueryTriggerInteraction.Collide);
 
+            Enemy firstEnemy = null;
+            float firstFraction = float.PositiveInfinity;
+            float headY = 0f;
             foreach (Collider hit in hits)
             {
                 if (hit.GetComponent<EnemyAttackZone>() != null)
                     continue;
                 Enemy enemy = hit.GetComponentInParent<Enemy>();
-                bool validStomp = enemy != null && (isGroundSlamming
-                    ? enemy.IsValidGroundSlamStomp(beforeMove, afterMove)
-                    : enemy.IsValidStomp(beforeMove, afterMove));
-                if (!validStomp ||
-                    !TryKillEnemy(enemy, "Stomp Attack"))
+                if (enemy == null || !enemy.TryGetStompContact(beforeMove, afterMove,
+                    out float fraction, out float top) || fraction >= firstFraction)
                     continue;
+                firstEnemy = enemy;
+                firstFraction = fraction;
+                headY = top;
+            }
+            if (firstEnemy == null)
+                return false;
 
-                isFastFalling = false;
+            Vector3 movement = (afterMove.center - beforeMove.center) * firstFraction;
+            // Stop just above the head; never apply the rest of this downward step.
+            movement.y = headY + 0.02f - beforeMove.min.y;
+            MoveWithObstacleCheck(movement, out bool landedOnObstacle);
+            if (gameTimer.IsGameOver)
+                return true;
+            if (landedOnObstacle)
+            {
+                isGrounded = true;
                 isGroundSlamming = false;
-                hasGroundSlamImpacted = false;
+                isFastFalling = false;
                 pendingGroundSlide = false;
                 airComboReady = false;
-                isGrounded = false;
-                verticalSpeed = stompBouncePower;
-                jumpAttackTimeRemaining = 0f;
-                StopAirDash();
-                lastAirJumpTime = float.NegativeInfinity;
+                verticalSpeed = -2f;
                 return true;
             }
-            return false;
+            if (characterController.bounds.min.y > headY + 0.15f)
+                return true;
+            if (!TryKillEnemy(firstEnemy, "Stomp Attack"))
+                return true;
+
+            isFastFalling = false;
+            isGroundSlamming = false;
+            hasGroundSlamImpacted = false;
+            pendingGroundSlide = false;
+            airComboReady = false;
+            isGrounded = false;
+            verticalSpeed = stompBouncePower;
+            jumpAttackTimeRemaining = 0f;
+            StopAirDash();
+            lastAirJumpTime = float.NegativeInfinity;
+            return true;
         }
 
         private Enemy FindAirTarget(int requiredSide = 0)
@@ -573,7 +658,8 @@ namespace Deadline4Sec
             airHomingElapsed = 0f;
             isHomingDash = true;
             if (cameraFeedback != null)
-                cameraFeedback.PlayHomingStart();
+                cameraFeedback.PlayHomingStart(characterController.bounds.center, GetAirTargetPoint(target));
+            ActionPerformed?.Invoke(PlayerAction.Homing);
             Debug.Log("Homing Dash Started");
             return true;
         }
@@ -775,17 +861,6 @@ namespace Deadline4Sec
             if (enemy == null || enemy.IsKilled)
                 return false;
 
-            if (isGroundSlamming)
-            {
-                if (CanGroundSlamHit(enemy))
-                {
-                    groundSlamContacts.Add(enemy);
-                    return false;
-                }
-                gameTimer.TriggerGameOver();
-                return true;
-            }
-
             if ((laneAttackActive && TryKillContactEnemy(enemy, "Lane Attack")) ||
                 (jumpAttackActive && TryKillContactEnemy(enemy, "Jump Attack")) ||
                 (slideAttackActive && TryKillContactEnemy(enemy, "Slide Attack")))
@@ -827,9 +902,6 @@ namespace Deadline4Sec
             if (isHomingDash && airDashTarget == enemy)
                 return true;
 
-            if (isGroundSlamming && CanGroundSlamHit(enemy))
-                return true;
-
             if (CanStompOnCurrentTrajectory(enemy))
                 return true;
 
@@ -850,7 +922,7 @@ namespace Deadline4Sec
 
         private bool CanStompOnCurrentTrajectory(Enemy enemy)
         {
-            if (!isFastFalling || isGroundSlamming || verticalSpeed >= 0f ||
+            if (!isFastFalling || verticalSpeed >= 0f ||
                 gameTimer == null || !gameTimer.IsRunning)
                 return false;
 
@@ -863,27 +935,10 @@ namespace Deadline4Sec
             float secondsToHead = feetAboveHead / Mathf.Max(0.1f, -verticalSpeed);
             float forward = runForwardSpeed >= 0f ? runForwardSpeed : forwardSpeed;
             float projectedZ = playerBounds.center.z + forward * secondsToHead;
-            return enemy.IsInStompPath(playerBounds, projectedZ);
-        }
-
-        private bool CanGroundSlamHit(Enemy enemy)
-        {
-            if (enemy == null || enemy.IsKilled ||
-                !TryGetGroundDistance(out float distance, out Vector3 groundPoint))
-                return false;
-
-            float forward = runForwardSpeed >= 0f ? runForwardSpeed : forwardSpeed;
-            float fallTime = distance / groundSlamFallSpeed;
-            Vector3 expectedImpact = groundPoint + Vector3.forward * forward * fallTime;
-            Collider body = enemy.GetComponent<Collider>();
-            if (body == null || !body.enabled)
-                return false;
-            if (enemy.Type == Enemy.EnemyType.Air &&
-                body.bounds.min.y - expectedImpact.y > groundSlamAttackHeight)
-                return false;
-
-            return Vector3.Distance(body.ClosestPoint(expectedImpact), expectedImpact) <=
-                groundSlamRadius;
+            float targetX = centerX + laneIndex * laneWidth;
+            float projectedX = Mathf.MoveTowards(playerBounds.center.x, targetX,
+                laneChangeSpeed * Mathf.Max(0f, secondsToHead));
+            return enemy.IsInStompPath(playerBounds, projectedX, projectedZ);
         }
 
         private void OnDrawGizmosSelected()
@@ -953,7 +1008,7 @@ namespace Deadline4Sec
 
         public void Jump()
         {
-            if (!isActiveAndEnabled || (gameTimer != null && gameTimer.IsGameOver))
+            if (!CanReceiveInput)
                 return;
             if (isHomingDash)
                 return;
@@ -969,6 +1024,7 @@ namespace Deadline4Sec
                 Debug.Log("Normal Jump");
                 if (cameraFeedback != null)
                     cameraFeedback.PlayMovement();
+                ActionPerformed?.Invoke(PlayerAction.Jump);
             }
             else
             {
@@ -981,7 +1037,7 @@ namespace Deadline4Sec
 
         public void Slide()
         {
-            if (!isActiveAndEnabled || (gameTimer != null && gameTimer.IsGameOver))
+            if (!CanReceiveInput)
                 return;
 
             if (isGrounded)
@@ -997,10 +1053,10 @@ namespace Deadline4Sec
                 {
                     isGroundSlamming = true;
                     hasGroundSlamImpacted = false;
-                    groundSlamContacts.Clear();
                     pendingGroundSlide = false;
                     isFastFalling = true;
                     verticalSpeed = -groundSlamFallSpeed;
+                    ActionPerformed?.Invoke(PlayerAction.SlamStart);
                     if (showGroundSlamDebug)
                     {
                         Debug.Log($"Ground Slam Available | Height: {groundDistance:F2}");
@@ -1014,6 +1070,7 @@ namespace Deadline4Sec
                     pendingGroundSlide = true;
                     isFastFalling = true;
                     verticalSpeed = Mathf.Min(verticalSpeed, -fastFallSpeed);
+                    ActionPerformed?.Invoke(PlayerAction.FastFall);
                 }
                 if (cameraFeedback != null)
                     cameraFeedback.PlayMovement();
@@ -1092,24 +1149,6 @@ namespace Deadline4Sec
                 groundSlamEnemies.Add(enemy);
             }
 
-            // Validate all contacts before granting any reward. A body touched
-            // outside the actual impact area must still end the run.
-            bool invalidContact = false;
-            foreach (Enemy contacted in groundSlamContacts)
-            {
-                if (contacted == null || contacted.IsKilled ||
-                    groundSlamEnemies.Contains(contacted))
-                    continue;
-                invalidContact = true;
-                break;
-            }
-            groundSlamContacts.Clear();
-            if (invalidContact)
-            {
-                gameTimer.TriggerGameOver();
-                return;
-            }
-
             int killedCount = 0;
             foreach (Enemy enemy in groundSlamEnemies)
             {
@@ -1128,7 +1167,7 @@ namespace Deadline4Sec
             if (showGroundSlamDebug)
                 Debug.Log($"Ground Slam Hit: {killedCount} Enemies");
             if (cameraFeedback != null)
-                cameraFeedback.PlayGroundSlamImpact();
+                cameraFeedback.PlayGroundSlamImpact(lastGroundSlamImpactPoint, groundSlamRadius);
 
             isGroundSlamming = false;
             isFastFalling = false;
@@ -1138,6 +1177,8 @@ namespace Deadline4Sec
             jumpAttackTimeRemaining = 0f;
             verticalSpeed = groundSlamBouncePower;
             lastAirJumpTime = float.NegativeInfinity;
+            ActionPerformed?.Invoke(PlayerAction.SlamImpact);
+            SlamResolved?.Invoke(killedCount);
             if (showGroundSlamDebug)
                 Debug.Log("Ground Slam Bounce");
         }
@@ -1148,6 +1189,7 @@ namespace Deadline4Sec
             slideTimeRemaining = slideDuration;
             SetSlideColliders(true);
             SetSlideVisual(true);
+            ActionPerformed?.Invoke(PlayerAction.Slide);
             if (cameraFeedback != null)
                 cameraFeedback.PlayMovement();
         }
