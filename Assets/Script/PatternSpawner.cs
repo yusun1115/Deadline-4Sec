@@ -18,7 +18,7 @@ namespace Deadline4Sec
         [SerializeField, Min(0f)] private float cleanupDistance = 25f;
         [SerializeField, Range(0.5f, 4f)] private float maxOpportunityGapSeconds = 3.5f;
 
-        [Header("Difficulty by expected arrival time")]
+        [Header("Difficulty unlock by run time")]
         [SerializeField, Min(0f)] private float mediumStartsAtSeconds = 20f;
         [SerializeField, Min(0f)] private float hardStartsAtSeconds = 45f;
 
@@ -80,6 +80,33 @@ namespace Deadline4Sec
             EnsurePatternsAhead();
         }
 
+        public void PrepareOpeningPatterns(float expectedGoZ)
+        {
+            if (activePatterns.Count > 0 || player == null)
+                return;
+
+            // Show the opening course throughout the intro, with at least 1.5s
+            // to read its first threat after Go (before its local object offset).
+            float speed = runManager != null ? runManager.BaseForwardSpeed : 10.2f;
+            nextStartZ = Mathf.Max(nextStartZ, expectedGoZ + speed * 1.5f);
+            if (createFloorUnderPatterns)
+            {
+                GameObject floor = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                floor.name = "Opening Runway";
+                float start = player.transform.position.z - 5f;
+                floor.transform.position = new Vector3(transform.position.x,
+                    floorTopY - floorThickness * 0.5f, (start + nextStartZ) * 0.5f);
+                floor.transform.localScale = new Vector3(floorWidth, floorThickness, nextStartZ - start);
+                floor.transform.SetParent(transform, true);
+                ApplyFloorMaterial(floor.GetComponent<Renderer>());
+            }
+            // Initial gap validation is measured from Go, excluding cinematic travel.
+            openingGoZ = expectedGoZ;
+            EnsurePatternsAhead();
+        }
+
+        private float? openingGoZ;
+
         private void CleanupPassedPatterns()
         {
             while (activePatterns.Count > 0 &&
@@ -117,14 +144,17 @@ namespace Deadline4Sec
 
         private CoursePattern ChooseNextPattern()
         {
-            float speed = runManager != null ? Mathf.Max(0.1f, runManager.CurrentForwardSpeed) : 10.2f;
+            float speed = runManager != null ? Mathf.Max(runManager.BaseForwardSpeed, runManager.CurrentForwardSpeed) : 10.2f;
             float currentTime = runManager != null ? runManager.CurrentRunTime : 0f;
             float arrivalTime = currentTime +
                 Mathf.Max(0f, nextStartZ - player.transform.position.z) / speed;
 
             int minimumDifficulty = arrivalTime >= hardStartsAtSeconds ? 1 : 0;
-            int maximumDifficulty = arrivalTime >= hardStartsAtSeconds ? 2 :
-                arrivalTime >= mediumStartsAtSeconds ? 1 : 0;
+            // Homing can reach queued patterns much sooner than an auto-run
+            // estimate. Unlock new tiers only after the actual run threshold;
+            // retain the estimate to phase Easy out of the queued course.
+            int maximumDifficulty = currentTime >= hardStartsAtSeconds ? 2 :
+                currentTime >= mediumStartsAtSeconds ? 1 : 0;
 
             CollectCandidates(minimumDifficulty, maximumDifficulty, true);
             return candidates.Count == 0 ? null : candidates[random.Next(candidates.Count)];
@@ -160,7 +190,7 @@ namespace Deadline4Sec
             next.CollectOpportunityPositions(opportunityPositions);
             if (opportunityPositions.Count == 0)
                 return false;
-            float speed = runManager != null ? Mathf.Max(0.1f, runManager.CurrentForwardSpeed) : 10.2f;
+            float speed = runManager != null ? Mathf.Max(runManager.BaseForwardSpeed, runManager.CurrentForwardSpeed) : 10.2f;
             float maximumGap = maxOpportunityGapSeconds * speed;
             if (previousPrefab != null)
             {
@@ -168,7 +198,7 @@ namespace Deadline4Sec
                     previousPrefab.PatternLength - previousLast + opportunityPositions[0] > maximumGap)
                     return false;
             }
-            else if (Mathf.Max(0f, nextStartZ - player.transform.position.z) +
+            else if (Mathf.Max(0f, nextStartZ - (openingGoZ ?? player.transform.position.z)) +
                      opportunityPositions[0] > maximumGap)
             {
                 return false;

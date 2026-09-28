@@ -1,0 +1,1893 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="35" result="Passed" total="35" passed="35" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-09-27 09:58:31Z" end-time="2026-09-27 09:58:34Z" duration="2.3142318">
+  <test-suite type="TestSuite" id="1000" name="Deadline-4Sec" fullname="Deadline-4Sec" runstate="Runnable" testcasecount="37" result="Passed" start-time="2026-09-27 09:58:31Z" end-time="2026-09-27 09:58:34Z" duration="2.314232" total="35" passed="35" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <test-suite type="Assembly" id="1044" name="Deadline4Sec.AcceptanceTests.dll" fullname="C:/UnityProjects/Deadline-4Sec/ValidationProject/Library/ScriptAssemblies/Deadline4Sec.AcceptanceTests.dll" runstate="Runnable" testcasecount="35" result="Passed" start-time="2026-09-27 09:58:32Z" end-time="2026-09-27 09:58:34Z" duration="2.220082" total="35" passed="35" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="10116" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestSuite" id="1045" name="Deadline4Sec" fullname="Deadline4Sec" runstate="Runnable" testcasecount="35" result="Passed" start-time="2026-09-27 09:58:32Z" end-time="2026-09-27 09:58:34Z" duration="2.218953" total="35" passed="35" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1046" name="AcceptanceTests" fullname="Deadline4Sec.AcceptanceTests" runstate="Runnable" testcasecount="35" result="Passed" start-time="2026-09-27 09:58:32Z" end-time="2026-09-27 09:58:34Z" duration="2.217807" total="35" passed="35" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestFixture" id="1005" name="CourseReplayAcceptanceTests" fullname="Deadline4Sec.AcceptanceTests.CourseReplayAcceptanceTests" classname="Deadline4Sec.AcceptanceTests.CourseReplayAcceptanceTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-09-27 09:55:05Z" end-time="2026-09-27 09:55:21Z" duration="15.798805" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1006" name="FixedSeedProductionCourseHasAPlayableSixtySecondRoute" fullname="Deadline4Sec.AcceptanceTests.CourseReplayAcceptanceTests.FixedSeedProductionCourseHasAPlayableSixtySecondRoute" methodname="FixedSeedProductionCourseHasAPlayableSixtySecondRoute" classname="Deadline4Sec.AcceptanceTests.CourseReplayAcceptanceTests" runstate="Runnable" seed="1048740125" result="Passed" start-time="2026-09-27 09:54:37Z" end-time="2026-09-27 09:54:59Z" duration="22.127901" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[Spawn Pattern: Pattern_A_LaneAttack | Easy
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+Spawn Pattern: Pattern_A_LaneAttack | Easy
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Spawn Pattern: Pattern_A_LaneAttack | Easy
+Normal Jump
+NEAR MISS! [01 Jump / Near Miss]
+Timer Reset by Near Miss
+Normal Jump
+NEAR MISS! [03 Jump / Near Miss]
+Timer Reset by Near Miss
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Spawn Pattern: Pattern_A_LaneAttack | Easy
+Normal Jump
+NEAR MISS! [01 Jump / Near Miss]
+Timer Reset by Near Miss
+Normal Jump
+NEAR MISS! [03 Jump / Near Miss]
+Timer Reset by Near Miss
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Spawn Pattern: Pattern_A_LaneAttack | Easy
+Normal Jump
+NEAR MISS! [01 Jump / Near Miss]
+Timer Reset by Near Miss
+Normal Jump
+NEAR MISS! [03 Jump / Near Miss]
+Timer Reset by Near Miss
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Spawn Pattern: Pattern_A_LaneAttack | Easy
+Normal Jump
+NEAR MISS! [01 Jump / Near Miss]
+Timer Reset by Near Miss
+Normal Jump
+NEAR MISS! [03 Jump / Near Miss]
+Timer Reset by Near Miss
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Spawn Pattern: Pattern_A_LaneAttack | Easy
+Normal Jump
+NEAR MISS! [01 Jump / Near Miss]
+Timer Reset by Near Miss
+Normal Jump
+NEAR MISS! [03 Jump / Near Miss]
+Timer Reset by Near Miss
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Spawn Pattern: Pattern_A_LaneAttack | Easy
+Normal Jump
+NEAR MISS! [01 Jump / Near Miss]
+Timer Reset by Near Miss
+Normal Jump
+NEAR MISS! [03 Jump / Near Miss]
+Timer Reset by Near Miss
+Spawn Pattern: Pattern_C_AirCombo | Medium
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Spawn Pattern: Pattern_D_Stomp | Medium
+Normal Jump
+NEAR MISS! [01 Jump / Near Miss]
+Timer Reset by Near Miss
+Normal Jump
+NEAR MISS! [03 Jump / Near Miss]
+Timer Reset by Near Miss
+Spawn Pattern: Pattern_C_AirCombo | Medium
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Normal Jump
+Spawn Pattern: Pattern_D_Stomp | Medium
+Enemy Killed by Jump Attack
+Timer Reset by Kill
+Air Target Scan: 7 Air Enemy, 1 in front/range
+Air Target Found: 02 Dash Right
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 6 Air Enemy, 1 in front/range
+Air Target Found: 03 Dash Center
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 5 Air Enemy, 1 in front/range
+Air Target Found: 04 Dash Left
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Spawn Pattern: Pattern_C_AirCombo | Medium
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Air Target Scan: 8 Air Enemy, 1 in front/range
+Air Target Found: 01 Jump Attack
+Homing Dash Started
+Spawn Pattern: Pattern_D_Stomp | Medium
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 7 Air Enemy, 2 in front/range
+Air Target Found: 02 Dash Right
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 6 Air Enemy, 1 in front/range
+Air Target Found: 03 Dash Center
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 5 Air Enemy, 1 in front/range
+Air Target Found: 04 Dash Left
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Spawn Pattern: Pattern_C_AirCombo | Medium
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Air Target Scan: 8 Air Enemy, 1 in front/range
+Air Target Found: 01 Jump Attack
+Homing Dash Started
+Spawn Pattern: Pattern_D_Stomp | Medium
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 7 Air Enemy, 2 in front/range
+Air Target Found: 02 Dash Right
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 6 Air Enemy, 1 in front/range
+Air Target Found: 03 Dash Center
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 5 Air Enemy, 1 in front/range
+Air Target Found: 04 Dash Left
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Spawn Pattern: Pattern_C_AirCombo | Medium
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Air Target Scan: 8 Air Enemy, 1 in front/range
+Air Target Found: 01 Jump Attack
+Homing Dash Started
+Spawn Pattern: Pattern_D_Stomp | Medium
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 7 Air Enemy, 2 in front/range
+Air Target Found: 02 Dash Right
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 6 Air Enemy, 1 in front/range
+Air Target Found: 03 Dash Center
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 5 Air Enemy, 1 in front/range
+Air Target Found: 04 Dash Left
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Spawn Pattern: Pattern_C_AirCombo | Medium
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Air Target Scan: 8 Air Enemy, 1 in front/range
+Air Target Found: 01 Jump Attack
+Homing Dash Started
+Spawn Pattern: Pattern_D_Stomp | Medium
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 7 Air Enemy, 2 in front/range
+Air Target Found: 02 Dash Right
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 6 Air Enemy, 1 in front/range
+Air Target Found: 03 Dash Center
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 5 Air Enemy, 1 in front/range
+Air Target Found: 04 Dash Left
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Spawn Pattern: Pattern_C_AirCombo | Medium
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Air Target Scan: 8 Air Enemy, 1 in front/range
+Air Target Found: 01 Jump Attack
+Homing Dash Started
+Spawn Pattern: Pattern_D_Stomp | Medium
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 7 Air Enemy, 2 in front/range
+Air Target Found: 02 Dash Right
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 6 Air Enemy, 1 in front/range
+Air Target Found: 03 Dash Center
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 5 Air Enemy, 1 in front/range
+Air Target Found: 04 Dash Left
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Spawn Pattern: Pattern_C_AirCombo | Medium
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Air Target Scan: 8 Air Enemy, 1 in front/range
+Air Target Found: 01 Jump Attack
+Homing Dash Started
+Spawn Pattern: Pattern_D_Stomp | Medium
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 7 Air Enemy, 2 in front/range
+Air Target Found: 02 Dash Right
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 6 Air Enemy, 1 in front/range
+Air Target Found: 03 Dash Center
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 5 Air Enemy, 1 in front/range
+Air Target Found: 04 Dash Left
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Spawn Pattern: Pattern_C_AirCombo | Medium
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Air Target Scan: 8 Air Enemy, 1 in front/range
+Air Target Found: 01 Jump Attack
+Homing Dash Started
+Spawn Pattern: Pattern_D_Stomp | Medium
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 7 Air Enemy, 2 in front/range
+Air Target Found: 02 Dash Right
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 6 Air Enemy, 1 in front/range
+Air Target Found: 03 Dash Center
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 5 Air Enemy, 1 in front/range
+Air Target Found: 04 Dash Left
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Spawn Pattern: Pattern_C_AirCombo | Medium
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Air Target Scan: 8 Air Enemy, 1 in front/range
+Air Target Found: 01 Jump Attack
+Homing Dash Started
+Spawn Pattern: Pattern_D_Stomp | Medium
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 7 Air Enemy, 2 in front/range
+Air Target Found: 02 Dash Right
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 6 Air Enemy, 1 in front/range
+Air Target Found: 03 Dash Center
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 5 Air Enemy, 1 in front/range
+Air Target Found: 04 Dash Left
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Spawn Pattern: Pattern_C_AirCombo | Medium
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Air Target Scan: 8 Air Enemy, 1 in front/range
+Air Target Found: 01 Jump Attack
+Homing Dash Started
+Spawn Pattern: Pattern_D_Stomp | Medium
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 7 Air Enemy, 2 in front/range
+Air Target Found: 02 Dash Right
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 6 Air Enemy, 1 in front/range
+Air Target Found: 03 Dash Center
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 5 Air Enemy, 1 in front/range
+Air Target Found: 04 Dash Left
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Spawn Pattern: Pattern_C_AirCombo | Medium
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Air Target Scan: 8 Air Enemy, 1 in front/range
+Air Target Found: 01 Jump Attack
+Homing Dash Started
+Spawn Pattern: Pattern_D_Stomp | Medium
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 7 Air Enemy, 2 in front/range
+Air Target Found: 02 Dash Right
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 6 Air Enemy, 1 in front/range
+Air Target Found: 03 Dash Center
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 5 Air Enemy, 1 in front/range
+Air Target Found: 04 Dash Left
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Spawn Pattern: Pattern_C_AirCombo | Medium
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Air Target Scan: 8 Air Enemy, 1 in front/range
+Air Target Found: 01 Jump Attack
+Homing Dash Started
+Spawn Pattern: Pattern_E_MixedRisk | Hard
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 9 Air Enemy, 2 in front/range
+Air Target Found: 02 Dash Right
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 8 Air Enemy, 1 in front/range
+Air Target Found: 03 Dash Center
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 7 Air Enemy, 1 in front/range
+Air Target Found: 04 Dash Left
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Spawn Pattern: Pattern_C_AirCombo | Medium
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Air Target Scan: 10 Air Enemy, 1 in front/range
+Air Target Found: 01 Jump Attack
+Homing Dash Started
+Spawn Pattern: Pattern_D_Stomp | Medium
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 9 Air Enemy, 2 in front/range
+Air Target Found: 02 Dash Right
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 8 Air Enemy, 1 in front/range
+Air Target Found: 03 Dash Center
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 7 Air Enemy, 1 in front/range
+Air Target Found: 04 Dash Left
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 6 Air Enemy, 0 in front/range
+No Air Target Found
+Spawn Pattern: Pattern_C_AirCombo | Medium
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Air Target Scan: 10 Air Enemy, 2 in front/range
+Air Target Found: 03 Air Combo Start
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 9 Air Enemy, 1 in front/range
+Air Target Found: 04 Homing Right
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 8 Air Enemy, 0 in front/range
+No Air Target Found
+Air Target Scan: 8 Air Enemy, 0 in front/range
+No Air Target Found
+Normal Jump
+Spawn Pattern: Pattern_E_MixedRisk | Hard
+Air Target Scan: 10 Air Enemy, 2 in front/range
+Air Target Found: 01 Jump Attack
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 9 Air Enemy, 2 in front/range
+Air Target Found: 02 Dash Right
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 8 Air Enemy, 1 in front/range
+Air Target Found: 03 Dash Center
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 7 Air Enemy, 1 in front/range
+Air Target Found: 04 Dash Left
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Spawn Pattern: Pattern_C_AirCombo | Medium
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Air Target Scan: 10 Air Enemy, 1 in front/range
+Air Target Found: 01 Jump Attack
+Homing Dash Started
+Spawn Pattern: Pattern_D_Stomp | Medium
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 9 Air Enemy, 2 in front/range
+Air Target Found: 02 Dash Right
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 8 Air Enemy, 1 in front/range
+Air Target Found: 03 Dash Center
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 7 Air Enemy, 1 in front/range
+Air Target Found: 04 Dash Left
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 6 Air Enemy, 0 in front/range
+No Air Target Found
+Spawn Pattern: Pattern_E_MixedRisk | Hard
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Air Target Scan: 8 Air Enemy, 2 in front/range
+Air Target Found: 03 Air Combo Start
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 7 Air Enemy, 1 in front/range
+Air Target Found: 04 Homing Right
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 6 Air Enemy, 0 in front/range
+No Air Target Found
+Air Target Scan: 6 Air Enemy, 0 in front/range
+No Air Target Found
+Normal Jump
+Spawn Pattern: Pattern_C_AirCombo | Medium
+Air Target Scan: 10 Air Enemy, 3 in front/range
+Air Target Found: 01 Jump Attack
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 9 Air Enemy, 2 in front/range
+Air Target Found: 02 Dash Right
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 8 Air Enemy, 1 in front/range
+Air Target Found: 03 Dash Center
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 7 Air Enemy, 1 in front/range
+Air Target Found: 04 Dash Left
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Spawn Pattern: Pattern_E_MixedRisk | Hard
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Spawn Pattern: Pattern_C_AirCombo | Medium
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Air Target Scan: 12 Air Enemy, 2 in front/range
+Air Target Found: 03 Air Combo Start
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 11 Air Enemy, 1 in front/range
+Air Target Found: 04 Homing Right
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 10 Air Enemy, 0 in front/range
+No Air Target Found
+]]></output>
+            </test-case>
+            <test-case id="1007" name="ProductionCourseAlsoWorksAtThirtyFramesPerSecond" fullname="Deadline4Sec.AcceptanceTests.CourseReplayAcceptanceTests.ProductionCourseAlsoWorksAtThirtyFramesPerSecond" methodname="ProductionCourseAlsoWorksAtThirtyFramesPerSecond" classname="Deadline4Sec.AcceptanceTests.CourseReplayAcceptanceTests" runstate="Runnable" seed="428161979" result="Passed" start-time="2026-09-27 09:54:59Z" end-time="2026-09-27 09:55:21Z" duration="21.738195" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[Spawn Pattern: Pattern_A_LaneAttack | Easy
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+Spawn Pattern: Pattern_A_LaneAttack | Easy
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Spawn Pattern: Pattern_A_LaneAttack | Easy
+Normal Jump
+NEAR MISS! [01 Jump / Near Miss]
+Timer Reset by Near Miss
+Normal Jump
+NEAR MISS! [03 Jump / Near Miss]
+Timer Reset by Near Miss
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Spawn Pattern: Pattern_A_LaneAttack | Easy
+Normal Jump
+NEAR MISS! [01 Jump / Near Miss]
+Timer Reset by Near Miss
+Normal Jump
+NEAR MISS! [03 Jump / Near Miss]
+Timer Reset by Near Miss
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Spawn Pattern: Pattern_A_LaneAttack | Easy
+Normal Jump
+NEAR MISS! [01 Jump / Near Miss]
+Timer Reset by Near Miss
+Normal Jump
+NEAR MISS! [03 Jump / Near Miss]
+Timer Reset by Near Miss
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Spawn Pattern: Pattern_A_LaneAttack | Easy
+Normal Jump
+NEAR MISS! [01 Jump / Near Miss]
+Timer Reset by Near Miss
+Normal Jump
+NEAR MISS! [03 Jump / Near Miss]
+Timer Reset by Near Miss
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Spawn Pattern: Pattern_A_LaneAttack | Easy
+Normal Jump
+NEAR MISS! [01 Jump / Near Miss]
+Timer Reset by Near Miss
+Normal Jump
+NEAR MISS! [03 Jump / Near Miss]
+Timer Reset by Near Miss
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Spawn Pattern: Pattern_A_LaneAttack | Easy
+Normal Jump
+NEAR MISS! [01 Jump / Near Miss]
+Timer Reset by Near Miss
+Normal Jump
+NEAR MISS! [03 Jump / Near Miss]
+Timer Reset by Near Miss
+Spawn Pattern: Pattern_C_AirCombo | Medium
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Spawn Pattern: Pattern_D_Stomp | Medium
+Normal Jump
+NEAR MISS! [01 Jump / Near Miss]
+Timer Reset by Near Miss
+Normal Jump
+NEAR MISS! [03 Jump / Near Miss]
+Timer Reset by Near Miss
+Spawn Pattern: Pattern_C_AirCombo | Medium
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Normal Jump
+Spawn Pattern: Pattern_D_Stomp | Medium
+Enemy Killed by Jump Attack
+Timer Reset by Kill
+Air Target Scan: 7 Air Enemy, 1 in front/range
+Air Target Found: 02 Dash Right
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 6 Air Enemy, 1 in front/range
+Air Target Found: 03 Dash Center
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 5 Air Enemy, 1 in front/range
+Air Target Found: 04 Dash Left
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Spawn Pattern: Pattern_C_AirCombo | Medium
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Air Target Scan: 8 Air Enemy, 1 in front/range
+Air Target Found: 01 Jump Attack
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Spawn Pattern: Pattern_D_Stomp | Medium
+Air Target Scan: 7 Air Enemy, 2 in front/range
+Air Target Found: 02 Dash Right
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 6 Air Enemy, 1 in front/range
+Air Target Found: 03 Dash Center
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 5 Air Enemy, 1 in front/range
+Air Target Found: 04 Dash Left
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Spawn Pattern: Pattern_C_AirCombo | Medium
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Air Target Scan: 8 Air Enemy, 1 in front/range
+Air Target Found: 01 Jump Attack
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Spawn Pattern: Pattern_D_Stomp | Medium
+Air Target Scan: 7 Air Enemy, 2 in front/range
+Air Target Found: 02 Dash Right
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 6 Air Enemy, 1 in front/range
+Air Target Found: 03 Dash Center
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 5 Air Enemy, 1 in front/range
+Air Target Found: 04 Dash Left
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Spawn Pattern: Pattern_C_AirCombo | Medium
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Air Target Scan: 8 Air Enemy, 1 in front/range
+Air Target Found: 01 Jump Attack
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Spawn Pattern: Pattern_D_Stomp | Medium
+Air Target Scan: 7 Air Enemy, 2 in front/range
+Air Target Found: 02 Dash Right
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 6 Air Enemy, 1 in front/range
+Air Target Found: 03 Dash Center
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 5 Air Enemy, 1 in front/range
+Air Target Found: 04 Dash Left
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Spawn Pattern: Pattern_C_AirCombo | Medium
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Air Target Scan: 8 Air Enemy, 1 in front/range
+Air Target Found: 01 Jump Attack
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Spawn Pattern: Pattern_D_Stomp | Medium
+Air Target Scan: 7 Air Enemy, 2 in front/range
+Air Target Found: 02 Dash Right
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 6 Air Enemy, 1 in front/range
+Air Target Found: 03 Dash Center
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 5 Air Enemy, 1 in front/range
+Air Target Found: 04 Dash Left
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Spawn Pattern: Pattern_C_AirCombo | Medium
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Air Target Scan: 8 Air Enemy, 1 in front/range
+Air Target Found: 01 Jump Attack
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Spawn Pattern: Pattern_D_Stomp | Medium
+Air Target Scan: 7 Air Enemy, 2 in front/range
+Air Target Found: 02 Dash Right
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 6 Air Enemy, 1 in front/range
+Air Target Found: 03 Dash Center
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 5 Air Enemy, 1 in front/range
+Air Target Found: 04 Dash Left
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Spawn Pattern: Pattern_C_AirCombo | Medium
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Air Target Scan: 8 Air Enemy, 1 in front/range
+Air Target Found: 01 Jump Attack
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Spawn Pattern: Pattern_D_Stomp | Medium
+Air Target Scan: 7 Air Enemy, 2 in front/range
+Air Target Found: 02 Dash Right
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 6 Air Enemy, 1 in front/range
+Air Target Found: 03 Dash Center
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 5 Air Enemy, 1 in front/range
+Air Target Found: 04 Dash Left
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Spawn Pattern: Pattern_C_AirCombo | Medium
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Air Target Scan: 8 Air Enemy, 1 in front/range
+Air Target Found: 01 Jump Attack
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Spawn Pattern: Pattern_D_Stomp | Medium
+Air Target Scan: 7 Air Enemy, 2 in front/range
+Air Target Found: 02 Dash Right
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 6 Air Enemy, 1 in front/range
+Air Target Found: 03 Dash Center
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 5 Air Enemy, 1 in front/range
+Air Target Found: 04 Dash Left
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Spawn Pattern: Pattern_C_AirCombo | Medium
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Air Target Scan: 8 Air Enemy, 1 in front/range
+Air Target Found: 01 Jump Attack
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Spawn Pattern: Pattern_D_Stomp | Medium
+Air Target Scan: 7 Air Enemy, 2 in front/range
+Air Target Found: 02 Dash Right
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 6 Air Enemy, 1 in front/range
+Air Target Found: 03 Dash Center
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 5 Air Enemy, 1 in front/range
+Air Target Found: 04 Dash Left
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Spawn Pattern: Pattern_C_AirCombo | Medium
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Air Target Scan: 8 Air Enemy, 1 in front/range
+Air Target Found: 01 Jump Attack
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Spawn Pattern: Pattern_D_Stomp | Medium
+Air Target Scan: 7 Air Enemy, 2 in front/range
+Air Target Found: 02 Dash Right
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 6 Air Enemy, 1 in front/range
+Air Target Found: 03 Dash Center
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 5 Air Enemy, 1 in front/range
+Air Target Found: 04 Dash Left
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Spawn Pattern: Pattern_C_AirCombo | Medium
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Air Target Scan: 8 Air Enemy, 1 in front/range
+Air Target Found: 01 Jump Attack
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Spawn Pattern: Pattern_D_Stomp | Medium
+Air Target Scan: 7 Air Enemy, 2 in front/range
+Air Target Found: 02 Dash Right
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 6 Air Enemy, 1 in front/range
+Air Target Found: 03 Dash Center
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 5 Air Enemy, 1 in front/range
+Air Target Found: 04 Dash Left
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Spawn Pattern: Pattern_C_AirCombo | Medium
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Air Target Scan: 8 Air Enemy, 1 in front/range
+Air Target Found: 01 Jump Attack
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Spawn Pattern: Pattern_E_MixedRisk | Hard
+Air Target Scan: 9 Air Enemy, 2 in front/range
+Air Target Found: 02 Dash Right
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 8 Air Enemy, 1 in front/range
+Air Target Found: 03 Dash Center
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 7 Air Enemy, 1 in front/range
+Air Target Found: 04 Dash Left
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Spawn Pattern: Pattern_C_AirCombo | Medium
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Air Target Scan: 10 Air Enemy, 1 in front/range
+Air Target Found: 01 Jump Attack
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Spawn Pattern: Pattern_D_Stomp | Medium
+Air Target Scan: 9 Air Enemy, 2 in front/range
+Air Target Found: 02 Dash Right
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 8 Air Enemy, 1 in front/range
+Air Target Found: 03 Dash Center
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 7 Air Enemy, 1 in front/range
+Air Target Found: 04 Dash Left
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 6 Air Enemy, 0 in front/range
+No Air Target Found
+Spawn Pattern: Pattern_C_AirCombo | Medium
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Air Target Scan: 10 Air Enemy, 2 in front/range
+Air Target Found: 03 Air Combo Start
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 9 Air Enemy, 1 in front/range
+Air Target Found: 04 Homing Right
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 8 Air Enemy, 0 in front/range
+No Air Target Found
+Air Target Scan: 8 Air Enemy, 0 in front/range
+No Air Target Found
+Normal Jump
+Spawn Pattern: Pattern_E_MixedRisk | Hard
+Air Target Scan: 10 Air Enemy, 2 in front/range
+Air Target Found: 01 Jump Attack
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 9 Air Enemy, 2 in front/range
+Air Target Found: 02 Dash Right
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 8 Air Enemy, 1 in front/range
+Air Target Found: 03 Dash Center
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 7 Air Enemy, 1 in front/range
+Air Target Found: 04 Dash Left
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Spawn Pattern: Pattern_C_AirCombo | Medium
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Air Target Scan: 10 Air Enemy, 1 in front/range
+Air Target Found: 01 Jump Attack
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Spawn Pattern: Pattern_D_Stomp | Medium
+Air Target Scan: 9 Air Enemy, 2 in front/range
+Air Target Found: 02 Dash Right
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 8 Air Enemy, 1 in front/range
+Air Target Found: 03 Dash Center
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 7 Air Enemy, 1 in front/range
+Air Target Found: 04 Dash Left
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 6 Air Enemy, 0 in front/range
+No Air Target Found
+Spawn Pattern: Pattern_E_MixedRisk | Hard
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Air Target Scan: 8 Air Enemy, 2 in front/range
+Air Target Found: 03 Air Combo Start
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 7 Air Enemy, 1 in front/range
+Air Target Found: 04 Homing Right
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 6 Air Enemy, 0 in front/range
+No Air Target Found
+Air Target Scan: 6 Air Enemy, 0 in front/range
+No Air Target Found
+Normal Jump
+Spawn Pattern: Pattern_C_AirCombo | Medium
+Air Target Scan: 10 Air Enemy, 3 in front/range
+Air Target Found: 01 Jump Attack
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 9 Air Enemy, 2 in front/range
+Air Target Found: 02 Dash Right
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 8 Air Enemy, 1 in front/range
+Air Target Found: 03 Dash Center
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 7 Air Enemy, 1 in front/range
+Air Target Found: 04 Dash Left
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Spawn Pattern: Pattern_E_MixedRisk | Hard
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Spawn Pattern: Pattern_C_AirCombo | Medium
+]]></output>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1008" name="RuntimeAcceptanceTests" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" testcasecount="26" result="Passed" start-time="2026-09-27 09:57:19Z" end-time="2026-09-27 09:57:20Z" duration="0.447388" total="26" passed="26" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1025" name="AirEnemyDownZoneKillsUnresponsivePlayer" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests.AirEnemyDownZoneKillsUnresponsivePlayer" methodname="AirEnemyDownZoneKillsUnresponsivePlayer" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" seed="469466611" result="Passed" start-time="2026-09-27 09:55:21Z" end-time="2026-09-27 09:55:27Z" duration="5.615151" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[Game Over: Air Enemy Down Attack
+]]></output>
+            </test-case>
+            <test-case id="1024" name="AirHomingChainsTwoActualPrefabEnemies" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests.AirHomingChainsTwoActualPrefabEnemies" methodname="AirHomingChainsTwoActualPrefabEnemies" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" seed="280459301" result="Passed" start-time="2026-09-27 09:55:27Z" end-time="2026-09-27 09:55:31Z" duration="4.668514" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[Normal Jump
+Air Target Scan: 2 Air Enemy, 2 in front/range
+Air Target Found: EnemyAir(Clone)
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 1 Air Enemy, 1 in front/range
+Air Target Found: EnemyAir(Clone)
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+]]></output>
+            </test-case>
+            <test-case id="1026" name="AirJumpWithoutTargetDoesNotDoubleJump" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests.AirJumpWithoutTargetDoesNotDoubleJump" methodname="AirJumpWithoutTargetDoesNotDoubleJump" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" seed="1305975598" result="Passed" start-time="2026-09-27 09:55:31Z" end-time="2026-09-27 09:55:36Z" duration="4.735663" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[Normal Jump
+Air Target Scan: 0 Air Enemy, 0 in front/range
+No Air Target Found
+]]></output>
+            </test-case>
+            <test-case id="1014" name="ClosePassAwardsOneNearMiss" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests.ClosePassAwardsOneNearMiss" methodname="ClosePassAwardsOneNearMiss" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" seed="1916577622" result="Passed" start-time="2026-09-27 09:55:36Z" end-time="2026-09-27 09:55:42Z" duration="5.715242" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[NEAR MISS! [Obstacle]
+Timer Reset by Near Miss
+]]></output>
+            </test-case>
+            <test-case id="1032" name="DistanceTracksForwardOnlyAndSpeedRises" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests.DistanceTracksForwardOnlyAndSpeedRises" methodname="DistanceTracksForwardOnlyAndSpeedRises" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" seed="1419014799" result="Passed" start-time="2026-09-27 09:55:42Z" end-time="2026-09-27 09:55:47Z" duration="4.902770" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+            </test-case>
+            <test-case id="1033" name="EasySpawnerDoesNotRepeatPatternOrLoseRewards" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests.EasySpawnerDoesNotRepeatPatternOrLoseRewards" methodname="EasySpawnerDoesNotRepeatPatternOrLoseRewards" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" seed="690614258" result="Passed" start-time="2026-09-27 09:55:47Z" end-time="2026-09-27 09:55:52Z" duration="4.905884" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[Floor Material Missing
+]]></output>
+            </test-case>
+            <test-case id="1019" name="ElevatedFloorUsesRelativeHeightForSlam" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests.ElevatedFloorUsesRelativeHeightForSlam" methodname="ElevatedFloorUsesRelativeHeightForSlam" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" seed="1003326979" result="Passed" start-time="2026-09-27 09:55:52Z" end-time="2026-09-27 09:55:56Z" duration="4.693378" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+            </test-case>
+            <test-case id="1027" name="FastFallHeadContactStompsBeforeEnemyAttack" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests.FastFallHeadContactStompsBeforeEnemyAttack" methodname="FastFallHeadContactStompsBeforeEnemyAttack" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" seed="1222307172" result="Passed" start-time="2026-09-27 09:55:56Z" end-time="2026-09-27 09:56:01Z" duration="4.444933" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[Enemy Killed by Stomp Attack
+Timer Reset by Kill
+]]></output>
+            </test-case>
+            <test-case id="1011" name="ForwardGroundEnemyKillsJumpingPlayer" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests.ForwardGroundEnemyKillsJumpingPlayer" methodname="ForwardGroundEnemyKillsJumpingPlayer" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" seed="2095734598" result="Passed" start-time="2026-09-27 09:56:01Z" end-time="2026-09-27 09:56:06Z" duration="5.430353" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[Normal Jump
+Game Over: Ground Enemy Front Attack
+]]></output>
+            </test-case>
+            <test-case id="1029" name="ForwardGroundEnemyKillsSlidingPlayer" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests.ForwardGroundEnemyKillsSlidingPlayer" methodname="ForwardGroundEnemyKillsSlidingPlayer" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" seed="152022701" result="Passed" start-time="2026-09-27 09:56:06Z" end-time="2026-09-27 09:56:11Z" duration="4.801000" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[Game Over: Ground Enemy Front Attack
+]]></output>
+            </test-case>
+            <test-case id="1030" name="FourSecondTimerAndComboAreIndependent" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests.FourSecondTimerAndComboAreIndependent" methodname="FourSecondTimerAndComboAreIndependent" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" seed="1674762699" result="Passed" start-time="2026-09-27 09:56:11Z" end-time="2026-09-27 09:56:15Z" duration="4.264877" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+            </test-case>
+            <test-case id="1009" name="GroundEnemyRejectsJumpAndSlideKill" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests.GroundEnemyRejectsJumpAndSlideKill" methodname="GroundEnemyRejectsJumpAndSlideKill" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" seed="46809053" result="Passed" start-time="2026-09-27 09:56:15Z" end-time="2026-09-27 09:56:15Z" duration="0.002020" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1018" name="GroundSlamKillsTwoAndResetsTimerOnce" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests.GroundSlamKillsTwoAndResetsTimerOnce" methodname="GroundSlamKillsTwoAndResetsTimerOnce" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" seed="1288093091" result="Passed" start-time="2026-09-27 09:56:15Z" end-time="2026-09-27 09:56:21Z" duration="5.211777" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[Enemy Killed by Ground Slam Attack
+Enemy Killed by Ground Slam Attack
+Timer Reset by Ground Slam
+]]></output>
+            </test-case>
+            <test-case id="1021" name="HighSlamHeadLandingStompsWithoutPassingThroughOrAoe" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests.HighSlamHeadLandingStompsWithoutPassingThroughOrAoe" methodname="HighSlamHeadLandingStompsWithoutPassingThroughOrAoe" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" seed="1661951858" result="Passed" start-time="2026-09-27 09:56:21Z" end-time="2026-09-27 09:56:26Z" duration="4.946385" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[Enemy Killed by Stomp Attack
+Timer Reset by Kill
+]]></output>
+            </test-case>
+            <test-case id="1016" name="IgnoredSideEnemyKillsPlayer" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests.IgnoredSideEnemyKillsPlayer" methodname="IgnoredSideEnemyKillsPlayer" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" seed="892065428" result="Passed" start-time="2026-09-27 09:56:26Z" end-time="2026-09-27 09:56:30Z" duration="4.847239" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[Game Over: Ground Enemy Side Attack
+]]></output>
+            </test-case>
+            <test-case id="1020" name="InvalidSlamContactDoesNotAwardOtherKills" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests.InvalidSlamContactDoesNotAwardOtherKills" methodname="InvalidSlamContactDoesNotAwardOtherKills" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" seed="1510758937" result="Passed" start-time="2026-09-27 09:56:30Z" end-time="2026-09-27 09:56:35Z" duration="4.845977" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[Game Over: Hit Enemy Without Attack
+]]></output>
+            </test-case>
+            <test-case id="1022" name="LargeSlamStepStopsAtFirstHeadIncludingFootprintEdge" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests.LargeSlamStepStopsAtFirstHeadIncludingFootprintEdge" methodname="LargeSlamStepStopsAtFirstHeadIncludingFootprintEdge" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" seed="1605970546" result="Passed" start-time="2026-09-27 09:56:35Z" end-time="2026-09-27 09:56:39Z" duration="4.217597" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[Enemy Killed by Stomp Attack
+Timer Reset by Kill
+]]></output>
+            </test-case>
+            <test-case id="1028" name="MissedFastFallDoesNotIgnoreSideAttack" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests.MissedFastFallDoesNotIgnoreSideAttack" methodname="MissedFastFallDoesNotIgnoreSideAttack" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" seed="1428252856" result="Passed" start-time="2026-09-27 09:56:39Z" end-time="2026-09-27 09:56:44Z" duration="4.478367" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[Game Over: Ground Enemy Side Attack
+]]></output>
+            </test-case>
+            <test-case id="1023" name="ObstacleAboveEnemyHeadStopsSlamWithoutStompOrShockwave" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests.ObstacleAboveEnemyHeadStopsSlamWithoutStompOrShockwave" methodname="ObstacleAboveEnemyHeadStopsSlamWithoutStompOrShockwave" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" seed="1889223744" result="Passed" start-time="2026-09-27 09:56:44Z" end-time="2026-09-27 09:56:49Z" duration="5.246152" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+            </test-case>
+            <test-case id="1012" name="ObstacleFrontCollisionKillsPlayer" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests.ObstacleFrontCollisionKillsPlayer" methodname="ObstacleFrontCollisionKillsPlayer" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" seed="1462813851" result="Passed" start-time="2026-09-27 09:56:49Z" end-time="2026-09-27 09:56:55Z" duration="5.298228" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[Game Over: Hit Obstacle Obstacle
+]]></output>
+            </test-case>
+            <test-case id="1013" name="ObstacleTopLandingIsSafeAndUnrewarded" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests.ObstacleTopLandingIsSafeAndUnrewarded" methodname="ObstacleTopLandingIsSafeAndUnrewarded" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" seed="1965059580" result="Passed" start-time="2026-09-27 09:56:55Z" end-time="2026-09-27 09:57:00Z" duration="5.468191" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+            </test-case>
+            <test-case id="1010" name="PatternCandidatesHaveInternalRewardIntervalsBelowFourSeconds" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests.PatternCandidatesHaveInternalRewardIntervalsBelowFourSeconds" methodname="PatternCandidatesHaveInternalRewardIntervalsBelowFourSeconds" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" seed="1593581420" result="Passed" start-time="2026-09-27 09:57:00Z" end-time="2026-09-27 09:57:00Z" duration="0.012056" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1015" name="SideLaneAttackKillsOneGroundEnemy" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests.SideLaneAttackKillsOneGroundEnemy" methodname="SideLaneAttackKillsOneGroundEnemy" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" seed="1693527949" result="Passed" start-time="2026-09-27 09:57:00Z" end-time="2026-09-27 09:57:05Z" duration="5.451759" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[Enemy Killed by Lane Attack
+Timer Reset by Kill
+]]></output>
+            </test-case>
+            <test-case id="1017" name="SufficientlyHighSidePassStaysSafe" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests.SufficientlyHighSidePassStaysSafe" methodname="SufficientlyHighSidePassStaysSafe" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" seed="2107982451" result="Passed" start-time="2026-09-27 09:57:06Z" end-time="2026-09-27 09:57:11Z" duration="5.390745" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+            </test-case>
+            <test-case id="1034" name="SwipeRunsOnceAndNonButtonHudDoesNotBlockIt" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests.SwipeRunsOnceAndNonButtonHudDoesNotBlockIt" methodname="SwipeRunsOnceAndNonButtonHudDoesNotBlockIt" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" seed="729514734" result="Passed" start-time="2026-09-27 09:57:11Z" end-time="2026-09-27 09:57:15Z" duration="4.290899" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+            </test-case>
+            <test-case id="1031" name="TimerShowsNormalWarningAndCriticalColors" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests.TimerShowsNormalWarningAndCriticalColors" methodname="TimerShowsNormalWarningAndCriticalColors" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" seed="416464528" result="Passed" start-time="2026-09-27 09:57:15Z" end-time="2026-09-27 09:57:20Z" duration="4.405366" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1035" name="SceneFlowAcceptanceTests" fullname="Deadline4Sec.AcceptanceTests.SceneFlowAcceptanceTests" classname="Deadline4Sec.AcceptanceTests.SceneFlowAcceptanceTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-09-27 09:57:44Z" end-time="2026-09-27 09:57:47Z" duration="3.011493" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1036" name="ConfirmedKillFeedbackHasABoundedPoolAndStopsWithTheRun" fullname="Deadline4Sec.AcceptanceTests.SceneFlowAcceptanceTests.ConfirmedKillFeedbackHasABoundedPoolAndStopsWithTheRun" methodname="ConfirmedKillFeedbackHasABoundedPoolAndStopsWithTheRun" classname="Deadline4Sec.AcceptanceTests.SceneFlowAcceptanceTests" runstate="Runnable" seed="578054632" result="Passed" start-time="2026-09-27 09:57:20Z" end-time="2026-09-27 09:57:26Z" duration="5.990281" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[Spawn Pattern: Pattern_A_LaneAttack | Easy
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+Spawn Pattern: Pattern_A_LaneAttack | Easy
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+]]></output>
+            </test-case>
+            <test-case id="1039" name="ResultMainMenuReturnsToTitle" fullname="Deadline4Sec.AcceptanceTests.SceneFlowAcceptanceTests.ResultMainMenuReturnsToTitle" methodname="ResultMainMenuReturnsToTitle" classname="Deadline4Sec.AcceptanceTests.SceneFlowAcceptanceTests" runstate="Runnable" seed="1639900136" result="Passed" start-time="2026-09-27 09:57:26Z" end-time="2026-09-27 09:57:31Z" duration="5.491836" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[Spawn Pattern: Pattern_B_JumpSlide | Easy
+Spawn Pattern: Pattern_A_LaneAttack | Easy
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+Spawn Pattern: Pattern_A_LaneAttack | Easy
+]]></output>
+            </test-case>
+            <test-case id="1038" name="ResultRetryStartsFreshRunIntro" fullname="Deadline4Sec.AcceptanceTests.SceneFlowAcceptanceTests.ResultRetryStartsFreshRunIntro" methodname="ResultRetryStartsFreshRunIntro" classname="Deadline4Sec.AcceptanceTests.SceneFlowAcceptanceTests" runstate="Runnable" seed="136624604" result="Passed" start-time="2026-09-27 09:57:31Z" end-time="2026-09-27 09:57:39Z" duration="8.176881" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[Spawn Pattern: Pattern_B_JumpSlide | Easy
+Spawn Pattern: Pattern_A_LaneAttack | Easy
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+Spawn Pattern: Pattern_A_LaneAttack | Easy
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+Spawn Pattern: Pattern_A_LaneAttack | Easy
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+Spawn Pattern: Pattern_A_LaneAttack | Easy
+]]></output>
+            </test-case>
+            <test-case id="1037" name="TitleStartWaitsForGoBeforeRunning" fullname="Deadline4Sec.AcceptanceTests.SceneFlowAcceptanceTests.TitleStartWaitsForGoBeforeRunning" methodname="TitleStartWaitsForGoBeforeRunning" classname="Deadline4Sec.AcceptanceTests.SceneFlowAcceptanceTests" runstate="Runnable" seed="1068263270" result="Passed" start-time="2026-09-27 09:57:39Z" end-time="2026-09-27 09:57:47Z" duration="7.498581" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[Spawn Pattern: Pattern_A_LaneAttack | Easy
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+Spawn Pattern: Pattern_A_LaneAttack | Easy
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+]]></output>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1040" name="TutorialAcceptanceTests" fullname="Deadline4Sec.AcceptanceTests.TutorialAcceptanceTests" classname="Deadline4Sec.AcceptanceTests.TutorialAcceptanceTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-09-27 09:58:32Z" end-time="2026-09-27 09:58:34Z" duration="2.205774" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1042" name="DisplayedCuesAlsoCompleteAtThirtyFramesPerSecond" fullname="Deadline4Sec.AcceptanceTests.TutorialAcceptanceTests.DisplayedCuesAlsoCompleteAtThirtyFramesPerSecond" methodname="DisplayedCuesAlsoCompleteAtThirtyFramesPerSecond" classname="Deadline4Sec.AcceptanceTests.TutorialAcceptanceTests" runstate="Runnable" seed="156106671" result="Passed" start-time="2026-09-27 09:57:47Z" end-time="2026-09-27 09:58:07Z" duration="19.735502" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[Normal Jump
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+NEAR MISS! [Lane Blocker(Clone)]
+Timer Reset by Near Miss
+Normal Jump
+Air Target Scan: 2 Air Enemy, 2 in front/range
+Air Target Found: EnemyAir(Clone)
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 1 Air Enemy, 1 in front/range
+Air Target Found: EnemyAir(Clone)
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Normal Jump
+Normal Jump
+Enemy Killed by Jump Attack
+Timer Reset by Kill
+Air Target Scan: 1 Air Enemy, 1 in front/range
+Air Target Found: EnemyAir(Clone)
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Normal Jump
+Enemy Killed by Jump Attack
+Timer Reset by Kill
+Air Target Scan: 4 Air Enemy, 1 in front/range
+Air Target Found: EnemyAir(Clone)
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 3 Air Enemy, 1 in front/range
+Air Target Found: EnemyAir(Clone)
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Enemy Killed by Ground Slam Attack
+Enemy Killed by Ground Slam Attack
+Timer Reset by Ground Slam
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+Spawn Pattern: Pattern_A_LaneAttack | Easy
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+Spawn Pattern: Pattern_A_LaneAttack | Easy
+]]></output>
+            </test-case>
+            <test-case id="1041" name="DisplayedCuesCompleteTenRealLessonsAndEnterNormalRun" fullname="Deadline4Sec.AcceptanceTests.TutorialAcceptanceTests.DisplayedCuesCompleteTenRealLessonsAndEnterNormalRun" methodname="DisplayedCuesCompleteTenRealLessonsAndEnterNormalRun" classname="Deadline4Sec.AcceptanceTests.TutorialAcceptanceTests" runstate="Runnable" seed="122727235" result="Passed" start-time="2026-09-27 09:58:07Z" end-time="2026-09-27 09:58:27Z" duration="20.110719" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[Normal Jump
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+NEAR MISS! [Lane Blocker(Clone)]
+Timer Reset by Near Miss
+Normal Jump
+Air Target Scan: 2 Air Enemy, 2 in front/range
+Air Target Found: EnemyAir(Clone)
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 1 Air Enemy, 1 in front/range
+Air Target Found: EnemyAir(Clone)
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Normal Jump
+Normal Jump
+Enemy Killed by Jump Attack
+Timer Reset by Kill
+Air Target Scan: 1 Air Enemy, 1 in front/range
+Air Target Found: EnemyAir(Clone)
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Normal Jump
+Enemy Killed by Jump Attack
+Timer Reset by Kill
+Air Target Scan: 4 Air Enemy, 1 in front/range
+Air Target Found: EnemyAir(Clone)
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 3 Air Enemy, 1 in front/range
+Air Target Found: EnemyAir(Clone)
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Enemy Killed by Ground Slam Attack
+Enemy Killed by Ground Slam Attack
+Timer Reset by Ground Slam
+Spawn Pattern: Pattern_A_LaneAttack | Easy
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+Spawn Pattern: Pattern_A_LaneAttack | Easy
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+]]></output>
+            </test-case>
+            <test-case id="1043" name="ExpiredPracticeRetriesSameLessonAndMenuRestoresTitle" fullname="Deadline4Sec.AcceptanceTests.TutorialAcceptanceTests.ExpiredPracticeRetriesSameLessonAndMenuRestoresTitle" methodname="ExpiredPracticeRetriesSameLessonAndMenuRestoresTitle" classname="Deadline4Sec.AcceptanceTests.TutorialAcceptanceTests" runstate="Runnable" seed="69381754" result="Passed" start-time="2026-09-27 09:58:27Z" end-time="2026-09-27 09:58:34Z" duration="7.092804" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Saving results to: C:/Users/HP/AppData/LocalLow/DefaultCompany/Deadline-4Sec\TestResults.xml
+]]></output>
+            </test-case>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

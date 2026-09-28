@@ -40,6 +40,10 @@ namespace Deadline4Sec
         private float lastSuccessTime = float.NegativeInfinity;
         private TMP_Text nearMissText;
         private float nearMissVisibleUntil;
+        private bool practice;
+        private float practiceSpeed;
+
+        public event System.Action NearMissRecorded;
 
         public int CurrentScore { get; private set; }
         public int CurrentCombo { get; private set; }
@@ -59,6 +63,9 @@ namespace Deadline4Sec
                 playerController = FindFirstObjectByType<PlayerController>();
             if (gameTimer == null)
                 gameTimer = FindFirstObjectByType<GameTimer>();
+            GameFont.Apply(scoreText);
+            GameFont.Apply(comboText);
+            GameFont.Apply(distanceText);
         }
 
         private void Start()
@@ -87,9 +94,35 @@ namespace Deadline4Sec
             if (CurrentCombo > 0 && Time.time - lastSuccessTime >= comboTimeout)
                 CurrentCombo = 0;
 
-            CurrentForwardSpeed = Mathf.Min(maxForwardSpeed,
+            CurrentForwardSpeed = practice ? practiceSpeed : Mathf.Min(maxForwardSpeed,
                 baseForwardSpeed + CurrentRunTime * speedIncreasePerSecond);
             playerController.SetRunForwardSpeed(CurrentForwardSpeed);
+            UpdateDebugUI();
+        }
+
+        public void BeginRun()
+        {
+            practice = false;
+            startZ = playerController != null ? playerController.transform.position.z : 0f;
+            CurrentRunTime = 0f;
+            Distance = 0f;
+            CurrentForwardSpeed = baseForwardSpeed;
+            if (playerController != null)
+                playerController.SetRunForwardSpeed(CurrentForwardSpeed);
+            UpdateDebugUI();
+        }
+
+        public void BeginPractice(float speed)
+        {
+            BeginRun();
+            practice = true;
+            practiceSpeed = Mathf.Max(0f, speed);
+            CurrentForwardSpeed = practiceSpeed;
+            CurrentScore = CurrentCombo = BestCombo = 0;
+            lastSuccessTime = float.NegativeInfinity;
+            if (nearMissText != null)
+                nearMissText.gameObject.SetActive(false);
+            playerController.SetRunForwardSpeed(practiceSpeed);
             UpdateDebugUI();
         }
 
@@ -109,6 +142,7 @@ namespace Deadline4Sec
                 return;
 
             RecordSuccess(nearMissPoints);
+            NearMissRecorded?.Invoke();
             if (nearMissText != null)
             {
                 nearMissText.text = "NEAR MISS +" + nearMissPoints;
@@ -129,6 +163,7 @@ namespace Deadline4Sec
             rect.anchoredPosition = Vector2.zero;
             rect.sizeDelta = new Vector2(460f, 80f);
             nearMissText = label.GetComponent<TextMeshProUGUI>();
+            GameFont.Apply(nearMissText);
             nearMissText.alignment = TextAlignmentOptions.Center;
             nearMissText.fontSize = 38f;
             nearMissText.color = new Color(1f, 0.28f, 0.5f);

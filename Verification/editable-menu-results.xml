@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="9" result="Failed(Child)" total="9" passed="8" failed="1" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-09-27 14:33:34Z" end-time="2026-09-27 14:33:36Z" duration="2.3616577">
+  <test-suite type="TestSuite" id="1000" name="Deadline-4Sec" fullname="Deadline-4Sec" runstate="Runnable" testcasecount="43" result="Failed" site="Child" start-time="2026-09-27 14:33:34Z" end-time="2026-09-27 14:33:36Z" duration="2.361658" total="9" passed="8" failed="1" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <failure>
+      <message><![CDATA[One or more child tests had errors]]></message>
+    </failure>
+    <test-suite type="Assembly" id="1053" name="Deadline4Sec.AcceptanceTests.dll" fullname="C:/UnityProjects/Deadline-4Sec/ValidationProject/Library/ScriptAssemblies/Deadline4Sec.AcceptanceTests.dll" runstate="Runnable" testcasecount="41" result="Failed" site="Child" start-time="2026-09-27 14:33:34Z" end-time="2026-09-27 14:33:36Z" duration="2.271949" total="9" passed="8" failed="1" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="19528" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <failure>
+        <message><![CDATA[One or more child tests had errors]]></message>
+      </failure>
+      <test-suite type="TestSuite" id="1054" name="Deadline4Sec" fullname="Deadline4Sec" runstate="Runnable" testcasecount="41" result="Failed" site="Child" start-time="2026-09-27 14:33:34Z" end-time="2026-09-27 14:33:36Z" duration="2.271179" total="9" passed="8" failed="1" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-suite type="TestSuite" id="1055" name="AcceptanceTests" fullname="Deadline4Sec.AcceptanceTests" runstate="Runnable" testcasecount="41" result="Failed" site="Child" start-time="2026-09-27 14:33:34Z" end-time="2026-09-27 14:33:36Z" duration="2.270407" total="9" passed="8" failed="1" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <failure>
+            <message><![CDATA[One or more child tests had errors]]></message>
+          </failure>
+          <test-suite type="TestFixture" id="1010" name="EditableMenuAcceptanceTests" fullname="Deadline4Sec.AcceptanceTests.EditableMenuAcceptanceTests" classname="Deadline4Sec.AcceptanceTests.EditableMenuAcceptanceTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-09-27 14:32:24Z" end-time="2026-09-27 14:32:26Z" duration="1.782474" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1011" name="AllGameplayScenesContainSavedMenusAndInspectorButtonActions" fullname="Deadline4Sec.AcceptanceTests.EditableMenuAcceptanceTests.AllGameplayScenesContainSavedMenusAndInspectorButtonActions" methodname="AllGameplayScenesContainSavedMenusAndInspectorButtonActions" classname="Deadline4Sec.AcceptanceTests.EditableMenuAcceptanceTests" runstate="Runnable" seed="389772599" result="Passed" start-time="2026-09-27 14:32:18Z" end-time="2026-09-27 14:32:19Z" duration="1.202369" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1012" name="InspectorAppearanceEditsSurvivePlayAndMainMenuReload" fullname="Deadline4Sec.AcceptanceTests.EditableMenuAcceptanceTests.InspectorAppearanceEditsSurvivePlayAndMainMenuReload" methodname="InspectorAppearanceEditsSurvivePlayAndMainMenuReload" classname="Deadline4Sec.AcceptanceTests.EditableMenuAcceptanceTests" runstate="Runnable" seed="843340807" result="Passed" start-time="2026-09-27 14:32:19Z" end-time="2026-09-27 14:32:26Z" duration="6.730138" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[Spawn Pattern: Pattern_A_LaneAttack | Easy
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+Spawn Pattern: Pattern_A_LaneAttack | Easy
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+]]></output>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1044" name="SceneFlowAcceptanceTests" fullname="Deadline4Sec.AcceptanceTests.SceneFlowAcceptanceTests" classname="Deadline4Sec.AcceptanceTests.SceneFlowAcceptanceTests" runstate="Runnable" testcasecount="4" result="Failed" site="Child" start-time="2026-09-27 14:32:50Z" end-time="2026-09-27 14:32:51Z" duration="0.795571" total="4" passed="3" failed="1" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <failure>
+              <message><![CDATA[One or more child tests had errors]]></message>
+            </failure>
+            <test-case id="1045" name="ConfirmedKillFeedbackHasABoundedPoolAndStopsWithTheRun" fullname="Deadline4Sec.AcceptanceTests.SceneFlowAcceptanceTests.ConfirmedKillFeedbackHasABoundedPoolAndStopsWithTheRun" methodname="ConfirmedKillFeedbackHasABoundedPoolAndStopsWithTheRun" classname="Deadline4Sec.AcceptanceTests.SceneFlowAcceptanceTests" runstate="Runnable" seed="372958484" result="Passed" start-time="2026-09-27 14:32:26Z" end-time="2026-09-27 14:32:32Z" duration="5.986636" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[Spawn Pattern: Pattern_A_LaneAttack | Easy
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+Spawn Pattern: Pattern_A_LaneAttack | Easy
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+]]></output>
+            </test-case>
+            <test-case id="1048" name="ResultMainMenuReturnsToTitle" fullname="Deadline4Sec.AcceptanceTests.SceneFlowAcceptanceTests.ResultMainMenuReturnsToTitle" methodname="ResultMainMenuReturnsToTitle" classname="Deadline4Sec.AcceptanceTests.SceneFlowAcceptanceTests" runstate="Runnable" seed="539202159" result="Passed" start-time="2026-09-27 14:32:32Z" end-time="2026-09-27 14:32:37Z" duration="5.509111" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[Spawn Pattern: Pattern_A_LaneAttack | Easy
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+Spawn Pattern: Pattern_A_LaneAttack | Easy
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+]]></output>
+            </test-case>
+            <test-case id="1047" name="ResultRetryStartsFreshRunIntro" fullname="Deadline4Sec.AcceptanceTests.SceneFlowAcceptanceTests.ResultRetryStartsFreshRunIntro" methodname="ResultRetryStartsFreshRunIntro" classname="Deadline4Sec.AcceptanceTests.SceneFlowAcceptanceTests" runstate="Runnable" seed="1254947811" result="Passed" start-time="2026-09-27 14:32:37Z" end-time="2026-09-27 14:32:46Z" duration="8.208665" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[Spawn Pattern: Pattern_B_JumpSlide | Easy
+Spawn Pattern: Pattern_A_LaneAttack | Easy
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+Spawn Pattern: Pattern_A_LaneAttack | Easy
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+Spawn Pattern: Pattern_A_LaneAttack | Easy
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+Spawn Pattern: Pattern_A_LaneAttack | Easy
+]]></output>
+            </test-case>
+            <test-case id="1046" name="TitleStartWaitsForGoBeforeRunning" fullname="Deadline4Sec.AcceptanceTests.SceneFlowAcceptanceTests.TitleStartWaitsForGoBeforeRunning" methodname="TitleStartWaitsForGoBeforeRunning" classname="Deadline4Sec.AcceptanceTests.SceneFlowAcceptanceTests" runstate="Runnable" seed="434280041" result="Failed" label="Error" start-time="2026-09-27 14:32:46Z" end-time="2026-09-27 14:32:51Z" duration="5.310479" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <failure>
+                <message><![CDATA[System.NullReferenceException : Object reference not set to an instance of an object]]></message>
+                <stack-trace><![CDATA[  at Deadline4Sec.AcceptanceTests.SceneFlowAcceptanceTests+<TitleStartWaitsForGoBeforeRunning>d__2.MoveNext () [0x00202] in C:\UnityProjects\Deadline-4Sec\ValidationProject\Assets\AcceptanceTests\SceneFlowAcceptanceTests.cs:129 
+  at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0003a] in .\Library\PackageCache\com.unity.test-framework@0b7a23ab2e1d\UnityEngine.TestRunner\NUnitExtensions\Attributes\TestEnumerator.cs:44 ]]></stack-trace>
+              </failure>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1049" name="TutorialAcceptanceTests" fullname="Deadline4Sec.AcceptanceTests.TutorialAcceptanceTests" classname="Deadline4Sec.AcceptanceTests.TutorialAcceptanceTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-09-27 14:33:34Z" end-time="2026-09-27 14:33:36Z" duration="2.257341" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1051" name="DisplayedCuesAlsoCompleteAtThirtyFramesPerSecond" fullname="Deadline4Sec.AcceptanceTests.TutorialAcceptanceTests.DisplayedCuesAlsoCompleteAtThirtyFramesPerSecond" methodname="DisplayedCuesAlsoCompleteAtThirtyFramesPerSecond" classname="Deadline4Sec.AcceptanceTests.TutorialAcceptanceTests" runstate="Runnable" seed="937713684" result="Passed" start-time="2026-09-27 14:32:51Z" end-time="2026-09-27 14:33:10Z" duration="19.223633" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[Normal Jump
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+NEAR MISS! [Lane Blocker(Clone)]
+Timer Reset by Near Miss
+Normal Jump
+Air Target Scan: 2 Air Enemy, 2 in front/range
+Air Target Found: EnemyAir(Clone)
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 1 Air Enemy, 1 in front/range
+Air Target Found: EnemyAir(Clone)
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Normal Jump
+Normal Jump
+Enemy Killed by Jump Attack
+Timer Reset by Kill
+Air Target Scan: 1 Air Enemy, 1 in front/range
+Air Target Found: EnemyAir(Clone)
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Normal Jump
+Enemy Killed by Jump Attack
+Timer Reset by Kill
+Air Target Scan: 4 Air Enemy, 1 in front/range
+Air Target Found: EnemyAir(Clone)
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 3 Air Enemy, 1 in front/range
+Air Target Found: EnemyAir(Clone)
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Enemy Killed by Ground Slam Attack
+Enemy Killed by Ground Slam Attack
+Timer Reset by Ground Slam
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+Spawn Pattern: Pattern_A_LaneAttack | Easy
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+Spawn Pattern: Pattern_A_LaneAttack | Easy
+]]></output>
+            </test-case>
+            <test-case id="1050" name="DisplayedCuesCompleteTenRealLessonsAndEnterNormalRun" fullname="Deadline4Sec.AcceptanceTests.TutorialAcceptanceTests.DisplayedCuesCompleteTenRealLessonsAndEnterNormalRun" methodname="DisplayedCuesCompleteTenRealLessonsAndEnterNormalRun" classname="Deadline4Sec.AcceptanceTests.TutorialAcceptanceTests" runstate="Runnable" seed="1190360773" result="Passed" start-time="2026-09-27 14:33:10Z" end-time="2026-09-27 14:33:30Z" duration="19.416820" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[Normal Jump
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+NEAR MISS! [Lane Blocker(Clone)]
+Timer Reset by Near Miss
+Normal Jump
+Air Target Scan: 2 Air Enemy, 2 in front/range
+Air Target Found: EnemyAir(Clone)
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 1 Air Enemy, 1 in front/range
+Air Target Found: EnemyAir(Clone)
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Normal Jump
+Normal Jump
+Enemy Killed by Jump Attack
+Timer Reset by Kill
+Air Target Scan: 1 Air Enemy, 1 in front/range
+Air Target Found: EnemyAir(Clone)
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Normal Jump
+Enemy Killed by Jump Attack
+Timer Reset by Kill
+Air Target Scan: 4 Air Enemy, 1 in front/range
+Air Target Found: EnemyAir(Clone)
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 3 Air Enemy, 1 in front/range
+Air Target Found: EnemyAir(Clone)
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Enemy Killed by Ground Slam Attack
+Enemy Killed by Ground Slam Attack
+Timer Reset by Ground Slam
+Spawn Pattern: Pattern_A_LaneAttack | Easy
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+Spawn Pattern: Pattern_A_LaneAttack | Easy
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+]]></output>
+            </test-case>
+            <test-case id="1052" name="ExpiredPracticeRetriesSameLessonAndMenuRestoresTitle" fullname="Deadline4Sec.AcceptanceTests.TutorialAcceptanceTests.ExpiredPracticeRetriesSameLessonAndMenuRestoresTitle" methodname="ExpiredPracticeRetriesSameLessonAndMenuRestoresTitle" classname="Deadline4Sec.AcceptanceTests.TutorialAcceptanceTests" runstate="Runnable" seed="245875151" result="Passed" start-time="2026-09-27 14:33:30Z" end-time="2026-09-27 14:33:36Z" duration="6.814618" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Saving results to: C:/Users/HP/AppData/LocalLow/DefaultCompany/Deadline-4Sec\TestResults.xml
+]]></output>
+            </test-case>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

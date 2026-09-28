@@ -38,7 +38,7 @@ namespace Deadline4Sec
 
         private void Update()
         {
-            if (gameFlow == null || !gameFlow.IsPlaying)
+            if (gameFlow == null || !gameFlow.CanReceiveInput)
             {
                 ResetTracking();
                 return;

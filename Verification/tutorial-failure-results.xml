@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="2" result="Failed(Child)" total="2" passed="1" failed="1" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-09-27 09:49:42Z" end-time="2026-09-27 09:49:45Z" duration="2.3671385">
+  <test-suite type="TestSuite" id="1000" name="Deadline-4Sec" fullname="Deadline-4Sec" runstate="Runnable" testcasecount="36" result="Failed" site="Child" start-time="2026-09-27 09:49:42Z" end-time="2026-09-27 09:49:45Z" duration="2.367139" total="2" passed="1" failed="1" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <failure>
+      <message><![CDATA[One or more child tests had errors]]></message>
+    </failure>
+    <test-suite type="Assembly" id="1043" name="Deadline4Sec.AcceptanceTests.dll" fullname="C:/UnityProjects/Deadline-4Sec/ValidationProject/Library/ScriptAssemblies/Deadline4Sec.AcceptanceTests.dll" runstate="Runnable" testcasecount="34" result="Failed" site="Child" start-time="2026-09-27 09:49:42Z" end-time="2026-09-27 09:49:45Z" duration="2.279699" total="2" passed="1" failed="1" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="35360" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <failure>
+        <message><![CDATA[One or more child tests had errors]]></message>
+      </failure>
+      <test-suite type="TestSuite" id="1044" name="Deadline4Sec" fullname="Deadline4Sec" runstate="Runnable" testcasecount="34" result="Failed" site="Child" start-time="2026-09-27 09:49:42Z" end-time="2026-09-27 09:49:45Z" duration="2.278401" total="2" passed="1" failed="1" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-suite type="TestSuite" id="1045" name="AcceptanceTests" fullname="Deadline4Sec.AcceptanceTests" runstate="Runnable" testcasecount="34" result="Failed" site="Child" start-time="2026-09-27 09:49:42Z" end-time="2026-09-27 09:49:45Z" duration="2.277320" total="2" passed="1" failed="1" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <failure>
+            <message><![CDATA[One or more child tests had errors]]></message>
+          </failure>
+          <test-suite type="TestFixture" id="1040" name="TutorialAcceptanceTests" fullname="Deadline4Sec.AcceptanceTests.TutorialAcceptanceTests" classname="Deadline4Sec.AcceptanceTests.TutorialAcceptanceTests" runstate="Runnable" testcasecount="2" result="Failed" site="Child" start-time="2026-09-27 09:49:42Z" end-time="2026-09-27 09:49:45Z" duration="2.274822" total="2" passed="1" failed="1" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <failure>
+              <message><![CDATA[One or more child tests had errors]]></message>
+            </failure>
+            <test-case id="1041" name="DisplayedCuesCompleteTenRealLessonsAndEnterNormalRun" fullname="Deadline4Sec.AcceptanceTests.TutorialAcceptanceTests.DisplayedCuesCompleteTenRealLessonsAndEnterNormalRun" methodname="DisplayedCuesCompleteTenRealLessonsAndEnterNormalRun" classname="Deadline4Sec.AcceptanceTests.TutorialAcceptanceTests" runstate="Runnable" seed="1818931537" result="Failed" start-time="2026-09-27 09:49:21Z" end-time="2026-09-27 09:49:38Z" duration="16.652502" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <failure>
+                <message><![CDATA[Actual lesson failed. EndlessRun tutorial, public input only, 60 FPS
+STEP 1 t=0.05
+INPUT Left step=1 t=0.46 pos=(25.87, 0.96, -3.95) feet=-0.04 ground=True homing=False timer=4 score=0
+INPUT Right step=1 t=0.61 pos=(23.37, 1.08, -3.05) feet=0.08 ground=True homing=False timer=3.85 score=0
+STEP 2 t=1.38
+INPUT Up step=2 t=2.63 pos=(25.87, 1.08, 0.85) feet=0.08 ground=True homing=False timer=3.200001 score=0
+STEP 3 t=3.99
+INPUT Down step=3 t=5.24 pos=(25.87, 1.08, 0.85) feet=0.08 ground=True homing=False timer=3.200001 score=0
+STEP 4 t=6.50
+INPUT Right step=4 t=7.69 pos=(25.87, 1.08, 0.45) feet=0.08 ground=True homing=False timer=3.266667 score=0
+STEP 5 t=8.29
+INPUT Right step=5 t=11.64 pos=(25.87, 1.08, 13.45) feet=0.08 ground=True homing=False timer=1.100003 score=0
+STEP 6 t=12.24
+INPUT Left step=6 t=12.69 pos=(28.37, 0.96, -3.95) feet=-0.04 ground=True homing=False timer=4 score=0
+STEP 7 t=14.85
+INPUT Up step=7 t=15.60 pos=(25.87, 1.08, -2.15) feet=0.08 ground=True homing=False timer=3.7 score=0
+INPUT Up step=7 t=15.75 pos=(25.87, 2.11, -1.25) feet=1.11 ground=False homing=False timer=3.55 score=0
+INPUT Up step=7 t=15.90 pos=(25.87, 2.61, 1.09) feet=1.61 ground=False homing=False timer=3.933333 score=100
+STEP 8 t=16.58
+INPUT Up step=8 t=17.03 pos=(25.87, 0.96, -3.95) feet=-0.04 ground=True homing=False timer=4 score=0
+INPUT Down step=8 t=17.18 pos=(25.87, 1.99, -3.05) feet=0.99 ground=False homing=False timer=3.85 score=0
+STEP 9 t=17.88
+INPUT Up step=9 t=18.48 pos=(25.87, 1.08, -2.15) feet=0.08 ground=True homing=False timer=3.85 score=0
+INPUT Up step=9 t=18.63 pos=(25.87, 2.19, -0.35) feet=1.19 ground=False homing=False timer=3.966667 score=100
+INPUT Down step=9 t=18.86 pos=(23.37, 6.34, 8.24) feet=5.34 ground=False homing=False timer=3.883333 score=200
+STEP 10 t=19.62
+INPUT Up step=10 t=20.22 pos=(25.87, 1.08, -2.15) feet=0.08 ground=True homing=False timer=3.85 score=0
+INPUT Up step=10 t=20.37 pos=(25.87, 2.19, -0.35) feet=1.19 ground=False homing=False timer=3.966667 score=100
+INPUT Up step=10 t=20.52 pos=(25.87, 5.57, 7.73) feet=4.57 ground=False homing=False timer=3.966667 score=200
+INPUT Down step=10 t=20.67 pos=(25.87, 8.25, 13.18) feet=7.25 ground=False homing=False timer=3.95 score=300
+INPUT Down step=10 t=20.89 pos=(25.87, 1.08, 15.78) feet=0.08 ground=False homing=False timer=3.733334 score=300
+INPUT Down step=10 t=21.04 pos=(25.87, 1.08, 17.58) feet=0.08 ground=True homing=False timer=3.583334 score=300
+INPUT Down step=10 t=21.19 pos=(25.87, 1.08, 19.38) feet=0.08 ground=True homing=False timer=3.433334 score=300
+INPUT Down step=10 t=21.34 pos=(25.87, 1.08, 21.18) feet=0.08 ground=True homing=False timer=3.283334 score=300
+INPUT Down step=10 t=21.49 pos=(25.87, 1.08, 22.98) feet=0.08 ground=True homing=False timer=3.133334 score=300
+INPUT Down step=10 t=21.64 pos=(25.87, 1.08, 24.78) feet=0.08 ground=True homing=False timer=2.983334 score=300
+INPUT Down step=10 t=21.79 pos=(25.87, 1.08, 26.58) feet=0.08 ground=True homing=False timer=2.833334 score=300
+INPUT Down step=10 t=21.94 pos=(25.87, 1.08, 28.38) feet=0.08 ground=True homing=False timer=2.683335 score=300
+INPUT Down step=10 t=22.09 pos=(25.87, 1.08, 30.18) feet=0.08 ground=True homing=False timer=2.533335 score=300
+INPUT Down step=10 t=22.24 pos=(25.87, 1.08, 31.98) feet=0.08 ground=True homing=False timer=2.383335 score=300
+INPUT Down step=10 t=22.39 pos=(25.87, 1.08, 33.78) feet=0.08 ground=True homing=False timer=2.233335 score=300
+INPUT Down step=10 t=22.54 pos=(25.87, 1.08, 35.58) feet=0.08 ground=True homing=False timer=2.083335 score=300
+INPUT Down step=10 t=22.69 pos=(25.87, 1.08, 37.38) feet=0.08 ground=True homing=False timer=1.933335 score=300
+INPUT Down step=10 t=22.84 pos=(25.87, 1.08, 39.18) feet=0.08 ground=True homing=False timer=1.783335 score=300
+INPUT Down step=10 t=22.99 pos=(25.87, 1.08, 40.98) feet=0.08 ground=True homing=False timer=1.633336 score=300
+INPUT Down step=10 t=23.14 pos=(25.87, 1.08, 42.78) feet=0.08 ground=True homing=False timer=1.483336 score=300
+INPUT Down step=10 t=23.29 pos=(25.87, 1.08, 44.58) feet=0.08 ground=True homing=False timer=1.333336 score=300
+INPUT Down step=10 t=23.44 pos=(25.87, 1.08, 46.38) feet=0.08 ground=True homing=False timer=1.183336 score=300
+INPUT Down step=10 t=23.59 pos=(25.87, 1.08, 48.18) feet=0.08 ground=True homing=False timer=1.033336 score=300
+INPUT Down step=10 t=23.74 pos=(25.87, 1.08, 49.98) feet=0.08 ground=True homing=False timer=0.8833363 score=300
+INPUT Down step=10 t=23.89 pos=(25.87, 1.08, 51.78) feet=0.08 ground=True homing=False timer=0.7333364 score=300
+INPUT Down step=10 t=24.04 pos=(25.87, 1.08, 53.58) feet=0.08 ground=True homing=False timer=0.5833366 score=300
+INPUT Down step=10 t=24.19 pos=(25.87, 1.08, 55.38) feet=0.08 ground=True homing=False timer=0.4333366 score=300
+INPUT Down step=10 t=24.34 pos=(25.87, 1.08, 57.18) feet=0.08 ground=True homing=False timer=0.2833365 score=300
+INPUT Down step=10 t=24.49 pos=(25.87, 1.08, 58.98) feet=0.08 ground=True homing=False timer=0.1333365 score=300
+step=10 t=24.64 pos=(25.87, 1.08, 60.58) feet=0.08 ground=True homing=False timer=0 score=300]]></message>
+                <stack-trace><![CDATA[at Deadline4Sec.AcceptanceTests.TutorialAcceptanceTests+<DisplayedCuesCompleteTenRealLessonsAndEnterNormalRun>d__5.MoveNext () [0x001c3] in C:\UnityProjects\Deadline-4Sec\ValidationProject\Assets\AcceptanceTests\TutorialAcceptanceTests.cs:55
+at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0003a] in .\Library\PackageCache\com.unity.test-framework@0b7a23ab2e1d\UnityEngine.TestRunner\NUnitExtensions\Attributes\TestEnumerator.cs:44
+]]></stack-trace>
+              </failure>
+              <output><![CDATA[Normal Jump
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+NEAR MISS! [Lane Blocker(Clone)]
+Timer Reset by Near Miss
+Normal Jump
+Air Target Scan: 2 Air Enemy, 2 in front/range
+Air Target Found: EnemyAir(Clone)
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 1 Air Enemy, 1 in front/range
+Air Target Found: EnemyAir(Clone)
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Normal Jump
+Normal Jump
+Enemy Killed by Jump Attack
+Timer Reset by Kill
+Air Target Scan: 1 Air Enemy, 1 in front/range
+Air Target Found: EnemyAir(Clone)
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Enemy Killed by Stomp Attack
+Timer Reset by Kill
+Normal Jump
+Enemy Killed by Jump Attack
+Timer Reset by Kill
+Air Target Scan: 4 Air Enemy, 1 in front/range
+Air Target Found: EnemyAir(Clone)
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 3 Air Enemy, 1 in front/range
+Air Target Found: EnemyAir(Clone)
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+]]></output>
+            </test-case>
+            <test-case id="1042" name="ExpiredPracticeRetriesSameLessonAndMenuRestoresTitle" fullname="Deadline4Sec.AcceptanceTests.TutorialAcceptanceTests.ExpiredPracticeRetriesSameLessonAndMenuRestoresTitle" methodname="ExpiredPracticeRetriesSameLessonAndMenuRestoresTitle" classname="Deadline4Sec.AcceptanceTests.TutorialAcceptanceTests" runstate="Runnable" seed="1359708717" result="Passed" start-time="2026-09-27 09:49:38Z" end-time="2026-09-27 09:49:45Z" duration="6.891424" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Saving results to: C:/Users/HP/AppData/LocalLow/DefaultCompany/Deadline-4Sec\TestResults.xml
+]]></output>
+            </test-case>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

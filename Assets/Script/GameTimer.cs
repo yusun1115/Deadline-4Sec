@@ -1,3 +1,4 @@
+using System;
 using System.Globalization;
 using UnityEngine;
 using UnityEngine.UI;
@@ -29,12 +30,31 @@ namespace Deadline4Sec
         public float RemainingTime => remainingTime;
         public bool IsGameOver => isGameOver;
         public bool IsRunning => isRunning && !isGameOver;
+        public event Action<float> TimerReset;
 
         private void Awake()
         {
             remainingTime = Duration;
             gameFlow = GetComponent<GameFlowManager>();
             cameraFeedback = FindFirstObjectByType<CameraFeedbackController>();
+            GameFont.Apply(timeText);
+            GameFont.Apply(gameOverText);
+            if (timeText != null)
+            {
+                // Anchor to the screen edge so the main timer survives canvas scaling.
+                RectTransform rect = timeText.rectTransform;
+                rect.anchorMin = rect.anchorMax = new Vector2(0.5f, 1f);
+                rect.pivot = new Vector2(0.5f, 1f);
+                rect.anchoredPosition = new Vector2(0f, -24f);
+                rect.sizeDelta = new Vector2(260f, 140f);
+                timeText.fontSize = 76;
+                timeText.resizeTextForBestFit = true;
+                timeText.resizeTextMinSize = 42;
+                timeText.resizeTextMaxSize = 76;
+                timeText.fontStyle = FontStyle.Normal;
+                timeText.alignment = TextAnchor.MiddleCenter;
+                timeText.raycastTarget = false;
+            }
             if (gameOverText != null)
                 gameOverText.gameObject.SetActive(false);
             UpdateTimeText();
@@ -83,9 +103,27 @@ namespace Deadline4Sec
             if (!IsRunning)
                 return;
 
+            float previous = remainingTime;
             remainingTime = Duration;
             warningPlayed = false;
             UpdateTimeText();
+            TimerReset?.Invoke(previous);
+        }
+
+        public void BeginPractice()
+        {
+            isGameOver = false;
+            isRunning = false;
+            if (gameOverText != null)
+                gameOverText.gameObject.SetActive(false);
+            BeginRun();
+        }
+
+        public void PausePractice()
+        {
+            isRunning = false;
+            if (gameOverText != null)
+                gameOverText.gameObject.SetActive(false);
         }
 
         public void TriggerGameOver()

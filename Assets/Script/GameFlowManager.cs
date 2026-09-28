@@ -16,7 +16,7 @@ namespace Deadline4Sec
     [RequireComponent(typeof(GameTimer))]
     public sealed class GameFlowManager : MonoBehaviour
     {
-        public enum GameState { Title, Settings, Ready, Countdown, Playing, GameOver, Result }
+        public enum GameState { Title, Settings, Ready, Playing, GameOver, Result, Tutorial }
 
         [Header("Scene references")]
         [SerializeField] private PlayerController playerController;
@@ -37,9 +37,15 @@ namespace Deadline4Sec
         [SerializeField] private TMP_Text newBestText;
         [SerializeField] private Button retryButton;
 
+        [Header("Authored menus (edit these objects in the scene)")]
+        [SerializeField] private GameObject titlePanel;
+        [SerializeField] private GameObject settingsPanel;
+        [SerializeField] private TMP_Text soundSettingText;
+        [SerializeField] private TMP_Text vibrationSettingText;
+        [SerializeField] private Button[] menuButtons;
+
         [Header("Flow timing (unscaled seconds)")]
-        [SerializeField, Min(0f)] private float readyDuration = 0.75f;
-        [SerializeField, Min(0.1f)] private float countdownStepDuration = 1f;
+        [SerializeField, Min(0.1f)] private float introDuration = 2.2f;
         [SerializeField, Min(0f)] private float goDisplayDuration = 0.5f;
         [SerializeField, Min(0f)] private float resultDelay = 0.4f;
 
@@ -48,14 +54,14 @@ namespace Deadline4Sec
         private const string BestComboKey = "Deadline4Sec.BestCombo";
         private bool gameOverHandled;
         private CameraFeedbackController cameraFeedback;
-        private GameObject titlePanel;
-        private GameObject settingsPanel;
-        private TMP_Text soundSettingText;
-        private TMP_Text vibrationSettingText;
         private static bool startImmediatelyAfterReload;
+        private TutorialController tutorial;
 
         public GameState State { get; private set; } = GameState.Title;
-        public bool IsPlaying => State == GameState.Playing;
+        public bool IsPlaying => State == GameState.Playing ||
+            (State == GameState.Tutorial && tutorial != null && tutorial.IsFeedbackActive);
+        public bool CanReceiveInput => State == GameState.Playing ||
+            (State == GameState.Tutorial && tutorial != null && tutorial.CanReceiveInput);
 
         private void Awake()
         {
@@ -71,7 +77,21 @@ namespace Deadline4Sec
                 playerController.enabled = false;
             if (retryButton != null)
                 retryButton.onClick.AddListener(Retry);
-            BuildMenuUI();
+            BindMenuUI();
+            foreach (TMP_Text text in FindObjectsByType<TMP_Text>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+                GameFont.Apply(text);
+            foreach (Text text in FindObjectsByType<Text>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+                GameFont.Apply(text);
+            if (countdownText != null)
+            {
+                RectTransform introLabel = countdownText.rectTransform;
+                introLabel.anchorMin = introLabel.anchorMax = new Vector2(0.5f, 0.72f);
+                introLabel.anchoredPosition = Vector2.zero;
+                introLabel.sizeDelta = new Vector2(520f, 110f);
+                countdownText.enableAutoSizing = true;
+                countdownText.fontSizeMax = 96f;
+                countdownText.fontSizeMin = 48f;
+            }
             SetUI(false, false, false);
             ShowTitle();
         }
@@ -94,19 +114,33 @@ namespace Deadline4Sec
         private IEnumerator BeginFlow()
         {
             State = GameState.Ready;
-            countdownText.text = "READY";
-            yield return new WaitForSecondsRealtime(readyDuration);
+            SetText(countdownText, "Ready?");
+            float speed = runManager != null ? runManager.BaseForwardSpeed : 10.2f;
+            // Integral of the symmetric smooth acceleration below is 0.675.
+            float goZ = playerController.transform.position.z + speed * introDuration * 0.675f;
+            PatternSpawner spawner = FindFirstObjectByType<PatternSpawner>();
+            if (spawner != null)
+                spawner.PrepareOpeningPatterns(goZ);
+            if (cameraFeedback != null)
+                cameraFeedback.BeginRunIntro(introDuration);
 
-            State = GameState.Countdown;
-            string[] steps = { "3", "2", "1" };
-            foreach (string step in steps)
+            float elapsed = 0f;
+            while (elapsed < introDuration)
             {
-                countdownText.text = step;
-                yield return new WaitForSecondsRealtime(countdownStepDuration);
+                float delta = Mathf.Min(Mathf.Min(Time.unscaledDeltaTime, 0.05f), introDuration - elapsed);
+                float progress = (elapsed + delta * 0.5f) / introDuration;
+                playerController.AdvanceRunIntro(delta,
+                    speed * Mathf.Lerp(0.35f, 1f, Mathf.SmoothStep(0f, 1f, progress)), progress);
+                elapsed += delta;
+                yield return null;
             }
-
-            countdownText.text = "GO!";
+            playerController.EndRunIntro();
+            if (cameraFeedback != null)
+                cameraFeedback.CompleteRunIntro();
+            SetText(countdownText, "Go!");
             State = GameState.Playing;
+            if (runManager != null)
+                runManager.BeginRun();
             gameTimer.BeginRun();
             if (playerController != null)
                 playerController.enabled = true;
@@ -141,6 +175,34 @@ namespace Deadline4Sec
                 settingsPanel.SetActive(true);
         }
 
+        public void StartTutorial()
+        {
+            if (State != GameState.Title)
+                return;
+            TutorialCourseAssets assets = Resources.Load<TutorialCourseAssets>("Tutorial/TutorialCourse");
+            if (assets == null || !assets.IsValid)
+            {
+                Debug.LogError("Tutorial course assets are missing. Prepare Tutorial Course before building.");
+                return;
+            }
+            if (tutorial == null)
+                tutorial = gameObject.AddComponent<TutorialController>();
+            titlePanel.SetActive(false);
+            State = GameState.Tutorial;
+            SetUI(true, false, false);
+            tutorial.Begin(this, playerController, gameTimer, runManager,
+                FindFirstObjectByType<PatternSpawner>(), titlePanel.GetComponentInParent<Canvas>(), assets);
+        }
+
+        public void FinishTutorial(bool startRun)
+        {
+            if (State != GameState.Tutorial)
+                return;
+            tutorial.Stop();
+            startImmediatelyAfterReload = startRun;
+            SceneManager.LoadScene(SceneManager.GetActiveScene().path);
+        }
+
         public void CloseSettings()
         {
             if (State == GameState.Settings)
@@ -158,13 +220,21 @@ namespace Deadline4Sec
 
         public void HandleGameOver()
         {
+            if (State == GameState.Tutorial && tutorial != null)
+            {
+                tutorial.HandleFailure();
+                return;
+            }
             if (gameOverHandled)
                 return;
 
             gameOverHandled = true;
             State = GameState.GameOver;
             if (cameraFeedback != null)
+            {
                 cameraFeedback.StopAllFeedback();
+                cameraFeedback.PlayGameOver();
+            }
             if (playerController != null)
                 playerController.enabled = false;
             SaveRecordsAndFillResult();
@@ -228,76 +298,29 @@ namespace Deadline4Sec
             SceneManager.LoadScene(SceneManager.GetActiveScene().path);
         }
 
-        private void BuildMenuUI()
+        private void BindMenuUI()
         {
-            Canvas canvas = resultPanel != null
-                ? resultPanel.GetComponentInParent<Canvas>()
-                : FindFirstObjectByType<Canvas>();
-            if (canvas == null)
+            if (titlePanel == null || settingsPanel == null)
             {
-                Debug.LogError("GameFlowManager: menu requires a Canvas.");
+                Debug.LogError("GameFlowManager: assign the saved TitlePanel and SettingsPanel in the scene.");
                 return;
             }
-
-            CanvasScaler scaler = canvas.GetComponent<CanvasScaler>();
-            if (scaler != null)
-            {
-                scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-                scaler.referenceResolution = new Vector2(800f, 600f);
-                scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
-                scaler.matchWidthOrHeight = 0f;
-            }
-
-            titlePanel = CreateOverlay(canvas.transform, "TitlePanel");
-            CreateMenuText(titlePanel.transform, "DEADLINE: 4 SEC",
-                new Vector2(0f, 185f), new Vector2(680f, 110f), 58f);
-            CreateMenuText(titlePanel.transform, "RISK TO LIVE",
-                new Vector2(0f, 105f), new Vector2(600f, 65f), 28f);
-            CreateMenuButton(titlePanel.transform, "START", new Vector2(0f, -45f),
-                new Vector2(360f, 84f), StartGame);
-            CreateMenuButton(titlePanel.transform, "SETTINGS", new Vector2(0f, -155f),
-                new Vector2(360f, 84f), OpenSettings);
-
-            settingsPanel = CreateOverlay(canvas.transform, "SettingsPanel");
-            CreateMenuText(settingsPanel.transform, "SETTINGS",
-                new Vector2(0f, 175f), new Vector2(600f, 90f), 52f);
-            soundSettingText = CreateMenuButton(settingsPanel.transform, string.Empty,
-                new Vector2(0f, 50f), new Vector2(420f, 80f), ToggleSound);
-            vibrationSettingText = CreateMenuButton(settingsPanel.transform, string.Empty,
-                new Vector2(0f, -50f), new Vector2(420f, 80f), ToggleVibration);
-            CreateMenuButton(settingsPanel.transform, "BACK", new Vector2(0f, -175f),
-                new Vector2(360f, 80f), CloseSettings);
+            // Text, layout, colours, and action bindings belong to the saved scene.
+            // Only dynamic setting values and click feedback are changed at runtime.
+            if (menuButtons != null)
+                foreach (Button button in menuButtons)
+                    if (button != null)
+                        button.onClick.AddListener(PlayMenuClick);
             RefreshSettingsLabels();
-            settingsPanel.SetActive(false);
-
-            if (resultPanel != null)
-            {
-                if (retryButton != null)
-                {
-                    RectTransform retryRect = retryButton.GetComponent<RectTransform>();
-                    if (retryRect != null)
-                        retryRect.anchoredPosition = new Vector2(0f, -255f);
-                }
-                CreateMenuButton(resultPanel.transform, "MAIN MENU",
-                    new Vector2(0f, -350f), new Vector2(360f, 80f), MainMenu);
-            }
         }
 
-        private static GameObject CreateOverlay(Transform parent, string objectName)
+        private void PlayMenuClick()
         {
-            GameObject panel = new GameObject(objectName,
-                typeof(RectTransform), typeof(Image));
-            panel.transform.SetParent(parent, false);
-            RectTransform rect = panel.GetComponent<RectTransform>();
-            rect.anchorMin = Vector2.zero;
-            rect.anchorMax = Vector2.one;
-            rect.offsetMin = Vector2.zero;
-            rect.offsetMax = Vector2.zero;
-            panel.GetComponent<Image>().color = new Color(0.025f, 0.03f, 0.055f, 0.97f);
-            return panel;
+            if (cameraFeedback != null)
+                cameraFeedback.PlayUIClick();
         }
 
-        private static TMP_Text CreateMenuText(Transform parent, string label,
+        internal static TMP_Text CreateMenuText(Transform parent, string label,
             Vector2 position, Vector2 size, float fontSize)
         {
             GameObject textObject = new GameObject("Label", typeof(RectTransform),
@@ -308,6 +331,7 @@ namespace Deadline4Sec
             rect.anchoredPosition = position;
             rect.sizeDelta = size;
             TextMeshProUGUI labelText = textObject.GetComponent<TextMeshProUGUI>();
+            GameFont.Apply(labelText);
             labelText.text = label;
             labelText.fontSize = fontSize;
             labelText.color = Color.white;
@@ -319,7 +343,7 @@ namespace Deadline4Sec
             return labelText;
         }
 
-        private static TMP_Text CreateMenuButton(Transform parent, string label,
+        internal TMP_Text CreateMenuButton(Transform parent, string label,
             Vector2 position, Vector2 size, Action onClick)
         {
             GameObject buttonObject = new GameObject(label + "Button",
@@ -333,18 +357,23 @@ namespace Deadline4Sec
             background.color = new Color(0.72f, 0.09f, 0.24f, 1f);
             Button button = buttonObject.GetComponent<Button>();
             button.targetGraphic = background;
-            button.onClick.AddListener(() => onClick());
+            button.onClick.AddListener(() =>
+            {
+                if (cameraFeedback != null)
+                    cameraFeedback.PlayUIClick();
+                onClick();
+            });
             return CreateMenuText(buttonObject.transform, label, Vector2.zero,
                 new Vector2(size.x - 20f, size.y - 10f), 36f);
         }
 
-        private void ToggleSound()
+        public void ToggleSound()
         {
             GamePreferences.SoundEnabled = !GamePreferences.SoundEnabled;
             RefreshSettingsLabels();
         }
 
-        private void ToggleVibration()
+        public void ToggleVibration()
         {
             GamePreferences.VibrationEnabled = !GamePreferences.VibrationEnabled;
             RefreshSettingsLabels();

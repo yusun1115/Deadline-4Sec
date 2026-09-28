@@ -1,0 +1,3 @@
+2026-09-27T10:15:02.9121742Z
+PASS: best score, best distance, best combo, sound and vibration settings across two Unity editor processes.
+Original preference keys/values restored. Android app persistence was not tested.

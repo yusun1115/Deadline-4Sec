@@ -1,0 +1,32 @@
+EndlessRun tutorial, public input only, 60 FPS
+STEP 1 t=0.05
+INPUT Left step=1 t=0.51 pos=(25.87, 0.96, -3.95) feet=-0.04 ground=True homing=False timer=4 score=0
+INPUT Right step=1 t=0.66 pos=(23.37, 1.08, -3.05) feet=0.08 ground=True homing=False timer=3.85 score=0
+STEP 2 t=1.43
+INPUT Up step=2 t=2.69 pos=(25.87, 1.08, 0.85) feet=0.08 ground=True homing=False timer=3.200001 score=0
+STEP 3 t=4.04
+INPUT Down step=3 t=5.29 pos=(25.87, 1.08, 0.85) feet=0.08 ground=True homing=False timer=3.200001 score=0
+STEP 4 t=6.55
+INPUT Right step=4 t=7.74 pos=(25.87, 1.08, 0.45) feet=0.08 ground=True homing=False timer=3.266667 score=0
+STEP 5 t=8.34
+INPUT Right step=5 t=11.69 pos=(25.87, 1.08, 13.45) feet=0.08 ground=True homing=False timer=1.100003 score=0
+STEP 6 t=12.29
+INPUT Left step=6 t=12.74 pos=(28.37, 0.96, -3.95) feet=-0.04 ground=True homing=False timer=4 score=0
+STEP 7 t=14.89
+INPUT Up step=7 t=15.65 pos=(25.87, 1.08, -2.15) feet=0.08 ground=True homing=False timer=3.7 score=0
+INPUT Up step=7 t=15.80 pos=(25.87, 2.11, -1.25) feet=1.11 ground=False homing=False timer=3.55 score=0
+INPUT Up step=7 t=15.95 pos=(25.87, 2.61, 1.09) feet=1.61 ground=False homing=False timer=3.933333 score=100
+STEP 8 t=16.62
+INPUT Up step=8 t=17.08 pos=(25.87, 0.96, -3.95) feet=-0.04 ground=True homing=False timer=4 score=0
+INPUT Down step=8 t=17.23 pos=(25.87, 1.99, -3.05) feet=0.99 ground=False homing=False timer=3.85 score=0
+STEP 9 t=17.93
+INPUT Up step=9 t=18.53 pos=(25.87, 1.08, -2.15) feet=0.08 ground=True homing=False timer=3.85 score=0
+INPUT Up step=9 t=18.68 pos=(25.87, 2.19, -0.35) feet=1.19 ground=False homing=False timer=3.966667 score=100
+INPUT Down step=9 t=18.91 pos=(23.37, 6.34, 8.24) feet=5.34 ground=False homing=False timer=3.883333 score=200
+STEP 10 t=19.67
+INPUT Up step=10 t=20.27 pos=(25.87, 1.08, -2.15) feet=0.08 ground=True homing=False timer=3.85 score=0
+INPUT Up step=10 t=20.42 pos=(25.87, 2.19, -0.35) feet=1.19 ground=False homing=False timer=3.966667 score=100
+INPUT Up step=10 t=20.57 pos=(25.87, 5.57, 7.73) feet=4.57 ground=False homing=False timer=3.966667 score=200
+INPUT Down step=10 t=20.72 pos=(25.87, 8.25, 13.18) feet=7.25 ground=False homing=False timer=3.95 score=300
+GROUND found=True distance=7.245104 point=(25.87, 0.00, 13.18)
+PASS: 10 actual lessons, no failure, records preserved, normal Ready/Go run.

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="1" result="Passed" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-09-27 09:25:22Z" end-time="2026-09-27 09:25:24Z" duration="1.5641322">
+  <test-suite type="TestSuite" id="1000" name="Deadline-4Sec" fullname="Deadline-4Sec" runstate="Runnable" testcasecount="34" result="Passed" start-time="2026-09-27 09:25:22Z" end-time="2026-09-27 09:25:24Z" duration="1.564132" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <test-suite type="Assembly" id="1040" name="Deadline4Sec.AcceptanceTests.dll" fullname="C:/UnityProjects/Deadline-4Sec/ValidationProject/Library/ScriptAssemblies/Deadline4Sec.AcceptanceTests.dll" runstate="Runnable" testcasecount="32" result="Passed" start-time="2026-09-27 09:25:23Z" end-time="2026-09-27 09:25:24Z" duration="1.481203" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="31664" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestSuite" id="1041" name="Deadline4Sec" fullname="Deadline4Sec" runstate="Runnable" testcasecount="32" result="Passed" start-time="2026-09-27 09:25:23Z" end-time="2026-09-27 09:25:24Z" duration="1.480056" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1042" name="AcceptanceTests" fullname="Deadline4Sec.AcceptanceTests" runstate="Runnable" testcasecount="32" result="Passed" start-time="2026-09-27 09:25:23Z" end-time="2026-09-27 09:25:24Z" duration="1.479215" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestFixture" id="1035" name="SceneFlowAcceptanceTests" fullname="Deadline4Sec.AcceptanceTests.SceneFlowAcceptanceTests" classname="Deadline4Sec.AcceptanceTests.SceneFlowAcceptanceTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-09-27 09:25:23Z" end-time="2026-09-27 09:25:24Z" duration="1.477393" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1036" name="ConfirmedKillFeedbackHasABoundedPoolAndStopsWithTheRun" fullname="Deadline4Sec.AcceptanceTests.SceneFlowAcceptanceTests.ConfirmedKillFeedbackHasABoundedPoolAndStopsWithTheRun" methodname="ConfirmedKillFeedbackHasABoundedPoolAndStopsWithTheRun" classname="Deadline4Sec.AcceptanceTests.SceneFlowAcceptanceTests" runstate="Runnable" seed="1329199074" result="Passed" start-time="2026-09-27 09:25:18Z" end-time="2026-09-27 09:25:24Z" duration="6.035876" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Spawn Pattern: Pattern_A_LaneAttack | Easy
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+Spawn Pattern: Pattern_A_LaneAttack | Easy
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+Saving results to: C:/Users/HP/AppData/LocalLow/DefaultCompany/Deadline-4Sec\TestResults.xml
+]]></output>
+            </test-case>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

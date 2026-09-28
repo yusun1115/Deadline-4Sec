@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="30" result="Passed" total="30" passed="30" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-09-27 09:03:06Z" end-time="2026-09-27 09:03:09Z" duration="3.0836619">
+  <test-suite type="TestSuite" id="1000" name="Deadline-4Sec" fullname="Deadline-4Sec" runstate="Runnable" testcasecount="34" result="Passed" start-time="2026-09-27 09:03:06Z" end-time="2026-09-27 09:03:09Z" duration="3.083662" total="30" passed="30" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <test-suite type="Assembly" id="1040" name="Deadline4Sec.AcceptanceTests.dll" fullname="C:/UnityProjects/Deadline-4Sec/ValidationProject/Library/ScriptAssemblies/Deadline4Sec.AcceptanceTests.dll" runstate="Runnable" testcasecount="32" result="Passed" start-time="2026-09-27 09:03:06Z" end-time="2026-09-27 09:03:09Z" duration="2.997507" total="30" passed="30" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="35076" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestSuite" id="1041" name="Deadline4Sec" fullname="Deadline4Sec" runstate="Runnable" testcasecount="32" result="Passed" start-time="2026-09-27 09:03:06Z" end-time="2026-09-27 09:03:09Z" duration="2.996557" total="30" passed="30" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1042" name="AcceptanceTests" fullname="Deadline4Sec.AcceptanceTests" runstate="Runnable" testcasecount="32" result="Passed" start-time="2026-09-27 09:03:06Z" end-time="2026-09-27 09:03:09Z" duration="2.995535" total="30" passed="30" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestFixture" id="1008" name="RuntimeAcceptanceTests" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" testcasecount="26" result="Passed" start-time="2026-09-27 09:02:42Z" end-time="2026-09-27 09:02:42Z" duration="0.385767" total="26" passed="26" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1025" name="AirEnemyDownZoneKillsUnresponsivePlayer" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests.AirEnemyDownZoneKillsUnresponsivePlayer" methodname="AirEnemyDownZoneKillsUnresponsivePlayer" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" seed="606273074" result="Passed" start-time="2026-09-27 09:00:55Z" end-time="2026-09-27 09:00:59Z" duration="4.638098" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[Game Over: Air Enemy Down Attack
+]]></output>
+            </test-case>
+            <test-case id="1024" name="AirHomingChainsTwoActualPrefabEnemies" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests.AirHomingChainsTwoActualPrefabEnemies" methodname="AirHomingChainsTwoActualPrefabEnemies" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" seed="586933015" result="Passed" start-time="2026-09-27 09:00:59Z" end-time="2026-09-27 09:01:04Z" duration="4.528360" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[Normal Jump
+Air Target Scan: 2 Air Enemy, 2 in front/range
+Air Target Found: EnemyAir(Clone)
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+Air Target Scan: 1 Air Enemy, 1 in front/range
+Air Target Found: EnemyAir(Clone)
+Homing Dash Started
+Homing Dash Reached Target
+Enemy Killed by Homing Dash Attack
+Timer Reset by Kill
+Homing Dash Ended
+]]></output>
+            </test-case>
+            <test-case id="1026" name="AirJumpWithoutTargetDoesNotDoubleJump" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests.AirJumpWithoutTargetDoesNotDoubleJump" methodname="AirJumpWithoutTargetDoesNotDoubleJump" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" seed="655222116" result="Passed" start-time="2026-09-27 09:01:04Z" end-time="2026-09-27 09:01:08Z" duration="4.073618" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[Normal Jump
+Air Target Scan: 0 Air Enemy, 0 in front/range
+No Air Target Found
+]]></output>
+            </test-case>
+            <test-case id="1014" name="ClosePassAwardsOneNearMiss" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests.ClosePassAwardsOneNearMiss" methodname="ClosePassAwardsOneNearMiss" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" seed="566629378" result="Passed" start-time="2026-09-27 09:01:08Z" end-time="2026-09-27 09:01:14Z" duration="5.625237" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[NEAR MISS! [Obstacle]
+Timer Reset by Near Miss
+]]></output>
+            </test-case>
+            <test-case id="1032" name="DistanceTracksForwardOnlyAndSpeedRises" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests.DistanceTracksForwardOnlyAndSpeedRises" methodname="DistanceTracksForwardOnlyAndSpeedRises" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" seed="1492656637" result="Passed" start-time="2026-09-27 09:01:14Z" end-time="2026-09-27 09:01:18Z" duration="4.630157" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+            </test-case>
+            <test-case id="1033" name="EasySpawnerDoesNotRepeatPatternOrLoseRewards" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests.EasySpawnerDoesNotRepeatPatternOrLoseRewards" methodname="EasySpawnerDoesNotRepeatPatternOrLoseRewards" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" seed="166893459" result="Passed" start-time="2026-09-27 09:01:18Z" end-time="2026-09-27 09:01:22Z" duration="4.169463" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[Floor Material Missing
+]]></output>
+            </test-case>
+            <test-case id="1019" name="ElevatedFloorUsesRelativeHeightForSlam" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests.ElevatedFloorUsesRelativeHeightForSlam" methodname="ElevatedFloorUsesRelativeHeightForSlam" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" seed="213583276" result="Passed" start-time="2026-09-27 09:01:22Z" end-time="2026-09-27 09:01:27Z" duration="4.171407" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+            </test-case>
+            <test-case id="1027" name="FastFallHeadContactStompsBeforeEnemyAttack" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests.FastFallHeadContactStompsBeforeEnemyAttack" methodname="FastFallHeadContactStompsBeforeEnemyAttack" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" seed="556874277" result="Passed" start-time="2026-09-27 09:01:27Z" end-time="2026-09-27 09:01:31Z" duration="4.432762" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[Enemy Killed by Stomp Attack
+Timer Reset by Kill
+]]></output>
+            </test-case>
+            <test-case id="1011" name="ForwardGroundEnemyKillsJumpingPlayer" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests.ForwardGroundEnemyKillsJumpingPlayer" methodname="ForwardGroundEnemyKillsJumpingPlayer" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" seed="1110323802" result="Passed" start-time="2026-09-27 09:01:31Z" end-time="2026-09-27 09:01:36Z" duration="4.770627" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[Normal Jump
+Game Over: Ground Enemy Front Attack
+]]></output>
+            </test-case>
+            <test-case id="1029" name="ForwardGroundEnemyKillsSlidingPlayer" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests.ForwardGroundEnemyKillsSlidingPlayer" methodname="ForwardGroundEnemyKillsSlidingPlayer" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" seed="1140651144" result="Passed" start-time="2026-09-27 09:01:36Z" end-time="2026-09-27 09:01:40Z" duration="4.655966" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[Game Over: Ground Enemy Front Attack
+]]></output>
+            </test-case>
+            <test-case id="1030" name="FourSecondTimerAndComboAreIndependent" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests.FourSecondTimerAndComboAreIndependent" methodname="FourSecondTimerAndComboAreIndependent" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" seed="124365763" result="Passed" start-time="2026-09-27 09:01:40Z" end-time="2026-09-27 09:01:45Z" duration="4.173597" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+            </test-case>
+            <test-case id="1009" name="GroundEnemyRejectsJumpAndSlideKill" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests.GroundEnemyRejectsJumpAndSlideKill" methodname="GroundEnemyRejectsJumpAndSlideKill" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" seed="1386924150" result="Passed" start-time="2026-09-27 09:01:45Z" end-time="2026-09-27 09:01:45Z" duration="0.002049" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1018" name="GroundSlamKillsTwoAndResetsTimerOnce" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests.GroundSlamKillsTwoAndResetsTimerOnce" methodname="GroundSlamKillsTwoAndResetsTimerOnce" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" seed="57391207" result="Passed" start-time="2026-09-27 09:01:45Z" end-time="2026-09-27 09:01:49Z" duration="4.440900" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[Enemy Killed by Ground Slam Attack
+Enemy Killed by Ground Slam Attack
+Timer Reset by Ground Slam
+]]></output>
+            </test-case>
+            <test-case id="1021" name="HighSlamHeadLandingStompsWithoutPassingThroughOrAoe" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests.HighSlamHeadLandingStompsWithoutPassingThroughOrAoe" methodname="HighSlamHeadLandingStompsWithoutPassingThroughOrAoe" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" seed="307314276" result="Passed" start-time="2026-09-27 09:01:49Z" end-time="2026-09-27 09:01:53Z" duration="4.284244" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[Enemy Killed by Stomp Attack
+Timer Reset by Kill
+]]></output>
+            </test-case>
+            <test-case id="1016" name="IgnoredSideEnemyKillsPlayer" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests.IgnoredSideEnemyKillsPlayer" methodname="IgnoredSideEnemyKillsPlayer" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" seed="1521936716" result="Passed" start-time="2026-09-27 09:01:53Z" end-time="2026-09-27 09:01:58Z" duration="4.676483" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[Game Over: Ground Enemy Side Attack
+]]></output>
+            </test-case>
+            <test-case id="1020" name="InvalidSlamContactDoesNotAwardOtherKills" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests.InvalidSlamContactDoesNotAwardOtherKills" methodname="InvalidSlamContactDoesNotAwardOtherKills" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" seed="1679701642" result="Passed" start-time="2026-09-27 09:01:58Z" end-time="2026-09-27 09:02:02Z" duration="4.031993" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[Game Over: Hit Enemy Without Attack
+]]></output>
+            </test-case>
+            <test-case id="1022" name="LargeSlamStepStopsAtFirstHeadIncludingFootprintEdge" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests.LargeSlamStepStopsAtFirstHeadIncludingFootprintEdge" methodname="LargeSlamStepStopsAtFirstHeadIncludingFootprintEdge" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" seed="636662370" result="Passed" start-time="2026-09-27 09:02:02Z" end-time="2026-09-27 09:02:06Z" duration="4.055587" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[Enemy Killed by Stomp Attack
+Timer Reset by Kill
+]]></output>
+            </test-case>
+            <test-case id="1028" name="MissedFastFallDoesNotIgnoreSideAttack" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests.MissedFastFallDoesNotIgnoreSideAttack" methodname="MissedFastFallDoesNotIgnoreSideAttack" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" seed="840516613" result="Passed" start-time="2026-09-27 09:02:06Z" end-time="2026-09-27 09:02:11Z" duration="4.364621" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[Game Over: Ground Enemy Side Attack
+]]></output>
+            </test-case>
+            <test-case id="1023" name="ObstacleAboveEnemyHeadStopsSlamWithoutStompOrShockwave" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests.ObstacleAboveEnemyHeadStopsSlamWithoutStompOrShockwave" methodname="ObstacleAboveEnemyHeadStopsSlamWithoutStompOrShockwave" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" seed="1975106578" result="Passed" start-time="2026-09-27 09:02:11Z" end-time="2026-09-27 09:02:15Z" duration="4.167110" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+            </test-case>
+            <test-case id="1012" name="ObstacleFrontCollisionKillsPlayer" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests.ObstacleFrontCollisionKillsPlayer" methodname="ObstacleFrontCollisionKillsPlayer" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" seed="678653323" result="Passed" start-time="2026-09-27 09:02:15Z" end-time="2026-09-27 09:02:19Z" duration="4.699818" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[Game Over: Hit Obstacle Obstacle
+]]></output>
+            </test-case>
+            <test-case id="1013" name="ObstacleTopLandingIsSafeAndUnrewarded" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests.ObstacleTopLandingIsSafeAndUnrewarded" methodname="ObstacleTopLandingIsSafeAndUnrewarded" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" seed="1311181265" result="Passed" start-time="2026-09-27 09:02:19Z" end-time="2026-09-27 09:02:24Z" duration="4.900811" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+            </test-case>
+            <test-case id="1010" name="PatternCandidatesHaveInternalRewardIntervalsBelowFourSeconds" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests.PatternCandidatesHaveInternalRewardIntervalsBelowFourSeconds" methodname="PatternCandidatesHaveInternalRewardIntervalsBelowFourSeconds" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" seed="736168680" result="Passed" start-time="2026-09-27 09:02:24Z" end-time="2026-09-27 09:02:24Z" duration="0.008205" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1015" name="SideLaneAttackKillsOneGroundEnemy" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests.SideLaneAttackKillsOneGroundEnemy" methodname="SideLaneAttackKillsOneGroundEnemy" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" seed="746536882" result="Passed" start-time="2026-09-27 09:02:24Z" end-time="2026-09-27 09:02:29Z" duration="4.578409" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[Enemy Killed by Lane Attack
+Timer Reset by Kill
+]]></output>
+            </test-case>
+            <test-case id="1017" name="SufficientlyHighSidePassStaysSafe" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests.SufficientlyHighSidePassStaysSafe" methodname="SufficientlyHighSidePassStaysSafe" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" seed="1188926368" result="Passed" start-time="2026-09-27 09:02:29Z" end-time="2026-09-27 09:02:34Z" duration="4.765434" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+            </test-case>
+            <test-case id="1034" name="SwipeRunsOnceAndNonButtonHudDoesNotBlockIt" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests.SwipeRunsOnceAndNonButtonHudDoesNotBlockIt" methodname="SwipeRunsOnceAndNonButtonHudDoesNotBlockIt" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" seed="2069316046" result="Passed" start-time="2026-09-27 09:02:34Z" end-time="2026-09-27 09:02:38Z" duration="4.173977" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+            </test-case>
+            <test-case id="1031" name="TimerShowsNormalWarningAndCriticalColors" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests.TimerShowsNormalWarningAndCriticalColors" methodname="TimerShowsNormalWarningAndCriticalColors" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" seed="442865766" result="Passed" start-time="2026-09-27 09:02:38Z" end-time="2026-09-27 09:02:42Z" duration="4.157469" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1035" name="SceneFlowAcceptanceTests" fullname="Deadline4Sec.AcceptanceTests.SceneFlowAcceptanceTests" classname="Deadline4Sec.AcceptanceTests.SceneFlowAcceptanceTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-09-27 09:03:06Z" end-time="2026-09-27 09:03:09Z" duration="2.984118" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1036" name="ConfirmedKillFeedbackHasABoundedPoolAndStopsWithTheRun" fullname="Deadline4Sec.AcceptanceTests.SceneFlowAcceptanceTests.ConfirmedKillFeedbackHasABoundedPoolAndStopsWithTheRun" methodname="ConfirmedKillFeedbackHasABoundedPoolAndStopsWithTheRun" classname="Deadline4Sec.AcceptanceTests.SceneFlowAcceptanceTests" runstate="Runnable" seed="1470500887" result="Passed" start-time="2026-09-27 09:02:42Z" end-time="2026-09-27 09:02:48Z" duration="5.468478" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[Spawn Pattern: Pattern_A_LaneAttack | Easy
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+Spawn Pattern: Pattern_A_LaneAttack | Easy
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+Enemy Killed by Lane Attack
+Timer Reset by Kill
+]]></output>
+            </test-case>
+            <test-case id="1039" name="ResultMainMenuReturnsToTitle" fullname="Deadline4Sec.AcceptanceTests.SceneFlowAcceptanceTests.ResultMainMenuReturnsToTitle" methodname="ResultMainMenuReturnsToTitle" classname="Deadline4Sec.AcceptanceTests.SceneFlowAcceptanceTests" runstate="Runnable" seed="1760443079" result="Passed" start-time="2026-09-27 09:02:48Z" end-time="2026-09-27 09:02:53Z" duration="5.930226" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[Spawn Pattern: Pattern_B_JumpSlide | Easy
+Spawn Pattern: Pattern_A_LaneAttack | Easy
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+Spawn Pattern: Pattern_A_LaneAttack | Easy
+]]></output>
+            </test-case>
+            <test-case id="1038" name="ResultRetryStartsFreshRunIntro" fullname="Deadline4Sec.AcceptanceTests.SceneFlowAcceptanceTests.ResultRetryStartsFreshRunIntro" methodname="ResultRetryStartsFreshRunIntro" classname="Deadline4Sec.AcceptanceTests.SceneFlowAcceptanceTests" runstate="Runnable" seed="1152519504" result="Passed" start-time="2026-09-27 09:02:53Z" end-time="2026-09-27 09:03:01Z" duration="7.997004" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[Spawn Pattern: Pattern_A_LaneAttack | Easy
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+Spawn Pattern: Pattern_A_LaneAttack | Easy
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+Spawn Pattern: Pattern_A_LaneAttack | Easy
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+Spawn Pattern: Pattern_A_LaneAttack | Easy
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+]]></output>
+            </test-case>
+            <test-case id="1037" name="TitleStartWaitsForGoBeforeRunning" fullname="Deadline4Sec.AcceptanceTests.SceneFlowAcceptanceTests.TitleStartWaitsForGoBeforeRunning" methodname="TitleStartWaitsForGoBeforeRunning" classname="Deadline4Sec.AcceptanceTests.SceneFlowAcceptanceTests" runstate="Runnable" seed="163404954" result="Passed" start-time="2026-09-27 09:03:01Z" end-time="2026-09-27 09:03:09Z" duration="7.238960" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Spawn Pattern: Pattern_B_JumpSlide | Easy
+Spawn Pattern: Pattern_A_LaneAttack | Easy
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+Spawn Pattern: Pattern_A_LaneAttack | Easy
+Saving results to: C:/Users/HP/AppData/LocalLow/DefaultCompany/Deadline-4Sec\TestResults.xml
+]]></output>
+            </test-case>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>
