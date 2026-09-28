@@ -73,7 +73,7 @@ Unity Editor가 원본 프로젝트를 열고 있어서, 게임 스크립트·�
 
 ## 인터랙티브 튜토리얼과 PC 회귀 (2026-09-27)
 
-- 타이틀의 Tutorial에서 10단계 실제 연습을 시작한다. 이동, 점프, 슬라이드, 레인 처치, 4초 회복, 비접촉 Near Miss, 호밍, 빠른 낙하, Stomp, 맨 바닥 Slam을 수행해야 진행한다. 실패한 단계만 재시도하며 연습 기록은 최고 기록에 저장하지 않는다.
+- 최초 타이틀 탭 또는 설정의 Tutorial에서 10단계 실제 연습을 시작한다. 이동, 점프, 슬라이드, 레인 처치, 4초 회복, 비접촉 Near Miss, 호밍, 빠른 낙하, Stomp, 맨 바닥 Slam을 수행해야 진행한다. 실패한 단계만 재시도하며 연습 기록은 최고 기록에 저장하지 않는다.
 - 첫 경로에서 마지막 슬램 착지점과 대상 간격이 멀어 광역 처치가 없었다. [실패 입력 기록](tutorial-failure-slam.txt), [첫 실패 결과](tutorial-failure-results.xml). 바닥 거리 탐지와 슬램 발동은 정상이라 연습 대상 Z만 23.5→21.5m로 조정했다. 게임의 슬램 최소 높이/반경과 머리 우선 규칙은 유지했다.
 - 안내 입력만으로 30/60FPS에서 10단계를 모두 완료하고 새 일반 런의 Ready?→Go!로 진입했다. 실패/재시도·메뉴 복귀·최고 기록 보존도 통과했다. 처치/타이머/위치를 테스트가 주입하지 않으며, 단계의 준비·재배치는 실제 튜토리얼이 수행한다. [60FPS 입력 기록](tutorial-replay.txt), [30FPS 입력 기록](tutorial-replay-30fps.txt).
 - 기존 코어·HUD·폰트·메뉴·시작·VFX·시드 12345 코스와 튜토리얼 3개를 합쳐 **35 통과 / 0 실패**. [회귀 결과](tutorial-regression-results.xml). 이는 검증 조건에서의 기능 증거이며 신규 플레이어의 설명 없는 이해도를 입증하지 않는다.
@@ -87,16 +87,14 @@ Unity Editor가 원본 프로젝트를 열고 있어서, 게임 스크립트·�
 - 같은 시드 98765 / 30FPS / 180.01초 재실행 **통과**: 실제 보상 516회, 최대 공백 1.73초, Score 234,800 / Distance 3,367.9m. 최대 자동 전진 속도에서 패턴 A–E 연결·반복 금지·난도 해금을 유지했다. [최종 결과](long-course-results.xml), [입력 기록](course-replay-long.txt).
 - 새 코스 경로도 정상 공개 입력만 사용한다. 적 처치·타이머 초기화·속도 변경·텔레포트를 주입하지 않는다. APK/Android 성능 측정이나 모든 시드/설정의 보장을 의미하지 않는다.
 
-## Android 개발 APK (2026-09-27)
+## Android 개발 APK (코인·아이템 반영, 2026-09-28 갱신)
 
-- 최종 빌드 성공: Unity 6000.3.7f1, Development + Script Debugging, IL2CPP / ARM64, EndlessRun 씬과 10단계 튜토리얼·씬에 저장된 타이틀 포함. 오류 0개·경고 3개. 타이틀 편집 구조 변경 후 갱신한 빌드는 2026-09-27 14:38:29 UTC에 완료됐다. [빌드 기록](android-build.json).
-- APK: `Builds/Android/Deadline4Sec-Development.apk`, **123,947,220 bytes (약 124MB)**. 빌드 보고서의 전체 출력 크기는 디버그 산출물을 포함하므로 APK 파일 크기와 분리해 기록한다.
-- Android 최소 API 25 / 대상 API 36. `aapt`로 패키지와 Manifest를 검사했고 `android.permission.VIBRATE` 포함을 확인했다. `apksigner verify` 종료 코드 0이며 ARM64 `libil2cpp.so`가 포함됐다.
-- 현재 패키지 ID는 프로젝트에 설정된 `com.UnityTechnologies.com.unity.template.urpblank`다. 출시용 ID·최적화/스토어 검증은 별도 작업이다.
-- 최종 경고는 기존 Unity Pipeline 패키지의 Runtime 설정 없음 1건과 Editor 전용 필드 미사용 2건이다 (`CoursePattern.referenceForwardSpeed`, `MobileSwipeInput.enableMouseSwipeTesting`). 해당 Pipeline 부가 기능은 Player 빌드에서 꺼지며 게임의 URP 렌더링과 구분한다.
-- 앞선 튜토리얼 APK는 기존 패키징의 미사용 공간 약 90MB가 남아 214MB였다. 검증 프로젝트의 생성된 `launcher/build` 캐시만 정리한 후 다시 패키징해 124MB로 줄였다. 타이틀 변경 후 이번 빌드도 같은 생성 캐시를 정리하고 패키징했다.
-- APK [SHA-256](android-apk-sha256.txt), 빌드에 사용한 주요 게임 코드·프리팹·폰트·리소스·빌드 설정과 메타데이터 **70개** [소스 SHA-256](android-source-sha256.txt)을 기록했다. 모두 원본 작업 공간과 검증 프로젝트의 해시가 일치한다. 동일 원본의 폰트 글리프 캐시도 동기화했다.
-- 이 APK는 기기에 설치하거나 실행하지 않았다. 빌드/서명/내용 검사는 Android 실기기 Acceptance 통과 증거가 아니다.
+- Unity 6000.3.7f1에서 Development + Script Debugging, IL2CPP / ARM64, `EndlessRun` 씬을 빌드했다. 코인·6종 파워업 프리팹, 업그레이드 UI, 기존 타이틀/튜토리얼이 포함된다. 최종 Unity 로그의 `Build Finished, Result: Success`를 확인했다. [빌드 기록](android-build.json).
+- APK: `Builds/Android/Deadline4Sec-Development.apk`, **124,292,014 bytes**. 첫 패키징에서 발생한 약 90MB의 ZIP 빈 공간은 검증 프로젝트의 생성된 Gradle 출력만 정리해 재패키징했다.
+- `apksigner verify --verbose`에서 v2 서명 검증 성공, 서명자 1명. `aapt`에서 최소 API 25, 대상 API 36, `arm64-v8a`, `android.permission.VIBRATE`를 확인했다. 현재 패키지 ID는 `com.UnityTechnologies.com.unity.template.urpblank`다.
+- 최종 BuildPipeline은 성공했으나 직후 `Verification/android-build.json`을 쓰는 단계에서 일시적인 Win32 IO 1224 오류로 배치 명령은 종료 코드 1을 반환했다. APK 자체는 별도 서명·패키지 검사를 통과했고 JSON은 Unity 로그와 최종 파일 정보로 복원했다. 최종 경고 수와 전체 출력 크기는 복원하지 않아 `null`로 기록했다.
+- APK [SHA-256](android-apk-sha256.txt)과 작업 공간의 모든 `Assets` 파일 및 주요 설정 **313개** [SHA-256](android-source-sha256.txt)을 기록했다. 313개 `Assets` 파일은 원본 프로젝트와 검증 프로젝트에서 해시가 일치한다. 검증 프로젝트에 남은 이전 테스트용 추가 파일 6개는 이 목록에 포함하지 않았다.
+- 이 APK는 Android 기기에 설치하거나 실행하지 않았다. 빌드/서명/내용 검사는 실기기 Acceptance 통과 증거가 아니다.
 
 ## PC 저장의 프로세스 재실행 검증 (2026-09-27)
 
@@ -114,3 +112,19 @@ Unity Editor가 원본 프로젝트를 열고 있어서, 게임 스크립트·�
 - 480×800 타이틀/설정/시작 화면을 렌더링해 확인했다. 새 타이틀 편집과 메뉴 흐름 검증은 PC 범위이며 Android 실행은 포함하지 않는다.
 - 변경된 씬/메뉴를 포함한 APK를 다시 제작하고 서명·최소/대상 API·VIBRATE 권한·ARM64를 확인했다. 주요 소스 70개가 원본/검증 프로젝트와 일치하며 APK와 소스 해시를 갱신했다. 기기 설치/실행은 미실행이다.
 - Windows Unity 에디터 저장 증거이며 Android 앱의 설치/재실행 저장 검증을 대신하지 않는다. 전체 남은 조건은 [PC Acceptance 범위 점검](pc-acceptance-audit.md)에 기록했다.
+
+## 타이틀 탭·튜토리얼 Skip (2026-09-28)
+
+- 사용자가 편집한 `Titlelogo`, `TitleFrame`, `TitleFrame (1)` 이미지는 유지했다. 타이틀의 Start/Tutorial 버튼을 제거하고 `Tap to start` 텍스트와 화면 전체의 투명한 탭 영역을 씬에 저장했다. 프레임/로고 Image의 Raycast Target을 꺼서 화면 탭이 가로막히지 않게 했다. [현재 480×800 타이틀](font-title.png).
+- 완료/스킵 기록이 없는 첫 타이틀 탭은 튜토리얼로 간다. 기록이 있으면 기존 Ready?→Go! 일반 런으로 간다. Settings에는 진동 아래 Tutorial 버튼을 추가해 재연습할 수 있다.
+- 연습 우측 상단 Skip과 예/아니오 확인창을 세 씬에 저장했다. 확인 중 시간·이동·입력·단계 전환이 멈춘다. 아니오는 현재 단계로 돌아가고 예는 완료 플래그를 저장한 뒤 새 일반 런으로 연결한다. 한글 텍스트와 GFCRedSpirit-Bold 사용을 [확인창 렌더링](tutorial-skip-confirmation.png)에서 확인했다.
+- 첫 관련 실행에서 기존 타이틀 편집 검사가 사용자가 제거한 `TitleText`를 가정해 **9 통과 / 2 실패**했다. 테스트를 실제 이미지 타이틀 구조에 맞춘 뒤 [메뉴 4개 통과](tap-menu-recheck-results.xml). 이후 장식 이미지가 탭을 가로채는 것을 발견해 Raycast Target을 수정하고, [실제 중앙/설정 탭 Raycast 포함 4개 통과](tap-raycast-results.xml)했다. 다른 메뉴·씬 흐름·튜토리얼 7개는 [첫 실행 결과](tap-tutorial-results.xml)에서 통과했다.
+- 검증 프로젝트에 사용자 로고/프레임 원본 PNG가 누락된 상태의 첫 APK는 최종 산출물로 채택하지 않았다. 원본 이미지와 `.meta` 5개를 동기화하고 [타이틀·첫 탭 렌더링 2개를 재검증](tap-art-results.xml)했다. Android 실기기 입력은 아직 확인하지 않았다.
+- 이미지가 포함된 당시 APK를 다시 빌드해 서명 v2, ARM64, 최소 API 25·대상 API 36, VIBRATE 권한을 확인했다. 이후 코인·아이템을 포함한 APK 검증은 위 Android 섹션에 기록했다. 설치/기기 실행은 사용자 범위에 따라 수행하지 않았다.
+
+## 코인·6종 파워업·업그레이드 (2026-09-28)
+
+- 코인과 6종 픽업을 패턴 A–E에 수동 배치했다. `GameManager`의 `CoinWallet`, `PowerUpManager`, `UpgradeMenu`와 Inspector에서 편집 가능한 `PowerUpBalance.asset`이 런 중 효과·정산·영구 레벨을 관리한다. 하이어라키의 `Canvas/TitlePanel/CoinBalanceText`·`UpgradeButton`과 `Canvas/UpgradePanel`에서 화면을 직접 편집할 수 있다. [편집/배치 안내](../COIN_POWERUP_SETUP.md).
+- [신규 PC 테스트 5개](coin-powerup-results.xml) 통과: 프리팹·세 씬의 UI/버튼 참조, 코인 정산·비용/레벨 저장·MAX, 타이머 정지/확장, 점수 x2, 질주 적 처치·장애물 무시, 콤보 유지, 자석 수집, 업그레이드 화면 왕복. [480×800 업그레이드 화면](upgrade-menu.png)을 렌더링했다.
+- [전체 회귀 48개](coin-powerup-regression-results.xml) 통과: 기존 코어 조작·장애물 윗면·Stomp/Slam·패턴·튜토리얼/메뉴 테스트를 포함한다. 최종 변경인 Lv.7 `MAX` 버튼 표기와 Editor 전용 코인 테스트 메뉴는 신규 5개 재실행으로 확인했다.
+- 코인/아이템의 실제 플레이 배치 난이도와 Android 터치·성능·저장 복원은 실기기에서 추가 확인이 필요하다.

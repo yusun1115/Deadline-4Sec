@@ -42,6 +42,7 @@ namespace Deadline4Sec
         private float nearMissVisibleUntil;
         private bool practice;
         private float practiceSpeed;
+        private PowerUpManager powerUps;
 
         public event System.Action NearMissRecorded;
 
@@ -63,6 +64,7 @@ namespace Deadline4Sec
                 playerController = FindFirstObjectByType<PlayerController>();
             if (gameTimer == null)
                 gameTimer = FindFirstObjectByType<GameTimer>();
+            powerUps = FindFirstObjectByType<PowerUpManager>();
             GameFont.Apply(scoreText);
             GameFont.Apply(comboText);
             GameFont.Apply(distanceText);
@@ -91,11 +93,17 @@ namespace Deadline4Sec
             CurrentRunTime += Time.deltaTime;
             Distance = Mathf.Max(Distance, playerController.transform.position.z - startZ);
 
-            if (CurrentCombo > 0 && Time.time - lastSuccessTime >= comboTimeout)
-                CurrentCombo = 0;
+            if (CurrentCombo > 0)
+            {
+                if (powerUps != null && powerUps.ComboSealed)
+                    lastSuccessTime += Time.deltaTime;
+                else if (Time.time - lastSuccessTime >= comboTimeout)
+                    CurrentCombo = 0;
+            }
 
             CurrentForwardSpeed = practice ? practiceSpeed : Mathf.Min(maxForwardSpeed,
-                baseForwardSpeed + CurrentRunTime * speedIncreasePerSecond);
+                baseForwardSpeed + CurrentRunTime * speedIncreasePerSecond) *
+                (powerUps != null ? powerUps.SpeedMultiplier : 1f);
             playerController.SetRunForwardSpeed(CurrentForwardSpeed);
             UpdateDebugUI();
         }
@@ -181,13 +189,15 @@ namespace Deadline4Sec
 
         private void RecordSuccess(int basePoints)
         {
-            if (CurrentCombo > 0 && Time.time - lastSuccessTime >= comboTimeout)
+            if (CurrentCombo > 0 && (powerUps == null || !powerUps.ComboSealed) &&
+                Time.time - lastSuccessTime >= comboTimeout)
                 CurrentCombo = 0;
 
             CurrentCombo++;
             BestCombo = Mathf.Max(BestCombo, CurrentCombo);
             lastSuccessTime = Time.time;
-            CurrentScore += basePoints * ScoreMultiplier;
+            CurrentScore += basePoints * ScoreMultiplier *
+                (powerUps != null ? powerUps.ScoreMultiplier : 1);
             UpdateDebugUI();
         }
 

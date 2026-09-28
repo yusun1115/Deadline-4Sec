@@ -78,6 +78,14 @@ namespace Deadline4Sec
             if (gameTimer == null || !gameTimer.IsRunning)
                 return;
 
+            PowerUpManager powerUps = gameTimer.GetComponent<PowerUpManager>();
+            if (powerUps != null && powerUps.ReaperRushActive)
+            {
+                trackedPlayer.TryReaperRushKill(owner);
+                ClearTrackedPlayer();
+                return;
+            }
+
             if (IsSafelyAboveSideAttack())
             {
                 ClearTrackedPlayer();

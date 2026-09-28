@@ -3,430 +3,430 @@ ENTER t=1.50 z=31.94 Pattern_A_LaneAttack tier=Easy feet=0.08
 INPUT t=1.70 z=34.36 lane=0 feet=0.08 RequestMoveRight -> 01 Right - Lane Attack dz=2.51
 REWARD t=1.72 z=34.56 score=100 gap=1.72
 INPUT t=2.12 z=39.40 lane=1 feet=0.08 RequestMoveLeft -> 02 Center - Lane Attack dz=2.47
-REWARD t=2.13 z=39.61 score=200 gap=0.42
+REWARD t=2.13 z=39.60 score=200 gap=0.42
 INPUT t=2.53 z=44.46 lane=0 feet=0.08 RequestMoveLeft -> 03 Left - Lane Attack dz=2.41
 REWARD t=2.55 z=44.66 score=300 gap=0.42
 INPUT t=2.93 z=49.33 lane=-1 feet=0.08 RequestMoveRight -> 04 Center - Lane Attack dz=2.54
-REWARD t=2.95 z=49.53 score=400 gap=0.40
+REWARD t=2.95 z=49.53 score=500 gap=0.40
 ENTER t=3.48 z=56.03 Pattern_B_JumpSlide tier=Easy feet=0.08
 INPUT t=3.58 z=57.25 lane=0 feet=0.08 RequestJump -> 01 Jump / Near Miss dz=2.62
-REWARD t=3.88 z=60.92 score=700 gap=0.93
+REWARD t=3.88 z=60.92 score=1100 gap=0.93
 INPUT t=3.97 z=61.94 lane=0 feet=1.59 RequestSlide -> 02 Slide / Near Miss dz=3.93
 INPUT t=4.57 z=69.29 lane=0 feet=0.08 RequestJump -> 03 Jump / Near Miss dz=2.58
 INPUT t=4.85 z=72.77 lane=0 feet=1.55 RequestMoveRight -> 01 Right - Lane Attack dz=10.10
-REWARD t=4.87 z=72.98 score=1000 gap=0.98
+REWARD t=4.87 z=72.98 score=1700 gap=0.98
 INPUT t=5.12 z=76.05 lane=1 feet=1.10 RequestMoveLeft -> 01 Right - Lane Attack dz=6.82
 ENTER t=5.27 z=77.90 Pattern_A_LaneAttack tier=Easy feet=0.08
 INPUT t=5.47 z=80.36 lane=0 feet=0.08 RequestMoveRight -> 01 Right - Lane Attack dz=2.51
-REWARD t=5.48 z=80.57 score=1200 gap=0.62
+REWARD t=5.48 z=80.57 score=2100 gap=0.62
 INPUT t=5.87 z=85.30 lane=1 feet=0.08 RequestMoveLeft -> 02 Center - Lane Attack dz=2.57
-REWARD t=5.88 z=85.51 score=1400 gap=0.40
+REWARD t=5.88 z=85.50 score=2500 gap=0.40
 INPUT t=6.28 z=90.45 lane=0 feet=0.08 RequestMoveLeft -> 03 Left - Lane Attack dz=2.42
-REWARD t=6.30 z=90.66 score=1600 gap=0.42
+REWARD t=6.30 z=90.66 score=2900 gap=0.42
 INPUT t=6.68 z=95.41 lane=-1 feet=0.08 RequestMoveRight -> 04 Center - Lane Attack dz=2.46
-REWARD t=6.70 z=95.61 score=1900 gap=0.40
+REWARD t=6.70 z=95.61 score=3500 gap=0.40
 ENTER t=7.22 z=102.03 Pattern_B_JumpSlide tier=Easy feet=0.08
 INPUT t=7.32 z=103.27 lane=0 feet=0.08 RequestJump -> 01 Jump / Near Miss dz=2.60
-REWARD t=7.62 z=107.01 score=2350 gap=0.92
+REWARD t=7.62 z=107.01 score=4400 gap=0.92
 INPUT t=7.68 z=107.84 lane=0 feet=1.60 RequestSlide -> 02 Slide / Near Miss dz=4.03
 INPUT t=8.28 z=115.32 lane=0 feet=0.08 RequestJump -> 03 Jump / Near Miss dz=2.55
 INPUT t=8.57 z=118.87 lane=0 feet=1.55 RequestMoveRight -> 01 Right - Lane Attack dz=10.00
-REWARD t=8.58 z=119.08 score=2800 gap=0.97
+REWARD t=8.58 z=119.08 score=5300 gap=0.97
 INPUT t=8.82 z=122.00 lane=1 feet=1.18 RequestMoveLeft -> 01 Right - Lane Attack dz=6.87
 ENTER t=8.97 z=123.88 Pattern_A_LaneAttack tier=Easy feet=0.21
 INPUT t=9.17 z=126.39 lane=0 feet=0.08 RequestMoveRight -> 01 Right - Lane Attack dz=2.48
-REWARD t=9.18 z=126.60 score=3100 gap=0.60
+REWARD t=9.18 z=126.59 score=5900 gap=0.60
 INPUT t=9.57 z=131.41 lane=1 feet=0.08 RequestMoveLeft -> 02 Center - Lane Attack dz=2.46
-REWARD t=9.58 z=131.62 score=3400 gap=0.40
-INPUT t=9.97 z=136.45 lane=0 feet=0.08 RequestMoveLeft -> 03 Left - Lane Attack dz=2.42
-REWARD t=9.98 z=136.66 score=3700 gap=0.40
+REWARD t=9.58 z=131.62 score=6500 gap=0.40
+INPUT t=9.97 z=136.44 lane=0 feet=0.08 RequestMoveLeft -> 03 Left - Lane Attack dz=2.43
+REWARD t=9.98 z=136.65 score=7100 gap=0.40
 INPUT t=10.35 z=141.28 lane=-1 feet=0.08 RequestMoveRight -> 04 Center - Lane Attack dz=2.59
-REWARD t=10.37 z=141.49 score=4000 gap=0.38
+REWARD t=10.37 z=141.49 score=7700 gap=0.38
 ENTER t=10.88 z=148.02 Pattern_B_JumpSlide tier=Easy feet=0.08
 INPUT t=10.98 z=149.28 lane=0 feet=0.08 RequestJump -> 01 Jump / Near Miss dz=2.59
-REWARD t=11.27 z=152.87 score=4450 gap=0.90
+REWARD t=11.27 z=152.87 score=8600 gap=0.90
 INPUT t=11.33 z=153.72 lane=0 feet=1.61 RequestSlide -> 02 Slide / Near Miss dz=4.15
 INPUT t=11.92 z=161.12 lane=0 feet=0.08 RequestJump -> 03 Jump / Near Miss dz=2.75
 INPUT t=12.20 z=164.73 lane=0 feet=1.55 RequestMoveRight -> 01 Right - Lane Attack dz=10.14
-REWARD t=12.22 z=164.94 score=4900 gap=0.95
+REWARD t=12.22 z=164.94 score=9500 gap=0.95
 INPUT t=12.45 z=167.91 lane=1 feet=1.18 RequestMoveLeft -> 01 Right - Lane Attack dz=6.96
 ENTER t=12.62 z=170.04 Pattern_A_LaneAttack tier=Easy feet=0.08
 INPUT t=12.80 z=172.38 lane=0 feet=0.08 RequestMoveRight -> 01 Right - Lane Attack dz=2.49
-REWARD t=12.82 z=172.59 score=5200 gap=0.60
+REWARD t=12.82 z=172.59 score=10100 gap=0.60
 INPUT t=13.18 z=177.28 lane=1 feet=0.08 RequestMoveLeft -> 02 Center - Lane Attack dz=2.59
-REWARD t=13.20 z=177.49 score=5600 gap=0.38
+REWARD t=13.20 z=177.49 score=10900 gap=0.38
 INPUT t=13.58 z=182.40 lane=0 feet=0.08 RequestMoveLeft -> 03 Left - Lane Attack dz=2.47
-REWARD t=13.60 z=182.61 score=6000 gap=0.40
-INPUT t=13.97 z=187.32 lane=-1 feet=0.08 RequestMoveRight -> 04 Center - Lane Attack dz=2.55
-REWARD t=13.98 z=187.53 score=6400 gap=0.38
+REWARD t=13.60 z=182.61 score=11700 gap=0.40
+INPUT t=13.97 z=187.31 lane=-1 feet=0.08 RequestMoveRight -> 04 Center - Lane Attack dz=2.56
+REWARD t=13.98 z=187.53 score=12500 gap=0.38
 ENTER t=14.48 z=193.96 Pattern_B_JumpSlide tier=Easy feet=0.08
 INPUT t=14.58 z=195.24 lane=0 feet=0.08 RequestJump -> 01 Jump / Near Miss dz=2.63
-REWARD t=14.87 z=198.89 score=7000 gap=0.88
+REWARD t=14.87 z=198.89 score=13700 gap=0.88
 INPUT t=14.93 z=199.75 lane=0 feet=1.61 RequestSlide -> 02 Slide / Near Miss dz=4.12
 INPUT t=15.50 z=207.07 lane=0 feet=0.08 RequestJump -> 03 Jump / Near Miss dz=2.80
-INPUT t=15.78 z=210.74 lane=0 feet=1.55 RequestMoveRight -> 01 Right - Lane Attack dz=10.13
-REWARD t=15.80 z=210.95 score=7600 gap=0.93
+INPUT t=15.78 z=210.73 lane=0 feet=1.55 RequestMoveRight -> 01 Right - Lane Attack dz=10.14
+REWARD t=15.80 z=210.95 score=14900 gap=0.93
 INPUT t=16.03 z=213.97 lane=1 feet=1.18 RequestMoveLeft -> 01 Right - Lane Attack dz=6.90
 ENTER t=16.18 z=215.92 Pattern_A_LaneAttack tier=Easy feet=0.21
 INPUT t=16.37 z=218.30 lane=0 feet=0.08 RequestMoveRight -> 01 Right - Lane Attack dz=2.57
-REWARD t=16.38 z=218.51 score=8000 gap=0.58
+REWARD t=16.38 z=218.51 score=15700 gap=0.58
 INPUT t=16.75 z=223.28 lane=1 feet=0.08 RequestMoveLeft -> 02 Center - Lane Attack dz=2.59
-REWARD t=16.77 z=223.50 score=8400 gap=0.38
-INPUT t=17.15 z=228.49 lane=0 feet=0.08 RequestMoveLeft -> 03 Left - Lane Attack dz=2.38
-REWARD t=17.17 z=228.70 score=8800 gap=0.40
+REWARD t=16.77 z=223.49 score=16500 gap=0.38
+INPUT t=17.15 z=228.48 lane=0 feet=0.08 RequestMoveLeft -> 03 Left - Lane Attack dz=2.39
+REWARD t=17.17 z=228.70 score=17300 gap=0.40
 INPUT t=17.53 z=233.48 lane=-1 feet=0.08 RequestMoveRight -> 04 Center - Lane Attack dz=2.39
-REWARD t=17.55 z=233.70 score=9200 gap=0.38
+REWARD t=17.55 z=233.70 score=18100 gap=0.38
 ENTER t=18.03 z=240.02 Pattern_B_JumpSlide tier=Easy feet=0.08
 INPUT t=18.12 z=241.11 lane=0 feet=0.08 RequestJump -> 01 Jump / Near Miss dz=2.76
-REWARD t=18.42 z=245.04 score=9800 gap=0.87
+REWARD t=18.42 z=245.04 score=19300 gap=0.87
 INPUT t=18.47 z=245.69 lane=0 feet=1.61 RequestSlide -> 02 Slide / Near Miss dz=4.18
 INPUT t=19.03 z=253.13 lane=0 feet=0.08 RequestJump -> 03 Jump / Near Miss dz=2.74
 INPUT t=19.32 z=256.85 lane=0 feet=1.55 RequestMoveRight -> 01 Right - Lane Attack dz=10.02
-REWARD t=19.33 z=257.07 score=10400 gap=0.92
+REWARD t=19.33 z=257.07 score=20500 gap=0.92
 INPUT t=19.55 z=259.93 lane=1 feet=1.26 RequestMoveLeft -> 01 Right - Lane Attack dz=6.94
 ENTER t=19.70 z=261.90 Pattern_A_LaneAttack tier=Easy feet=0.35
 INPUT t=19.88 z=264.32 lane=0 feet=0.08 RequestMoveRight -> 01 Right - Lane Attack dz=2.55
-REWARD t=19.90 z=264.54 score=10800 gap=0.57
+REWARD t=19.90 z=264.54 score=21300 gap=0.57
 INPUT t=20.27 z=269.38 lane=1 feet=0.08 RequestMoveLeft -> 02 Center - Lane Attack dz=2.49
-REWARD t=20.28 z=269.60 score=11200 gap=0.38
+REWARD t=20.28 z=269.60 score=22100 gap=0.38
 INPUT t=20.65 z=274.45 lane=0 feet=0.08 RequestMoveLeft -> 03 Left - Lane Attack dz=2.42
-REWARD t=20.67 z=274.67 score=11600 gap=0.38
+REWARD t=20.67 z=274.67 score=22900 gap=0.38
 INPUT t=21.02 z=279.31 lane=-1 feet=0.08 RequestMoveRight -> 04 Center - Lane Attack dz=2.56
-REWARD t=21.03 z=279.53 score=12000 gap=0.37
+REWARD t=21.03 z=279.53 score=23700 gap=0.37
 ENTER t=21.52 z=285.95 Pattern_B_JumpSlide tier=Easy feet=0.08
 INPUT t=21.60 z=287.06 lane=0 feet=0.08 RequestJump -> 01 Jump / Near Miss dz=2.81
-REWARD t=21.90 z=291.05 score=12600 gap=0.87
+REWARD t=21.90 z=291.05 score=24900 gap=0.87
 INPUT t=21.95 z=291.71 lane=0 feet=1.61 RequestSlide -> 02 Slide / Near Miss dz=4.16
 INPUT t=22.50 z=299.05 lane=0 feet=0.08 RequestJump -> 03 Jump / Near Miss dz=2.82
 INPUT t=22.78 z=302.83 lane=0 feet=1.55 RequestMoveRight -> 01 Right - Lane Attack dz=10.04
-REWARD t=22.80 z=303.05 score=13200 gap=0.90
+REWARD t=22.80 z=303.05 score=26100 gap=0.90
 INPUT t=23.02 z=305.95 lane=1 feet=1.26 RequestMoveLeft -> 01 Right - Lane Attack dz=6.92
 ENTER t=23.17 z=307.96 Pattern_A_LaneAttack tier=Easy feet=0.35
-INPUT t=23.35 z=310.42 lane=0 feet=0.08 RequestMoveRight -> 01 Right - Lane Attack dz=2.46
-REWARD t=23.37 z=310.64 score=13600 gap=0.57
+INPUT t=23.35 z=310.41 lane=0 feet=0.08 RequestMoveRight -> 01 Right - Lane Attack dz=2.46
+REWARD t=23.37 z=310.64 score=26900 gap=0.57
 INPUT t=23.72 z=315.33 lane=1 feet=0.08 RequestMoveLeft -> 02 Center - Lane Attack dz=2.54
-REWARD t=23.73 z=315.56 score=14000 gap=0.37
+REWARD t=23.73 z=315.56 score=27700 gap=0.37
 INPUT t=24.10 z=320.48 lane=0 feet=0.08 RequestMoveLeft -> 03 Left - Lane Attack dz=2.39
-REWARD t=24.12 z=320.71 score=14400 gap=0.38
+REWARD t=24.12 z=320.71 score=28500 gap=0.38
 INPUT t=24.47 z=325.42 lane=-1 feet=0.08 RequestMoveRight -> 04 Center - Lane Attack dz=2.45
-REWARD t=24.48 z=325.64 score=14800 gap=0.37
+REWARD t=24.48 z=325.64 score=29300 gap=0.37
 ENTER t=24.95 z=331.93 Pattern_B_JumpSlide tier=Easy feet=0.08
 INPUT t=25.03 z=333.06 lane=0 feet=0.08 RequestJump -> 01 Jump / Near Miss dz=2.81
-REWARD t=25.32 z=336.89 score=15400 gap=0.83
+REWARD t=25.32 z=336.88 score=30500 gap=0.83
 INPUT t=25.37 z=337.56 lane=0 feet=1.60 RequestSlide -> 02 Slide / Near Miss dz=4.31
 INPUT t=25.92 z=345.01 lane=0 feet=0.08 RequestJump -> 03 Jump / Near Miss dz=2.86
-REWARD t=26.22 z=349.08 score=16000 gap=0.90
+REWARD t=26.22 z=349.08 score=31700 gap=0.90
 INPUT t=26.28 z=349.98 lane=0 feet=1.60 RequestJump -> 01 Jump Attack dz=6.89
 ENTER t=26.37 z=354.42 Pattern_C_AirCombo tier=Medium feet=1.46
-REWARD t=26.38 z=355.31 score=16400 gap=0.17
+REWARD t=26.38 z=355.31 score=32500 gap=0.17
 INPUT t=26.38 z=355.31 lane=0 feet=1.43 RequestJump -> 02 Dash Right dz=5.56
-REWARD t=26.48 z=359.53 score=16800 gap=0.10
+REWARD t=26.48 z=359.53 score=33300 gap=0.10
 INPUT t=26.48 z=359.53 lane=1 feet=1.91 RequestJump -> 03 Dash Center dz=5.34
-REWARD t=26.58 z=363.56 score=17200 gap=0.10
+REWARD t=26.58 z=363.56 score=34100 gap=0.10
 INPUT t=26.58 z=363.56 lane=0 feet=2.48 RequestJump -> 04 Dash Left dz=5.31
-REWARD t=26.68 z=367.57 score=17600 gap=0.10
+REWARD t=26.68 z=367.57 score=34900 gap=0.10
 INPUT t=26.92 z=370.74 lane=-1 feet=3.63 RequestSlide -> 01 Fast Fall Stomp Left dz=2.13
 ENTER t=27.00 z=371.88 Pattern_D_Stomp tier=Medium feet=1.80
-REWARD t=27.03 z=372.23 score=18200 gap=0.35
+REWARD t=27.03 z=372.23 score=36100 gap=0.35
 INPUT t=27.05 z=372.45 lane=-1 feet=1.53 RequestMoveRight -> 02 Stomp Center dz=8.42
 INPUT t=27.42 z=377.45 lane=0 feet=5.67 RequestSlide -> 02 Stomp Center dz=3.42
-REWARD t=27.63 z=380.20 score=18800 gap=0.60
+REWARD t=27.63 z=380.20 score=37300 gap=0.60
 INPUT t=27.65 z=380.43 lane=0 feet=1.53 RequestMoveRight -> 03 Stomp Right dz=7.44
 INPUT t=27.97 z=384.76 lane=1 feet=5.30 RequestSlide -> 03 Stomp Right dz=3.11
-REWARD t=28.17 z=387.28 score=19400 gap=0.53
+REWARD t=28.17 z=387.28 score=38500 gap=0.53
 INPUT t=28.22 z=387.97 lane=1 feet=2.04 RequestJump -> 01 Jump Attack dz=6.90
 ENTER t=28.30 z=392.41 Pattern_C_AirCombo tier=Medium feet=1.60
-REWARD t=28.32 z=393.30 score=19800 gap=0.15
+REWARD t=28.32 z=393.30 score=38900 gap=0.15
 INPUT t=28.32 z=393.30 lane=0 feet=1.51 RequestJump -> 02 Dash Right dz=5.57
-REWARD t=28.42 z=397.53 score=20200 gap=0.10
+REWARD t=28.42 z=397.53 score=39300 gap=0.10
 INPUT t=28.42 z=397.53 lane=1 feet=1.92 RequestJump -> 03 Dash Center dz=5.34
-REWARD t=28.52 z=401.56 score=20600 gap=0.10
+REWARD t=28.52 z=401.56 score=39700 gap=0.10
 INPUT t=28.52 z=401.56 lane=0 feet=2.49 RequestJump -> 04 Dash Left dz=5.31
-REWARD t=28.62 z=405.57 score=21000 gap=0.10
+REWARD t=28.62 z=405.57 score=40100 gap=0.10
 INPUT t=28.85 z=408.77 lane=-1 feet=3.64 RequestSlide -> 01 Fast Fall Stomp Left dz=2.10
 ENTER t=28.93 z=409.92 Pattern_D_Stomp tier=Medium feet=1.80
-REWARD t=28.97 z=410.27 score=21600 gap=0.35
+REWARD t=28.97 z=410.27 score=40700 gap=0.35
 INPUT t=28.98 z=410.50 lane=-1 feet=1.53 RequestMoveRight -> 02 Stomp Center dz=8.37
 INPUT t=29.35 z=415.54 lane=0 feet=5.67 RequestSlide -> 02 Stomp Center dz=3.33
-REWARD t=29.57 z=418.31 score=22200 gap=0.60
+REWARD t=29.57 z=418.31 score=41300 gap=0.60
 INPUT t=29.58 z=418.54 lane=0 feet=1.53 RequestMoveRight -> 03 Stomp Right dz=7.33
 INPUT t=29.88 z=422.67 lane=1 feet=5.17 RequestSlide -> 03 Stomp Right dz=3.20
-REWARD t=30.07 z=425.13 score=22800 gap=0.50
+REWARD t=30.07 z=425.13 score=41900 gap=0.50
 INPUT t=30.13 z=426.05 lane=1 feet=2.29 RequestJump -> 01 Jump Attack dz=6.82
 ENTER t=30.22 z=430.44 Pattern_C_AirCombo tier=Medium feet=1.67
-REWARD t=30.23 z=431.32 score=23200 gap=0.17
+REWARD t=30.23 z=431.32 score=42300 gap=0.17
 INPUT t=30.23 z=431.32 lane=0 feet=1.55 RequestJump -> 02 Dash Right dz=5.55
-REWARD t=30.33 z=435.53 score=23600 gap=0.10
+REWARD t=30.33 z=435.53 score=42700 gap=0.10
 INPUT t=30.33 z=435.53 lane=1 feet=1.92 RequestJump -> 03 Dash Center dz=5.34
-REWARD t=30.43 z=439.56 score=24000 gap=0.10
+REWARD t=30.43 z=439.56 score=43100 gap=0.10
 INPUT t=30.43 z=439.56 lane=0 feet=2.49 RequestJump -> 04 Dash Left dz=5.31
-REWARD t=30.53 z=443.57 score=24400 gap=0.10
+REWARD t=30.53 z=443.57 score=43500 gap=0.10
 INPUT t=30.75 z=446.57 lane=-1 feet=3.64 RequestSlide -> 01 Fast Fall Stomp Left dz=2.30
 ENTER t=30.85 z=447.95 Pattern_D_Stomp tier=Medium feet=1.44
-REWARD t=30.87 z=448.08 score=25000 gap=0.33
+REWARD t=30.87 z=448.08 score=44100 gap=0.33
 INPUT t=30.88 z=448.31 lane=-1 feet=1.53 RequestMoveRight -> 02 Stomp Center dz=8.56
 INPUT t=31.25 z=453.39 lane=0 feet=5.67 RequestSlide -> 02 Stomp Center dz=3.48
-REWARD t=31.47 z=456.19 score=25600 gap=0.60
+REWARD t=31.47 z=456.19 score=44700 gap=0.60
 INPUT t=31.48 z=456.42 lane=0 feet=1.53 RequestMoveRight -> 03 Stomp Right dz=7.45
 INPUT t=31.80 z=460.82 lane=1 feet=5.30 RequestSlide -> 03 Stomp Right dz=3.05
-REWARD t=32.00 z=463.39 score=26200 gap=0.53
+REWARD t=32.00 z=463.39 score=45300 gap=0.53
 INPUT t=32.05 z=464.08 lane=1 feet=2.04 RequestJump -> 01 Jump Attack dz=6.79
 ENTER t=32.13 z=468.45 Pattern_C_AirCombo tier=Medium feet=1.60
-REWARD t=32.15 z=469.32 score=26600 gap=0.15
+REWARD t=32.15 z=469.32 score=45700 gap=0.15
 INPUT t=32.15 z=469.32 lane=0 feet=1.51 RequestJump -> 02 Dash Right dz=5.55
-REWARD t=32.25 z=473.53 score=27000 gap=0.10
+REWARD t=32.25 z=473.53 score=46100 gap=0.10
 INPUT t=32.25 z=473.53 lane=1 feet=1.92 RequestJump -> 03 Dash Center dz=5.34
-REWARD t=32.35 z=477.56 score=27400 gap=0.10
+REWARD t=32.35 z=477.56 score=46500 gap=0.10
 INPUT t=32.35 z=477.56 lane=0 feet=2.49 RequestJump -> 04 Dash Left dz=5.31
-REWARD t=32.45 z=481.57 score=27800 gap=0.10
+REWARD t=32.45 z=481.57 score=46900 gap=0.10
 INPUT t=32.67 z=484.59 lane=-1 feet=3.64 RequestSlide -> 01 Fast Fall Stomp Left dz=2.28
 ENTER t=32.77 z=485.99 Pattern_D_Stomp tier=Medium feet=1.44
-REWARD t=32.78 z=486.12 score=28400 gap=0.33
+REWARD t=32.78 z=486.12 score=47500 gap=0.33
 INPUT t=32.80 z=486.35 lane=-1 feet=1.53 RequestMoveRight -> 02 Stomp Center dz=8.52
 INPUT t=33.17 z=491.47 lane=0 feet=5.67 RequestSlide -> 02 Stomp Center dz=3.40
-REWARD t=33.38 z=494.29 score=29000 gap=0.60
+REWARD t=33.38 z=494.29 score=48100 gap=0.60
 INPUT t=33.40 z=494.52 lane=0 feet=1.53 RequestMoveRight -> 03 Stomp Right dz=7.35
 INPUT t=33.70 z=498.73 lane=1 feet=5.17 RequestSlide -> 03 Stomp Right dz=3.14
-REWARD t=33.88 z=501.23 score=29600 gap=0.50
+REWARD t=33.88 z=501.23 score=48700 gap=0.50
 INPUT t=33.93 z=501.93 lane=1 feet=2.04 RequestJump -> 01 Jump Attack dz=6.94
 ENTER t=34.02 z=506.40 Pattern_C_AirCombo tier=Medium feet=1.60
-REWARD t=34.03 z=507.30 score=30000 gap=0.15
+REWARD t=34.03 z=507.30 score=49100 gap=0.15
 INPUT t=34.03 z=507.30 lane=0 feet=1.51 RequestJump -> 02 Dash Right dz=5.57
-REWARD t=34.13 z=511.52 score=30400 gap=0.10
+REWARD t=34.13 z=511.52 score=49500 gap=0.10
 INPUT t=34.13 z=511.52 lane=1 feet=1.92 RequestJump -> 03 Dash Center dz=5.35
-REWARD t=34.23 z=515.56 score=30800 gap=0.10
+REWARD t=34.23 z=515.56 score=49900 gap=0.10
 INPUT t=34.23 z=515.56 lane=0 feet=2.49 RequestJump -> 04 Dash Left dz=5.31
-REWARD t=34.33 z=519.57 score=31200 gap=0.10
+REWARD t=34.33 z=519.57 score=50300 gap=0.10
 INPUT t=34.55 z=522.62 lane=-1 feet=3.64 RequestSlide -> 01 Fast Fall Stomp Left dz=2.25
 ENTER t=34.65 z=524.02 Pattern_D_Stomp tier=Medium feet=1.44
-REWARD t=34.67 z=524.15 score=31800 gap=0.33
+REWARD t=34.67 z=524.15 score=50900 gap=0.33
 INPUT t=34.68 z=524.39 lane=-1 feet=1.53 RequestMoveRight -> 02 Stomp Center dz=8.48
 INPUT t=35.03 z=529.32 lane=0 feet=5.55 RequestSlide -> 02 Stomp Center dz=3.55
-REWARD t=35.23 z=532.08 score=32400 gap=0.57
+REWARD t=35.23 z=532.08 score=51500 gap=0.57
 INPUT t=35.25 z=532.32 lane=0 feet=1.53 RequestMoveRight -> 03 Stomp Right dz=7.55
 INPUT t=35.55 z=536.56 lane=1 feet=5.17 RequestSlide -> 03 Stomp Right dz=3.31
-REWARD t=35.73 z=539.08 score=33000 gap=0.50
+REWARD t=35.73 z=539.08 score=52100 gap=0.50
 INPUT t=35.80 z=540.02 lane=1 feet=2.29 RequestJump -> 01 Jump Attack dz=6.85
 ENTER t=35.88 z=544.43 Pattern_C_AirCombo tier=Medium feet=1.67
-REWARD t=35.90 z=545.31 score=33400 gap=0.17
+REWARD t=35.90 z=545.31 score=52500 gap=0.17
 INPUT t=35.90 z=545.31 lane=0 feet=1.55 RequestJump -> 02 Dash Right dz=5.56
-REWARD t=36.00 z=549.53 score=33800 gap=0.10
+REWARD t=36.00 z=549.53 score=52900 gap=0.10
 INPUT t=36.00 z=549.53 lane=1 feet=1.92 RequestJump -> 03 Dash Center dz=5.34
-REWARD t=36.10 z=553.56 score=34200 gap=0.10
+REWARD t=36.10 z=553.56 score=53300 gap=0.10
 INPUT t=36.10 z=553.56 lane=0 feet=2.49 RequestJump -> 04 Dash Left dz=5.31
-REWARD t=36.20 z=557.57 score=34600 gap=0.10
+REWARD t=36.20 z=557.57 score=53700 gap=0.10
 INPUT t=36.42 z=560.64 lane=-1 feet=3.64 RequestSlide -> 01 Fast Fall Stomp Left dz=2.23
 ENTER t=36.52 z=562.06 Pattern_D_Stomp tier=Medium feet=1.44
-REWARD t=36.53 z=562.19 score=35200 gap=0.33
+REWARD t=36.53 z=562.19 score=54300 gap=0.33
 INPUT t=36.55 z=562.43 lane=-1 feet=1.53 RequestMoveRight -> 02 Stomp Center dz=8.44
 INPUT t=36.90 z=567.40 lane=0 feet=5.55 RequestSlide -> 02 Stomp Center dz=3.47
-REWARD t=37.10 z=570.18 score=35800 gap=0.57
+REWARD t=37.10 z=570.18 score=54900 gap=0.57
 INPUT t=37.12 z=570.42 lane=0 feet=1.53 RequestMoveRight -> 03 Stomp Right dz=7.45
 INPUT t=37.42 z=574.69 lane=1 feet=5.17 RequestSlide -> 03 Stomp Right dz=3.18
-REWARD t=37.60 z=577.23 score=36400 gap=0.50
+REWARD t=37.60 z=577.23 score=55500 gap=0.50
 INPUT t=37.65 z=577.95 lane=1 feet=2.04 RequestJump -> 01 Jump Attack dz=6.92
 ENTER t=37.73 z=582.41 Pattern_C_AirCombo tier=Medium feet=1.60
-REWARD t=37.75 z=583.30 score=36800 gap=0.15
+REWARD t=37.75 z=583.30 score=55900 gap=0.15
 INPUT t=37.75 z=583.30 lane=0 feet=1.51 RequestJump -> 02 Dash Right dz=5.57
-REWARD t=37.85 z=587.53 score=37200 gap=0.10
+REWARD t=37.85 z=587.53 score=56300 gap=0.10
 INPUT t=37.85 z=587.53 lane=1 feet=1.92 RequestJump -> 03 Dash Center dz=5.35
-REWARD t=37.95 z=591.56 score=37600 gap=0.10
+REWARD t=37.95 z=591.56 score=56700 gap=0.10
 INPUT t=37.95 z=591.56 lane=0 feet=2.49 RequestJump -> 04 Dash Left dz=5.31
-REWARD t=38.05 z=595.57 score=38000 gap=0.10
+REWARD t=38.05 z=595.57 score=57100 gap=0.10
 INPUT t=38.27 z=598.66 lane=-1 feet=3.64 RequestSlide -> 01 Fast Fall Stomp Left dz=2.21
 ENTER t=38.37 z=600.09 Pattern_D_Stomp tier=Medium feet=1.44
-REWARD t=38.38 z=600.23 score=38600 gap=0.33
+REWARD t=38.38 z=600.23 score=57700 gap=0.33
 INPUT t=38.40 z=600.46 lane=-1 feet=1.53 RequestMoveRight -> 02 Stomp Center dz=8.41
 INPUT t=38.75 z=605.47 lane=0 feet=5.55 RequestSlide -> 02 Stomp Center dz=3.40
-REWARD t=38.95 z=608.28 score=39200 gap=0.57
+REWARD t=38.95 z=608.28 score=58300 gap=0.57
 INPUT t=38.97 z=608.52 lane=0 feet=1.53 RequestMoveRight -> 03 Stomp Right dz=7.35
 INPUT t=39.27 z=612.83 lane=1 feet=5.17 RequestSlide -> 03 Stomp Right dz=3.04
-REWARD t=39.45 z=615.39 score=39800 gap=0.50
+REWARD t=39.45 z=615.39 score=58900 gap=0.50
 INPUT t=39.50 z=616.11 lane=1 feet=2.04 RequestJump -> 01 Jump Attack dz=6.76
 ENTER t=39.58 z=620.46 Pattern_C_AirCombo tier=Medium feet=1.60
-REWARD t=39.60 z=621.33 score=40200 gap=0.15
+REWARD t=39.60 z=621.33 score=59300 gap=0.15
 INPUT t=39.60 z=621.33 lane=0 feet=1.51 RequestJump -> 02 Dash Right dz=5.54
-REWARD t=39.70 z=625.53 score=40600 gap=0.10
+REWARD t=39.70 z=625.53 score=59700 gap=0.10
 INPUT t=39.70 z=625.53 lane=1 feet=1.92 RequestJump -> 03 Dash Center dz=5.34
-REWARD t=39.80 z=629.56 score=41000 gap=0.10
+REWARD t=39.80 z=629.56 score=60100 gap=0.10
 INPUT t=39.80 z=629.56 lane=0 feet=2.49 RequestJump -> 04 Dash Left dz=5.31
-REWARD t=39.90 z=633.57 score=41400 gap=0.10
+REWARD t=39.90 z=633.57 score=60500 gap=0.10
 INPUT t=40.12 z=636.69 lane=-1 feet=3.64 RequestSlide -> 01 Fast Fall Stomp Left dz=2.18
 ENTER t=40.20 z=637.89 Pattern_D_Stomp tier=Medium feet=1.81
-REWARD t=40.23 z=638.26 score=42000 gap=0.33
+REWARD t=40.23 z=638.26 score=61100 gap=0.33
 INPUT t=40.25 z=638.50 lane=-1 feet=1.53 RequestMoveRight -> 02 Stomp Center dz=8.37
 INPUT t=40.60 z=643.55 lane=0 feet=5.55 RequestSlide -> 02 Stomp Center dz=3.32
-REWARD t=40.80 z=646.38 score=42600 gap=0.57
+REWARD t=40.80 z=646.38 score=61700 gap=0.57
 INPUT t=40.82 z=646.62 lane=0 feet=1.53 RequestMoveRight -> 03 Stomp Right dz=7.25
 INPUT t=41.10 z=650.72 lane=1 feet=5.02 RequestSlide -> 03 Stomp Right dz=3.15
-REWARD t=41.28 z=653.21 score=43200 gap=0.48
+REWARD t=41.28 z=653.21 score=62300 gap=0.48
 INPUT t=41.33 z=653.93 lane=1 feet=2.04 RequestJump -> 01 Jump Attack dz=6.94
 ENTER t=41.42 z=658.40 Pattern_C_AirCombo tier=Medium feet=1.60
-REWARD t=41.43 z=659.30 score=43600 gap=0.15
+REWARD t=41.43 z=659.30 score=62700 gap=0.15
 INPUT t=41.43 z=659.30 lane=0 feet=1.51 RequestJump -> 02 Dash Right dz=5.57
-REWARD t=41.53 z=663.52 score=44000 gap=0.10
+REWARD t=41.53 z=663.52 score=63100 gap=0.10
 INPUT t=41.53 z=663.52 lane=1 feet=1.92 RequestJump -> 03 Dash Center dz=5.35
-REWARD t=41.63 z=667.56 score=44400 gap=0.10
+REWARD t=41.63 z=667.56 score=63500 gap=0.10
 INPUT t=41.63 z=667.56 lane=0 feet=2.49 RequestJump -> 04 Dash Left dz=5.31
-REWARD t=41.73 z=671.57 score=44800 gap=0.10
+REWARD t=41.73 z=671.57 score=63900 gap=0.10
 INPUT t=41.95 z=674.71 lane=-1 feet=3.64 RequestSlide -> 01 Fast Fall Stomp Left dz=2.16
 ENTER t=42.03 z=675.92 Pattern_D_Stomp tier=Medium feet=1.81
-REWARD t=42.07 z=676.30 score=45400 gap=0.33
+REWARD t=42.07 z=676.30 score=64500 gap=0.33
 INPUT t=42.08 z=676.54 lane=-1 feet=1.53 RequestMoveRight -> 02 Stomp Center dz=8.33
 INPUT t=42.42 z=681.38 lane=0 feet=5.43 RequestSlide -> 02 Stomp Center dz=3.49
-REWARD t=42.62 z=684.16 score=46000 gap=0.55
+REWARD t=42.62 z=684.16 score=65100 gap=0.55
 INPUT t=42.63 z=684.40 lane=0 feet=1.53 RequestMoveRight -> 03 Stomp Right dz=7.47
 INPUT t=42.93 z=688.77 lane=1 feet=5.17 RequestSlide -> 03 Stomp Right dz=3.10
-REWARD t=43.12 z=691.37 score=46600 gap=0.50
+REWARD t=43.12 z=691.37 score=65700 gap=0.50
 INPUT t=43.17 z=692.10 lane=1 feet=2.04 RequestJump -> 01 Jump Attack dz=6.77
 ENTER t=43.25 z=696.45 Pattern_C_AirCombo tier=Medium feet=1.60
-REWARD t=43.27 z=697.32 score=47000 gap=0.15
+REWARD t=43.27 z=697.32 score=66100 gap=0.15
 INPUT t=43.27 z=697.32 lane=0 feet=1.51 RequestJump -> 02 Dash Right dz=5.55
-REWARD t=43.37 z=701.53 score=47400 gap=0.10
+REWARD t=43.37 z=701.53 score=66500 gap=0.10
 INPUT t=43.37 z=701.53 lane=1 feet=1.92 RequestJump -> 03 Dash Center dz=5.34
-REWARD t=43.47 z=705.56 score=47800 gap=0.10
+REWARD t=43.47 z=705.56 score=66900 gap=0.10
 INPUT t=43.47 z=705.56 lane=0 feet=2.49 RequestJump -> 04 Dash Left dz=5.31
-REWARD t=43.57 z=709.57 score=48200 gap=0.10
+REWARD t=43.57 z=709.57 score=67300 gap=0.10
 INPUT t=43.77 z=712.49 lane=-1 feet=3.64 RequestSlide -> 01 Fast Fall Stomp Left dz=2.38
 ENTER t=43.87 z=713.96 Pattern_D_Stomp tier=Medium feet=1.44
-REWARD t=43.88 z=714.09 score=48800 gap=0.32
+REWARD t=43.88 z=714.09 score=67900 gap=0.32
 INPUT t=43.90 z=714.33 lane=-1 feet=1.53 RequestMoveRight -> 02 Stomp Center dz=8.54
 INPUT t=44.25 z=719.46 lane=0 feet=5.55 RequestSlide -> 02 Stomp Center dz=3.41
-REWARD t=44.45 z=722.33 score=49400 gap=0.57
+REWARD t=44.45 z=722.33 score=68500 gap=0.57
 INPUT t=44.47 z=722.58 lane=0 feet=1.53 RequestMoveRight -> 03 Stomp Right dz=7.29
 INPUT t=44.75 z=726.73 lane=1 feet=5.02 RequestSlide -> 03 Stomp Right dz=3.14
-REWARD t=44.93 z=729.26 score=50000 gap=0.48
+REWARD t=44.93 z=729.26 score=69100 gap=0.48
 INPUT t=44.98 z=729.99 lane=1 feet=2.04 RequestJump -> 01 Jump Attack dz=6.88
 ENTER t=45.07 z=734.42 Pattern_C_AirCombo tier=Medium feet=1.60
-REWARD t=45.08 z=735.31 score=50400 gap=0.15
+REWARD t=45.08 z=735.31 score=69500 gap=0.15
 INPUT t=45.08 z=735.31 lane=0 feet=1.51 RequestJump -> 02 Dash Right dz=5.56
-REWARD t=45.18 z=739.53 score=50800 gap=0.10
+REWARD t=45.18 z=739.53 score=69900 gap=0.10
 INPUT t=45.18 z=739.53 lane=1 feet=1.92 RequestJump -> 03 Dash Center dz=5.34
-REWARD t=45.28 z=743.56 score=51200 gap=0.10
+REWARD t=45.28 z=743.56 score=70300 gap=0.10
 INPUT t=45.28 z=743.56 lane=0 feet=2.49 RequestJump -> 04 Dash Left dz=5.31
-REWARD t=45.38 z=747.57 score=51600 gap=0.10
+REWARD t=45.38 z=747.57 score=70700 gap=0.10
 INPUT t=45.58 z=750.51 lane=-1 feet=3.64 RequestSlide -> 01 Fast Fall Stomp Left dz=2.36
 ENTER t=45.68 z=751.99 Pattern_D_Stomp tier=Medium feet=1.44
-REWARD t=45.70 z=752.12 score=52200 gap=0.32
+REWARD t=45.70 z=752.12 score=71300 gap=0.32
 INPUT t=45.72 z=752.37 lane=-1 feet=1.53 RequestMoveRight -> 02 Stomp Center dz=8.50
 INPUT t=46.05 z=757.29 lane=0 feet=5.43 RequestSlide -> 02 Stomp Center dz=3.59
-REWARD t=46.25 z=760.10 score=52800 gap=0.55
+REWARD t=46.25 z=760.10 score=71900 gap=0.55
 INPUT t=46.27 z=760.34 lane=0 feet=1.53 RequestMoveRight -> 03 Stomp Right dz=7.53
 INPUT t=46.55 z=764.53 lane=1 feet=5.02 RequestSlide -> 03 Stomp Right dz=3.34
-REWARD t=46.73 z=767.08 score=53400 gap=0.48
+REWARD t=46.73 z=767.08 score=72500 gap=0.48
 INPUT t=46.80 z=768.06 lane=1 feet=2.29 RequestJump -> 01 Jump Attack dz=6.81
 ENTER t=46.88 z=772.44 Pattern_C_AirCombo tier=Medium feet=1.67
-REWARD t=46.90 z=773.32 score=53800 gap=0.17
+REWARD t=46.90 z=773.32 score=72900 gap=0.17
 INPUT t=46.90 z=773.32 lane=0 feet=1.55 RequestJump -> 02 Dash Right dz=5.55
-REWARD t=47.00 z=777.53 score=54200 gap=0.10
+REWARD t=47.00 z=777.53 score=73300 gap=0.10
 INPUT t=47.00 z=777.53 lane=1 feet=1.92 RequestJump -> 03 Dash Center dz=5.34
-REWARD t=47.10 z=781.56 score=54600 gap=0.10
+REWARD t=47.10 z=781.56 score=73700 gap=0.10
 INPUT t=47.10 z=781.56 lane=0 feet=2.49 RequestJump -> 04 Dash Left dz=5.31
-REWARD t=47.20 z=785.57 score=55000 gap=0.10
+REWARD t=47.20 z=785.57 score=74100 gap=0.10
 INPUT t=47.40 z=788.54 lane=-1 feet=3.64 RequestSlide -> 01 Fast Fall Stomp Left dz=2.33
 ENTER t=47.50 z=790.02 Pattern_D_Stomp tier=Medium feet=1.44
-REWARD t=47.52 z=790.16 score=55600 gap=0.32
+REWARD t=47.52 z=790.16 score=74700 gap=0.32
 INPUT t=47.53 z=790.40 lane=-1 feet=1.53 RequestMoveRight -> 02 Stomp Center dz=8.47
 INPUT t=47.87 z=795.36 lane=0 feet=5.43 RequestSlide -> 02 Stomp Center dz=3.51
-REWARD t=48.07 z=798.19 score=56200 gap=0.55
+REWARD t=48.07 z=798.19 score=75300 gap=0.55
 INPUT t=48.08 z=798.44 lane=0 feet=1.53 RequestMoveRight -> 03 Stomp Right dz=7.43
 INPUT t=48.37 z=802.66 lane=1 feet=5.02 RequestSlide -> 03 Stomp Right dz=3.21
-REWARD t=48.55 z=805.22 score=56800 gap=0.48
+REWARD t=48.55 z=805.22 score=75900 gap=0.48
 INPUT t=48.57 z=805.47 lane=1 feet=1.53 RequestMoveLeft -> 01 Lane Enemy Center dz=8.40
 ENTER t=48.87 z=809.95 Pattern_E_MixedRisk tier=Hard feet=5.17
 INPUT t=48.90 z=810.44 lane=0 feet=5.43 RequestSlide -> 01 Lane Enemy Center dz=3.43
-REWARD t=49.10 z=813.29 score=57400 gap=0.55
+REWARD t=49.10 z=813.29 score=76500 gap=0.55
 INPUT t=49.53 z=819.77 lane=0 feet=5.97 RequestJump -> 03 Air Combo Start dz=4.10
-REWARD t=49.63 z=822.77 score=57800 gap=0.53
+REWARD t=49.63 z=822.77 score=76900 gap=0.53
 INPUT t=49.63 z=822.77 lane=0 feet=2.25 RequestJump -> 04 Homing Right dz=5.10
-REWARD t=49.73 z=826.60 score=58200 gap=0.10
+REWARD t=49.73 z=826.60 score=77300 gap=0.10
 BYPASS t=49.73 05 Fast Fall Stomp peakFeet=2.81
 INPUT t=49.73 z=826.60 lane=1 feet=2.21 RequestMoveLeft -> 05 Fast Fall Stomp dz=4.77
 INPUT t=50.20 z=833.60 lane=0 feet=1.95 RequestMoveRight -> 06 Lane Blocker / Near Miss dz=4.27
 INPUT t=50.55 z=838.86 lane=1 feet=0.08 RequestJump -> 01 Jump Attack dz=4.01
 ENTER t=50.63 z=840.11 Pattern_C_AirCombo tier=Medium feet=0.72
 INPUT t=50.68 z=840.86 lane=1 feet=1.02 RequestJump -> 01 Jump Attack dz=2.01
-REWARD t=50.75 z=841.70 score=58600 gap=1.02
+REWARD t=50.75 z=841.70 score=77700 gap=1.02
 INPUT t=50.75 z=841.70 lane=0 feet=1.23 RequestJump -> 02 Dash Right dz=5.17
-REWARD t=50.85 z=845.59 score=59000 gap=0.10
+REWARD t=50.85 z=845.59 score=78100 gap=0.10
 INPUT t=50.85 z=845.59 lane=1 feet=1.87 RequestJump -> 03 Dash Center dz=5.28
-REWARD t=50.95 z=849.57 score=59400 gap=0.10
+REWARD t=50.95 z=849.57 score=78500 gap=0.10
 INPUT t=50.95 z=849.57 lane=0 feet=2.48 RequestJump -> 04 Dash Left dz=5.30
-REWARD t=51.05 z=853.57 score=59800 gap=0.10
+REWARD t=51.05 z=853.57 score=78900 gap=0.10
 INPUT t=51.25 z=856.58 lane=-1 feet=3.64 RequestSlide -> 01 Fast Fall Stomp Left dz=2.29
 ENTER t=51.35 z=858.09 Pattern_D_Stomp tier=Medium feet=1.44
-REWARD t=51.37 z=858.23 score=60400 gap=0.32
+REWARD t=51.37 z=858.23 score=79500 gap=0.32
 INPUT t=51.38 z=858.48 lane=-1 feet=1.53 RequestMoveRight -> 02 Stomp Center dz=8.39
 INPUT t=51.72 z=863.51 lane=0 feet=5.43 RequestSlide -> 02 Stomp Center dz=3.36
-REWARD t=51.92 z=866.39 score=61000 gap=0.55
+REWARD t=51.92 z=866.39 score=80100 gap=0.55
 INPUT t=51.93 z=866.64 lane=0 feet=1.53 RequestMoveRight -> 03 Stomp Right dz=7.23
 INPUT t=52.20 z=870.67 lane=1 feet=4.87 RequestSlide -> 03 Stomp Right dz=3.20
-REWARD t=52.37 z=873.17 score=61600 gap=0.45
+REWARD t=52.37 z=873.17 score=80700 gap=0.45
 INPUT t=52.38 z=873.42 lane=1 feet=1.53 RequestMoveLeft -> 01 Lane Enemy Center dz=8.45
 ENTER t=52.68 z=877.97 Pattern_E_MixedRisk tier=Hard feet=5.17
 INPUT t=52.72 z=878.48 lane=0 feet=5.43 RequestSlide -> 01 Lane Enemy Center dz=3.39
-REWARD t=52.92 z=881.36 score=62200 gap=0.55
+REWARD t=52.92 z=881.36 score=81300 gap=0.55
 INPUT t=53.33 z=887.69 lane=0 feet=5.88 RequestJump -> 03 Air Combo Start dz=4.18
-REWARD t=53.43 z=890.76 score=62600 gap=0.52
+REWARD t=53.43 z=890.76 score=81700 gap=0.52
 INPUT t=53.43 z=890.76 lane=0 feet=2.23 RequestJump -> 04 Homing Right dz=5.11
-REWARD t=53.53 z=894.60 score=63000 gap=0.10
+REWARD t=53.53 z=894.60 score=82100 gap=0.10
 BYPASS t=53.53 05 Fast Fall Stomp peakFeet=2.81
 INPUT t=53.53 z=894.60 lane=1 feet=2.20 RequestMoveLeft -> 05 Fast Fall Stomp dz=4.77
 INPUT t=53.98 z=901.45 lane=0 feet=2.05 RequestMoveRight -> 06 Lane Blocker / Near Miss dz=4.42
 INPUT t=54.33 z=906.79 lane=1 feet=0.08 RequestJump -> 01 Jump Attack dz=4.08
 ENTER t=54.42 z=908.06 Pattern_C_AirCombo tier=Medium feet=0.72
 INPUT t=54.47 z=908.82 lane=1 feet=1.02 RequestJump -> 01 Jump Attack dz=2.05
-REWARD t=54.53 z=909.68 score=63400 gap=1.00
+REWARD t=54.53 z=909.68 score=82500 gap=1.00
 INPUT t=54.53 z=909.68 lane=0 feet=1.23 RequestJump -> 02 Dash Right dz=5.19
-REWARD t=54.63 z=913.59 score=63800 gap=0.10
+REWARD t=54.63 z=913.59 score=82900 gap=0.10
 INPUT t=54.63 z=913.59 lane=1 feet=1.87 RequestJump -> 03 Dash Center dz=5.28
-REWARD t=54.73 z=917.57 score=64200 gap=0.10
+REWARD t=54.73 z=917.57 score=83300 gap=0.10
 INPUT t=54.73 z=917.57 lane=0 feet=2.48 RequestJump -> 04 Dash Left dz=5.30
-REWARD t=54.83 z=921.57 score=64600 gap=0.10
+REWARD t=54.83 z=921.57 score=83700 gap=0.10
 INPUT t=55.03 z=924.63 lane=-1 feet=3.64 RequestSlide -> 01 Fast Fall Stomp Left dz=2.24
 ENTER t=55.12 z=925.91 Pattern_D_Stomp tier=Medium feet=1.80
-REWARD t=55.15 z=926.30 score=65200 gap=0.32
+REWARD t=55.15 z=926.30 score=84300 gap=0.32
 INPUT t=55.17 z=926.55 lane=-1 feet=1.53 RequestMoveRight -> 02 Stomp Center dz=8.32
 INPUT t=55.48 z=931.40 lane=0 feet=5.30 RequestSlide -> 02 Stomp Center dz=3.47
-REWARD t=55.68 z=934.24 score=65800 gap=0.53
+REWARD t=55.68 z=934.24 score=84900 gap=0.53
 INPUT t=55.70 z=934.49 lane=0 feet=1.53 RequestMoveRight -> 03 Stomp Right dz=7.38
 INPUT t=55.97 z=938.58 lane=1 feet=4.87 RequestSlide -> 03 Stomp Right dz=3.29
-REWARD t=56.13 z=941.12 score=66400 gap=0.45
+REWARD t=56.13 z=941.12 score=85500 gap=0.45
 INPUT t=56.18 z=941.89 lane=1 feet=2.04 RequestJump -> 01 Jump Attack dz=6.98
 ENTER t=56.27 z=946.39 Pattern_C_AirCombo tier=Medium feet=1.60
-REWARD t=56.28 z=947.29 score=66800 gap=0.15
+REWARD t=56.28 z=947.29 score=85900 gap=0.15
 INPUT t=56.28 z=947.29 lane=0 feet=1.51 RequestJump -> 02 Dash Right dz=5.58
-REWARD t=56.38 z=951.52 score=67200 gap=0.10
+REWARD t=56.38 z=951.52 score=86300 gap=0.10
 INPUT t=56.38 z=951.52 lane=1 feet=1.92 RequestJump -> 03 Dash Center dz=5.35
-REWARD t=56.48 z=955.56 score=67600 gap=0.10
+REWARD t=56.48 z=955.56 score=86700 gap=0.10
 INPUT t=56.48 z=955.56 lane=0 feet=2.49 RequestJump -> 04 Dash Left dz=5.31
-REWARD t=56.58 z=959.57 score=68000 gap=0.10
+REWARD t=56.58 z=959.57 score=87100 gap=0.10
 INPUT t=56.58 z=959.57 lane=-1 feet=3.08 RequestMoveRight -> 01 Lane Enemy Center dz=8.30
 ENTER t=56.87 z=963.93 Pattern_E_MixedRisk tier=Hard feet=3.58
 INPUT t=56.98 z=965.73 lane=0 feet=3.20 RequestSlide -> 01 Lane Enemy Center dz=2.14
-REWARD t=57.08 z=967.10 score=68600 gap=0.50
+REWARD t=57.08 z=967.10 score=87700 gap=0.50
 INPUT t=57.52 z=973.79 lane=0 feet=5.97 RequestJump -> 03 Air Combo Start dz=4.08
-REWARD t=57.62 z=976.77 score=69000 gap=0.53
+REWARD t=57.62 z=976.77 score=88100 gap=0.53
 INPUT t=57.62 z=976.77 lane=0 feet=2.25 RequestJump -> 04 Homing Right dz=5.10
-REWARD t=57.72 z=980.60 score=69400 gap=0.10
+REWARD t=57.72 z=980.60 score=88500 gap=0.10
 BYPASS t=57.72 05 Fast Fall Stomp peakFeet=2.81
 INPUT t=57.72 z=980.60 lane=1 feet=2.21 RequestMoveLeft -> 05 Fast Fall Stomp dz=4.77
 INPUT t=58.17 z=987.57 lane=0 feet=2.06 RequestMoveRight -> 06 Lane Blocker / Near Miss dz=4.30
 INPUT t=58.50 z=992.73 lane=1 feet=0.08 RequestJump -> 01 Jump Attack dz=4.14
 ENTER t=58.58 z=994.03 Pattern_C_AirCombo tier=Medium feet=0.72
 INPUT t=58.63 z=994.80 lane=1 feet=1.02 RequestJump -> 01 Jump Attack dz=2.07
-REWARD t=58.70 z=995.67 score=69800 gap=0.98
+REWARD t=58.70 z=995.67 score=88900 gap=0.98
 INPUT t=58.70 z=995.67 lane=0 feet=1.23 RequestJump -> 02 Dash Right dz=5.20
-REWARD t=58.80 z=999.59 score=70200 gap=0.10
+REWARD t=58.80 z=999.59 score=89300 gap=0.10
 INPUT t=58.80 z=999.59 lane=1 feet=1.87 RequestJump -> 03 Dash Center dz=5.28
-REWARD t=58.90 z=1003.57 score=70600 gap=0.10
+REWARD t=58.90 z=1003.57 score=89700 gap=0.10
 INPUT t=58.90 z=1003.57 lane=0 feet=2.48 RequestJump -> 04 Dash Left dz=5.30
-REWARD t=59.00 z=1007.57 score=71000 gap=0.10
+REWARD t=59.00 z=1007.57 score=90100 gap=0.10
 INPUT t=59.18 z=1010.42 lane=-1 feet=3.63 RequestSlide -> 01 Fast Fall Stomp Left dz=2.45
 ENTER t=59.28 z=1011.98 Pattern_D_Stomp tier=Medium feet=1.43
-REWARD t=59.30 z=1012.11 score=71600 gap=0.30
+REWARD t=59.30 z=1012.11 score=90700 gap=0.30
 INPUT t=59.32 z=1012.37 lane=-1 feet=1.53 RequestMoveRight -> 02 Stomp Center dz=8.50
 INPUT t=59.63 z=1017.30 lane=0 feet=5.30 RequestSlide -> 02 Stomp Center dz=3.57
-REWARD t=59.83 z=1020.18 score=72200 gap=0.53
+REWARD t=59.83 z=1020.18 score=91300 gap=0.53
 INPUT t=59.85 z=1020.44 lane=0 feet=1.53 RequestMoveRight -> 03 Stomp Right dz=7.43
-FINISH time=60.01592 score=72200 distance=1009.165 rewards=159 maximumRewardGap=1.72
+FINISH time=60.01592 score=91300 distance=1009.166 rewards=159 maximumRewardGap=1.72

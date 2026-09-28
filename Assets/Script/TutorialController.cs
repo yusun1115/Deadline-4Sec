@@ -147,6 +147,8 @@ namespace Deadline4Sec
         private IEnumerator ActivateStep()
         {
             yield return new WaitForSecondsRealtime(0.45f);
+            while (flow != null && flow.IsSkipConfirmationOpen)
+                yield return null;
             if (State != LessonState.Preparing)
                 yield break;
             run.BeginPractice(StepIndex >= 8 ? 12f : 6f);
@@ -171,7 +173,7 @@ namespace Deadline4Sec
 
         private void LateUpdate()
         {
-            if (State != LessonState.Active)
+            if (State != LessonState.Active || flow.IsSkipConfirmationOpen)
                 return;
             Bounds body = player.GetComponent<CharacterController>().bounds;
             if (StepIndex == 0 && left && player.LaneIndex == -1 &&
@@ -310,6 +312,8 @@ namespace Deadline4Sec
         private IEnumerator AdvanceStep()
         {
             yield return new WaitForSecondsRealtime(0.65f);
+            while (flow != null && flow.IsSkipConfirmationOpen)
+                yield return null;
             if (State != LessonState.Success)
                 yield break;
             if (++StepIndex < Titles.Length)

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="4" result="Passed" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-09-28 11:17:14Z" end-time="2026-09-28 11:17:15Z" duration="0.9534386">
+  <test-suite type="TestSuite" id="1000" name="Deadline-4Sec" fullname="Deadline-4Sec" runstate="Runnable" testcasecount="45" result="Passed" start-time="2026-09-28 11:17:14Z" end-time="2026-09-28 11:17:15Z" duration="0.953439" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <test-suite type="Assembly" id="1055" name="Deadline4Sec.AcceptanceTests.dll" fullname="C:/UnityProjects/Deadline-4Sec/ValidationProject/Library/ScriptAssemblies/Deadline4Sec.AcceptanceTests.dll" runstate="Runnable" testcasecount="43" result="Passed" start-time="2026-09-28 11:17:14Z" end-time="2026-09-28 11:17:15Z" duration="0.871925" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="7248" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestSuite" id="1056" name="Deadline4Sec" fullname="Deadline4Sec" runstate="Runnable" testcasecount="43" result="Passed" start-time="2026-09-28 11:17:14Z" end-time="2026-09-28 11:17:15Z" duration="0.870827" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1057" name="AcceptanceTests" fullname="Deadline4Sec.AcceptanceTests" runstate="Runnable" testcasecount="43" result="Passed" start-time="2026-09-28 11:17:14Z" end-time="2026-09-28 11:17:15Z" duration="0.870045" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestFixture" id="1010" name="EditableMenuAcceptanceTests" fullname="Deadline4Sec.AcceptanceTests.EditableMenuAcceptanceTests" classname="Deadline4Sec.AcceptanceTests.EditableMenuAcceptanceTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-09-28 11:17:14Z" end-time="2026-09-28 11:17:15Z" duration="0.868237" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1011" name="AllGameplayScenesContainSavedMenusAndInspectorButtonActions" fullname="Deadline4Sec.AcceptanceTests.EditableMenuAcceptanceTests.AllGameplayScenesContainSavedMenusAndInspectorButtonActions" methodname="AllGameplayScenesContainSavedMenusAndInspectorButtonActions" classname="Deadline4Sec.AcceptanceTests.EditableMenuAcceptanceTests" runstate="Runnable" seed="22140461" result="Passed" start-time="2026-09-28 11:16:54Z" end-time="2026-09-28 11:16:56Z" duration="1.323668" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1013" name="FirstTapStartsTutorialAndSkipRequiresConfirmation" fullname="Deadline4Sec.AcceptanceTests.EditableMenuAcceptanceTests.FirstTapStartsTutorialAndSkipRequiresConfirmation" methodname="FirstTapStartsTutorialAndSkipRequiresConfirmation" classname="Deadline4Sec.AcceptanceTests.EditableMenuAcceptanceTests" runstate="Runnable" seed="225321271" result="Passed" start-time="2026-09-28 11:16:56Z" end-time="2026-09-28 11:17:02Z" duration="6.302466" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[Spawn Pattern: Pattern_A_LaneAttack | Easy
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+Spawn Pattern: Pattern_A_LaneAttack | Easy
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+]]></output>
+            </test-case>
+            <test-case id="1012" name="InspectorAppearanceEditsSurvivePlayAndMainMenuReload" fullname="Deadline4Sec.AcceptanceTests.EditableMenuAcceptanceTests.InspectorAppearanceEditsSurvivePlayAndMainMenuReload" methodname="InspectorAppearanceEditsSurvivePlayAndMainMenuReload" classname="Deadline4Sec.AcceptanceTests.EditableMenuAcceptanceTests" runstate="Runnable" seed="538941802" result="Passed" start-time="2026-09-28 11:17:02Z" end-time="2026-09-28 11:17:09Z" duration="7.212134" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[Spawn Pattern: Pattern_A_LaneAttack | Easy
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+Spawn Pattern: Pattern_A_LaneAttack | Easy
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+]]></output>
+            </test-case>
+            <test-case id="1014" name="SettingsTutorialButtonReplaysPracticeEvenAfterCompletion" fullname="Deadline4Sec.AcceptanceTests.EditableMenuAcceptanceTests.SettingsTutorialButtonReplaysPracticeEvenAfterCompletion" methodname="SettingsTutorialButtonReplaysPracticeEvenAfterCompletion" classname="Deadline4Sec.AcceptanceTests.EditableMenuAcceptanceTests" runstate="Runnable" seed="1458624863" result="Passed" start-time="2026-09-28 11:17:09Z" end-time="2026-09-28 11:17:15Z" duration="5.363555" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Spawn Pattern: Pattern_B_JumpSlide | Easy
+Spawn Pattern: Pattern_A_LaneAttack | Easy
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+Spawn Pattern: Pattern_A_LaneAttack | Easy
+Saving results to: C:/Users/HP/AppData/LocalLow/DefaultCompany/Deadline-4Sec\TestResults.xml
+]]></output>
+            </test-case>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

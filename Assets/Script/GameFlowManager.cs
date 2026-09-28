@@ -16,7 +16,7 @@ namespace Deadline4Sec
     [RequireComponent(typeof(GameTimer))]
     public sealed class GameFlowManager : MonoBehaviour
     {
-        public enum GameState { Title, Settings, Ready, Playing, GameOver, Result, Tutorial }
+        public enum GameState { Title, Settings, Ready, Playing, GameOver, Result, Tutorial, Upgrades }
 
         [Header("Scene references")]
         [SerializeField] private PlayerController playerController;
@@ -40,9 +40,12 @@ namespace Deadline4Sec
         [Header("Authored menus (edit these objects in the scene)")]
         [SerializeField] private GameObject titlePanel;
         [SerializeField] private GameObject settingsPanel;
+        [SerializeField] private GameObject tutorialSkipUI;
+        [SerializeField] private GameObject tutorialSkipConfirmation;
         [SerializeField] private TMP_Text soundSettingText;
         [SerializeField] private TMP_Text vibrationSettingText;
         [SerializeField] private Button[] menuButtons;
+        [SerializeField] private GameObject upgradePanel;
 
         [Header("Flow timing (unscaled seconds)")]
         [SerializeField, Min(0.1f)] private float introDuration = 2.2f;
@@ -52,16 +55,23 @@ namespace Deadline4Sec
         private const string BestScoreKey = "Deadline4Sec.BestScore";
         private const string BestDistanceKey = "Deadline4Sec.BestDistance";
         private const string BestComboKey = "Deadline4Sec.BestCombo";
+        private const string TutorialCompletedKey = "Deadline4Sec.TutorialCompleted";
         private bool gameOverHandled;
         private CameraFeedbackController cameraFeedback;
         private static bool startImmediatelyAfterReload;
         private TutorialController tutorial;
+        private bool skipConfirmationOpen;
+        private float timeScaleBeforeSkip;
+        private CoinWallet wallet;
+        private PowerUpManager powerUps;
+        private UpgradeMenu upgradeMenu;
 
         public GameState State { get; private set; } = GameState.Title;
         public bool IsPlaying => State == GameState.Playing ||
-            (State == GameState.Tutorial && tutorial != null && tutorial.IsFeedbackActive);
+            (State == GameState.Tutorial && !skipConfirmationOpen && tutorial != null && tutorial.IsFeedbackActive);
         public bool CanReceiveInput => State == GameState.Playing ||
-            (State == GameState.Tutorial && tutorial != null && tutorial.CanReceiveInput);
+            (State == GameState.Tutorial && !skipConfirmationOpen && tutorial != null && tutorial.CanReceiveInput);
+        public bool IsSkipConfirmationOpen => skipConfirmationOpen;
 
         private void Awake()
         {
@@ -71,6 +81,9 @@ namespace Deadline4Sec
                 gameTimer = GetComponent<GameTimer>();
             if (runManager == null)
                 runManager = GetComponent<RunManager>();
+            wallet = GetComponent<CoinWallet>();
+            powerUps = GetComponent<PowerUpManager>();
+            upgradeMenu = GetComponent<UpgradeMenu>();
             cameraFeedback = FindFirstObjectByType<CameraFeedbackController>();
 
             if (playerController != null)
@@ -93,6 +106,12 @@ namespace Deadline4Sec
                 countdownText.fontSizeMin = 48f;
             }
             SetUI(false, false, false);
+            if (tutorialSkipUI != null)
+                tutorialSkipUI.SetActive(false);
+            if (tutorialSkipConfirmation != null)
+                tutorialSkipConfirmation.SetActive(false);
+            if (upgradePanel != null)
+                upgradePanel.SetActive(false);
             ShowTitle();
         }
 
@@ -141,6 +160,10 @@ namespace Deadline4Sec
             State = GameState.Playing;
             if (runManager != null)
                 runManager.BeginRun();
+            if (wallet != null)
+                wallet.BeginRun();
+            if (powerUps != null)
+                powerUps.ResetRunEffects();
             gameTimer.BeginRun();
             if (playerController != null)
                 playerController.enabled = true;
@@ -163,6 +186,16 @@ namespace Deadline4Sec
             StartCoroutine(BeginFlow());
         }
 
+        public void StartFromTitle()
+        {
+            if (State != GameState.Title)
+                return;
+            if (PlayerPrefs.GetInt(TutorialCompletedKey, 0) == 0)
+                StartTutorial();
+            else
+                StartGame();
+        }
+
         public void OpenSettings()
         {
             if (State != GameState.Title)
@@ -175,9 +208,27 @@ namespace Deadline4Sec
                 settingsPanel.SetActive(true);
         }
 
+        public void OpenUpgrades()
+        {
+            if (State != GameState.Title || upgradePanel == null)
+                return;
+            State = GameState.Upgrades;
+            if (titlePanel != null)
+                titlePanel.SetActive(false);
+            upgradePanel.SetActive(true);
+            if (upgradeMenu != null)
+                upgradeMenu.Refresh();
+        }
+
+        public void CloseUpgrades()
+        {
+            if (State == GameState.Upgrades)
+                ShowTitle();
+        }
+
         public void StartTutorial()
         {
-            if (State != GameState.Title)
+            if (State != GameState.Title && State != GameState.Settings)
                 return;
             TutorialCourseAssets assets = Resources.Load<TutorialCourseAssets>("Tutorial/TutorialCourse");
             if (assets == null || !assets.IsValid)
@@ -188,16 +239,67 @@ namespace Deadline4Sec
             if (tutorial == null)
                 tutorial = gameObject.AddComponent<TutorialController>();
             titlePanel.SetActive(false);
+            settingsPanel.SetActive(false);
             State = GameState.Tutorial;
             SetUI(true, false, false);
             tutorial.Begin(this, playerController, gameTimer, runManager,
                 FindFirstObjectByType<PatternSpawner>(), titlePanel.GetComponentInParent<Canvas>(), assets);
+            if (tutorialSkipUI != null)
+            {
+                tutorialSkipUI.SetActive(true);
+                tutorialSkipUI.transform.SetAsLastSibling();
+            }
+            if (tutorialSkipConfirmation != null)
+            {
+                tutorialSkipConfirmation.SetActive(false);
+                tutorialSkipConfirmation.transform.SetAsLastSibling();
+            }
         }
+
+        public void ShowSkipConfirmation()
+        {
+            if (State != GameState.Tutorial || skipConfirmationOpen || tutorialSkipConfirmation == null)
+                return;
+            skipConfirmationOpen = true;
+            timeScaleBeforeSkip = Time.timeScale;
+            Time.timeScale = 0f;
+            tutorialSkipConfirmation.SetActive(true);
+        }
+
+        public void CancelSkipTutorial()
+        {
+            if (State == GameState.Tutorial && skipConfirmationOpen)
+                CloseSkipConfirmation();
+        }
+
+        public void ConfirmSkipTutorial()
+        {
+            if (State != GameState.Tutorial || !skipConfirmationOpen)
+                return;
+            PlayerPrefs.SetInt(TutorialCompletedKey, 1);
+            PlayerPrefs.Save();
+            FinishTutorial(true);
+        }
+
+        private void CloseSkipConfirmation()
+        {
+            if (!skipConfirmationOpen)
+                return;
+            skipConfirmationOpen = false;
+            Time.timeScale = timeScaleBeforeSkip;
+            if (tutorialSkipConfirmation != null)
+                tutorialSkipConfirmation.SetActive(false);
+        }
+
+        private void OnDestroy() => CloseSkipConfirmation();
 
         public void FinishTutorial(bool startRun)
         {
             if (State != GameState.Tutorial)
                 return;
+            CloseSkipConfirmation();
+            if (tutorialSkipUI != null)
+                tutorialSkipUI.SetActive(false);
             tutorial.Stop();
             startImmediatelyAfterReload = startRun;
             SceneManager.LoadScene(SceneManager.GetActiveScene().path);
@@ -214,8 +316,12 @@ namespace Deadline4Sec
             State = GameState.Title;
             if (settingsPanel != null)
                 settingsPanel.SetActive(false);
+            if (upgradePanel != null)
+                upgradePanel.SetActive(false);
             if (titlePanel != null)
                 titlePanel.SetActive(true);
+            if (upgradeMenu != null)
+                upgradeMenu.Refresh();
         }
 
         public void HandleGameOver()
@@ -237,6 +343,10 @@ namespace Deadline4Sec
             }
             if (playerController != null)
                 playerController.enabled = false;
+            if (wallet != null)
+                wallet.BankRunCoins();
+            if (powerUps != null)
+                powerUps.ResetRunEffects();
             SaveRecordsAndFillResult();
             StartCoroutine(ShowResultAfterDelay());
         }

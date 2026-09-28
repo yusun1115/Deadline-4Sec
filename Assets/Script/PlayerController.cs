@@ -125,6 +125,7 @@ namespace Deadline4Sec
         private Vector3 standingVisualPosition;
         private CameraFeedbackController cameraFeedback;
         private GameFlowManager gameFlow;
+        private PowerUpManager powerUps;
 
         private void Awake()
         {
@@ -153,6 +154,7 @@ namespace Deadline4Sec
                 runManager = FindFirstObjectByType<RunManager>();
             cameraFeedback = FindFirstObjectByType<CameraFeedbackController>();
             gameFlow = gameTimer != null ? gameTimer.GetComponent<GameFlowManager>() : null;
+            powerUps = gameTimer != null ? gameTimer.GetComponent<PowerUpManager>() : null;
         }
 
         private void Start()
@@ -861,6 +863,12 @@ namespace Deadline4Sec
             if (enemy == null || enemy.IsKilled)
                 return false;
 
+            if (powerUps != null && powerUps.ReaperRushActive)
+            {
+                TryKillEnemy(enemy, "Reaper Rush");
+                return false;
+            }
+
             if ((laneAttackActive && TryKillContactEnemy(enemy, "Lane Attack")) ||
                 (jumpAttackActive && TryKillContactEnemy(enemy, "Jump Attack")) ||
                 (slideAttackActive && TryKillContactEnemy(enemy, "Slide Attack")))
@@ -869,6 +877,13 @@ namespace Deadline4Sec
             Debug.Log("Game Over: Hit Enemy Without Attack");
             gameTimer.TriggerGameOver();
             return true;
+        }
+
+        public void TryReaperRushKill(Enemy enemy)
+        {
+            if (powerUps != null && powerUps.ReaperRushActive &&
+                gameTimer != null && gameTimer.IsRunning)
+                TryKillEnemy(enemy, "Reaper Rush");
         }
 
         private bool TryKillContactEnemy(Enemy enemy, string attackName)
