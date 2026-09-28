@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Deadline4Sec
@@ -5,6 +6,7 @@ namespace Deadline4Sec
     [RequireComponent(typeof(BoxCollider))]
     public sealed class Obstacle : MonoBehaviour
     {
+        public static readonly HashSet<Obstacle> Active = new HashSet<Obstacle>();
         // Labels for arranging test cubes. Avoidance is decided only by collision.
         public enum ObstacleType { LaneBlocker, JumpObstacle, SlideObstacle }
 
@@ -22,6 +24,9 @@ namespace Deadline4Sec
         private bool wasNearWhilePassing;
         private bool physicallyTouched;
         private bool resolved;
+
+        private void OnEnable() => Active.Add(this);
+        private void OnDisable() => Active.Remove(this);
 
         private void Awake()
         {

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="1" result="Failed(Child)" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-09-28 12:14:13Z" end-time="2026-09-28 12:14:14Z" duration="0.6453377">
+  <test-suite type="TestSuite" id="1000" name="Deadline-4Sec" fullname="Deadline-4Sec" runstate="Runnable" testcasecount="50" result="Failed" site="Child" start-time="2026-09-28 12:14:13Z" end-time="2026-09-28 12:14:14Z" duration="0.645338" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <failure>
+      <message><![CDATA[One or more child tests had errors]]></message>
+    </failure>
+    <test-suite type="Assembly" id="1061" name="Deadline4Sec.AcceptanceTests.dll" fullname="C:/UnityProjects/Deadline-4Sec/ValidationProject/Library/ScriptAssemblies/Deadline4Sec.AcceptanceTests.dll" runstate="Runnable" testcasecount="48" result="Failed" site="Child" start-time="2026-09-28 12:14:13Z" end-time="2026-09-28 12:14:14Z" duration="0.556275" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="34976" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <failure>
+        <message><![CDATA[One or more child tests had errors]]></message>
+      </failure>
+      <test-suite type="TestSuite" id="1062" name="Deadline4Sec" fullname="Deadline4Sec" runstate="Runnable" testcasecount="48" result="Failed" site="Child" start-time="2026-09-28 12:14:13Z" end-time="2026-09-28 12:14:14Z" duration="0.555478" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <failure>
+          <message><![CDATA[One or more child tests had errors]]></message>
+        </failure>
+        <test-suite type="TestSuite" id="1063" name="AcceptanceTests" fullname="Deadline4Sec.AcceptanceTests" runstate="Runnable" testcasecount="48" result="Failed" site="Child" start-time="2026-09-28 12:14:13Z" end-time="2026-09-28 12:14:14Z" duration="0.554880" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <failure>
+            <message><![CDATA[One or more child tests had errors]]></message>
+          </failure>
+          <test-suite type="TestFixture" id="1005" name="CoinPowerUpAcceptanceTests" fullname="Deadline4Sec.AcceptanceTests.CoinPowerUpAcceptanceTests" classname="Deadline4Sec.AcceptanceTests.CoinPowerUpAcceptanceTests" runstate="Runnable" testcasecount="5" result="Failed" site="Child" start-time="2026-09-28 12:14:13Z" end-time="2026-09-28 12:14:14Z" duration="0.552550" total="1" passed="0" failed="1" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <failure>
+              <message><![CDATA[One or more child tests had errors]]></message>
+            </failure>
+            <test-case id="1010" name="RushMagnetAndComboSealResolveAndCleanUp" fullname="Deadline4Sec.AcceptanceTests.CoinPowerUpAcceptanceTests.RushMagnetAndComboSealResolveAndCleanUp" methodname="RushMagnetAndComboSealResolveAndCleanUp" classname="Deadline4Sec.AcceptanceTests.CoinPowerUpAcceptanceTests" runstate="Runnable" seed="941996986" result="Failed" start-time="2026-09-28 12:14:09Z" end-time="2026-09-28 12:14:14Z" duration="4.527242" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <failure>
+                <message><![CDATA[  running=True runTime=0.0350667 sealed=False elapsed=0.003029399
+  Expected: 0
+  But was:  2
+]]></message>
+                <stack-trace><![CDATA[at Deadline4Sec.AcceptanceTests.CoinPowerUpAcceptanceTests+<RushMagnetAndComboSealResolveAndCleanUp>d__10.MoveNext () [0x00400] in C:\UnityProjects\Deadline-4Sec\ValidationProject\Assets\AcceptanceTests\CoinPowerUpAcceptanceTests.cs:231
+at UnityEngine.TestTools.TestEnumerator+<Execute>d__7.MoveNext () [0x0003a] in .\Library\PackageCache\com.unity.test-framework@0b7a23ab2e1d\UnityEngine.TestRunner\NUnitExtensions\Attributes\TestEnumerator.cs:44
+]]></stack-trace>
+              </failure>
+              <output><![CDATA[Power-Up: ReaperRush (2.0s)
+Enemy Killed by Reaper Rush
+Timer Reset by Kill
+Power-Up: ComboSeal (3.0s)
+Saving results to: C:/Users/HP/AppData/LocalLow/DefaultCompany/Deadline-4Sec\TestResults.xml
+]]></output>
+            </test-case>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

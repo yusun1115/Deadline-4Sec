@@ -18,8 +18,9 @@ namespace Deadline4Sec
         [SerializeField, Min(0f)] private float warningAtSeconds = 2.5f;
         [SerializeField, Min(0f)] private float criticalAtSeconds = 1f;
 
-        private const float Duration = 4f;
+        public const float BaseDuration = 4f;
         private float remainingTime;
+        private float maximumTime = BaseDuration;
         private bool isGameOver;
         private bool isRunning;
         private int runStartedFrame = -1;
@@ -28,13 +29,14 @@ namespace Deadline4Sec
         private bool warningPlayed;
 
         public float RemainingTime => remainingTime;
+        public float MaximumTime => maximumTime;
         public bool IsGameOver => isGameOver;
         public bool IsRunning => isRunning && !isGameOver;
         public event Action<float> TimerReset;
 
         private void Awake()
         {
-            remainingTime = Duration;
+            remainingTime = BaseDuration;
             gameFlow = GetComponent<GameFlowManager>();
             cameraFeedback = FindFirstObjectByType<CameraFeedbackController>();
             GameFont.Apply(timeText);
@@ -70,7 +72,9 @@ namespace Deadline4Sec
             if (!IsRunning || Time.frameCount == runStartedFrame)
                 return;
 
-            remainingTime = Mathf.Max(0f, remainingTime - deltaTime);
+            PowerUpManager powerUps = GetComponent<PowerUpManager>();
+            if (powerUps == null || !powerUps.TimerFrozen)
+                remainingTime = Mathf.Max(0f, remainingTime - deltaTime);
             UpdateTimeText();
 
             if (!warningPlayed && remainingTime > 0f &&
@@ -90,7 +94,8 @@ namespace Deadline4Sec
             if (isGameOver || isRunning)
                 return;
 
-            remainingTime = Duration;
+            maximumTime = BaseDuration;
+            remainingTime = maximumTime;
             warningPlayed = false;
             isRunning = true;
             runStartedFrame = Time.frameCount;
@@ -104,7 +109,7 @@ namespace Deadline4Sec
                 return;
 
             float previous = remainingTime;
-            remainingTime = Duration;
+            remainingTime = maximumTime;
             warningPlayed = false;
             UpdateTimeText();
             TimerReset?.Invoke(previous);
@@ -117,6 +122,14 @@ namespace Deadline4Sec
             if (gameOverText != null)
                 gameOverText.gameObject.SetActive(false);
             BeginRun();
+        }
+
+        public void SetTemporaryMaximum(float seconds, bool refill)
+        {
+            maximumTime = Mathf.Max(BaseDuration, seconds);
+            remainingTime = refill ? maximumTime : Mathf.Min(remainingTime, maximumTime);
+            warningPlayed = false;
+            UpdateTimeText();
         }
 
         public void PausePractice()

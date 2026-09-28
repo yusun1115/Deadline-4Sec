@@ -45,9 +45,14 @@ namespace Deadline4Sec.Editor
             SerializedObject serializedFont = new SerializedObject(asset);
             serializedFont.FindProperty("m_ClearDynamicDataOnBuild").boolValue = false;
             serializedFont.ApplyModifiedPropertiesWithoutUndo();
-            const string labels = "DEADLINE: 4 SEC RISK TO LIVE START SETTINGS SOUND ON OFF VIBRATION BACK MAIN MENU RETRY Ready? Go! SCORE DISTANCE BEST COMBO TIME NEW NEAR MISS +0123456789.,:xm 준비시작설정점수거리최고기록재시도게임오버";
-            if (!asset.TryAddCharacters(labels, out string missing))
-                throw new InvalidOperationException("GFCRedSpirit is missing UI glyphs: " + missing);
+            const string labels = "DEADLINE: 4 SEC RISK TO LIVE TAP TO START SKIP YES NO START SETTINGS SOUND ON OFF VIBRATION TUTORIAL BACK MAIN MENU RETRY Ready? Go! SCORE DISTANCE BEST COMBO TIME NEW NEAR MISS +0123456789.,:xm() 준비시작설정점수거리최고기록재시도게임오버튜토리얼을 스킵하시겠습니까설정창에서 언제든지 다시 할 수 있습니다예아니오";
+            // TMP reports an entire already-populated string as missing on a
+            // repeated TryAddCharacters call. Check the atlas before adding.
+            if (!asset.HasCharacters(labels))
+            {
+                if (!asset.TryAddCharacters(labels, out string missing))
+                    throw new InvalidOperationException("GFCRedSpirit is missing UI glyphs: " + missing);
+            }
             foreach (Texture2D atlas in asset.atlasTextures)
             {
                 if (!AssetDatabase.Contains(atlas))

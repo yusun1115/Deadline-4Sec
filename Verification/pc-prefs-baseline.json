@@ -1,0 +1,39 @@
+{
+    "entries": [
+        {
+            "key": "Deadline4Sec.BestScore",
+            "exists": true,
+            "isFloat": false,
+            "integer": 61400,
+            "number": 0.0
+        },
+        {
+            "key": "Deadline4Sec.BestDistance",
+            "exists": true,
+            "isFloat": true,
+            "integer": 0,
+            "number": 864.8298950195313
+        },
+        {
+            "key": "Deadline4Sec.BestCombo",
+            "exists": true,
+            "isFloat": false,
+            "integer": 137,
+            "number": 0.0
+        },
+        {
+            "key": "Deadline4Sec.SoundEnabled",
+            "exists": true,
+            "isFloat": false,
+            "integer": 1,
+            "number": 0.0
+        },
+        {
+            "key": "Deadline4Sec.VibrationEnabled",
+            "exists": true,
+            "isFloat": false,
+            "integer": 1,
+            "number": 0.0
+        }
+    ]
+}
