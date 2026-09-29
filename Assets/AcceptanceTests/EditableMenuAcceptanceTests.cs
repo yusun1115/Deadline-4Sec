@@ -88,6 +88,7 @@ namespace Deadline4Sec.AcceptanceTests
             AssertAppearance();
             flow.GetType().GetField("introDuration", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(flow, 0.1f);
             flow.GetType().GetField("resultDelay", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(flow, 0.01f);
+            flow.GetType().GetField("deathPresentationDuration", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(flow, 0.5f);
             Click("Canvas/TitlePanel/TitleTapArea");
             Assert.AreEqual("Ready", State(flow));
             float end = Time.realtimeSinceStartup + 0.3f;
@@ -95,6 +96,10 @@ namespace Deadline4Sec.AcceptanceTests
             Assert.AreEqual("Playing", State(flow));
             Component timer = (Component)UnityEngine.Object.FindFirstObjectByType(Type.GetType("Deadline4Sec.GameTimer, Assembly-CSharp"));
             timer.GetType().GetMethod("TriggerGameOver").Invoke(timer, null);
+            end = Time.realtimeSinceStartup + 0.65f;
+            while (Time.realtimeSinceStartup < end) { yield return null; System.Threading.Thread.Sleep(1); }
+            Assert.AreEqual("RevivePrompt", State(flow));
+            flow.GetType().GetMethod("GiveUpRevive").Invoke(flow, null);
             end = Time.realtimeSinceStartup + 0.1f;
             while (Time.realtimeSinceStartup < end) { yield return null; System.Threading.Thread.Sleep(1); }
             Assert.AreEqual("Result", State(flow));

@@ -222,10 +222,14 @@ namespace Deadline4Sec.AcceptanceTests
             Component timer = Get("GameTimer");
             SetFloat(flow, "introDuration", 0.1f);
             SetFloat(flow, "resultDelay", 0.01f);
+            SetFloat(flow, "deathPresentationDuration", 0.5f);
             flow.GetType().GetMethod("StartGame").Invoke(flow, null);
             yield return AdvanceSeconds(0.2f);
             Assert.AreEqual("Playing", State(flow));
             timer.GetType().GetMethod("TriggerGameOver").Invoke(timer, null);
+            yield return AdvanceSeconds(0.6f);
+            Assert.AreEqual("RevivePrompt", State(flow));
+            flow.GetType().GetMethod("GiveUpRevive").Invoke(flow, null);
             yield return AdvanceSeconds(0.1f);
             Assert.AreEqual("Result", State(flow));
             AssertAllTextUsesGameFont();
@@ -255,9 +259,13 @@ namespace Deadline4Sec.AcceptanceTests
             Component timer = Get("GameTimer");
             SetFloat(flow, "introDuration", 0.1f);
             SetFloat(flow, "resultDelay", 0.01f);
+            SetFloat(flow, "deathPresentationDuration", 0.5f);
             flow.GetType().GetMethod("StartGame").Invoke(flow, null);
             yield return AdvanceSeconds(0.2f);
             timer.GetType().GetMethod("TriggerGameOver").Invoke(timer, null);
+            yield return AdvanceSeconds(0.6f);
+            Assert.AreEqual("RevivePrompt", State(flow));
+            flow.GetType().GetMethod("GiveUpRevive").Invoke(flow, null);
             yield return AdvanceSeconds(0.1f);
             Assert.AreEqual("Result", State(flow));
             flow.GetType().GetMethod("MainMenu").Invoke(flow, null);

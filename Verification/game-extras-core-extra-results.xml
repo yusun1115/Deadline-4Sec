@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="2" result="Passed" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-09-29 14:34:19Z" end-time="2026-09-29 14:34:20Z" duration="1.2528191">
+  <test-suite type="TestSuite" id="1000" name="Deadline-4Sec" fullname="Deadline-4Sec" runstate="Runnable" testcasecount="56" result="Passed" start-time="2026-09-29 14:34:19Z" end-time="2026-09-29 14:34:20Z" duration="1.252819" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <test-suite type="Assembly" id="1004" name="Assembly-CSharp-Editor.dll" fullname="C:/UnityProjects/Deadline-4Sec/ValidationProject/Library/ScriptAssemblies/Assembly-CSharp-Editor.dll" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-09-29 14:34:14Z" end-time="2026-09-29 14:34:15Z" duration="0.494280" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="27576" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestFixture" id="1001" name="CoreAcceptanceTests" fullname="CoreAcceptanceTests" classname="CoreAcceptanceTests" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-09-29 14:34:14Z" end-time="2026-09-29 14:34:15Z" duration="0.492698" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-case id="1003" name="ForwardGroundEnemyKillsJumpingPlayer" fullname="CoreAcceptanceTests.ForwardGroundEnemyKillsJumpingPlayer" methodname="ForwardGroundEnemyKillsJumpingPlayer" classname="CoreAcceptanceTests" runstate="Runnable" seed="419281584" result="Passed" start-time="2026-09-29 14:34:10Z" end-time="2026-09-29 14:34:15Z" duration="4.296369" asserts="0">
+          <properties>
+            <property name="_JOINTYPE" value="UnityCombinatorial" />
+          </properties>
+          <output><![CDATA[Game Over: Hit Enemy Without Attack
+]]></output>
+        </test-case>
+      </test-suite>
+    </test-suite>
+    <test-suite type="Assembly" id="1068" name="Deadline4Sec.AcceptanceTests.dll" fullname="C:/UnityProjects/Deadline-4Sec/ValidationProject/Library/ScriptAssemblies/Deadline4Sec.AcceptanceTests.dll" runstate="Runnable" testcasecount="54" result="Passed" start-time="2026-09-29 14:34:19Z" end-time="2026-09-29 14:34:20Z" duration="1.161645" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="27576" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestSuite" id="1069" name="Deadline4Sec" fullname="Deadline4Sec" runstate="Runnable" testcasecount="54" result="Passed" start-time="2026-09-29 14:34:19Z" end-time="2026-09-29 14:34:20Z" duration="1.160542" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1070" name="AcceptanceTests" fullname="Deadline4Sec.AcceptanceTests" runstate="Runnable" testcasecount="54" result="Passed" start-time="2026-09-29 14:34:19Z" end-time="2026-09-29 14:34:20Z" duration="1.159869" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestFixture" id="1032" name="RuntimeAcceptanceTests" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" testcasecount="26" result="Passed" start-time="2026-09-29 14:34:19Z" end-time="2026-09-29 14:34:20Z" duration="1.158478" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1035" name="ForwardGroundEnemyKillsJumpingPlayer" fullname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests.ForwardGroundEnemyKillsJumpingPlayer" methodname="ForwardGroundEnemyKillsJumpingPlayer" classname="Deadline4Sec.AcceptanceTests.RuntimeAcceptanceTests" runstate="Runnable" seed="1094532196" result="Passed" start-time="2026-09-29 14:34:15Z" end-time="2026-09-29 14:34:20Z" duration="4.984481" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Normal Jump
+Game Over: Ground Enemy Front Attack
+Saving results to: C:/Users/HP/AppData/LocalLow/DefaultCompany/Deadline-4Sec\TestResults.xml
+]]></output>
+            </test-case>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

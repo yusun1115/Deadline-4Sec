@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="6" result="Passed" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-09-29 14:33:00Z" end-time="2026-09-29 14:33:01Z" duration="0.937452">
+  <test-suite type="TestSuite" id="1000" name="Deadline-4Sec" fullname="Deadline-4Sec" runstate="Runnable" testcasecount="56" result="Passed" start-time="2026-09-29 14:33:00Z" end-time="2026-09-29 14:33:01Z" duration="0.937452" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <test-suite type="Assembly" id="1068" name="Deadline4Sec.AcceptanceTests.dll" fullname="C:/UnityProjects/Deadline-4Sec/ValidationProject/Library/ScriptAssemblies/Deadline4Sec.AcceptanceTests.dll" runstate="Runnable" testcasecount="54" result="Passed" start-time="2026-09-29 14:33:00Z" end-time="2026-09-29 14:33:01Z" duration="0.850188" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="28140" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestSuite" id="1069" name="Deadline4Sec" fullname="Deadline4Sec" runstate="Runnable" testcasecount="54" result="Passed" start-time="2026-09-29 14:33:00Z" end-time="2026-09-29 14:33:01Z" duration="0.849213" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1070" name="AcceptanceTests" fullname="Deadline4Sec.AcceptanceTests" runstate="Runnable" testcasecount="54" result="Passed" start-time="2026-09-29 14:33:00Z" end-time="2026-09-29 14:33:01Z" duration="0.848419" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestFixture" id="1021" name="GameExtrasAcceptanceTests" fullname="Deadline4Sec.AcceptanceTests.GameExtrasAcceptanceTests" classname="Deadline4Sec.AcceptanceTests.GameExtrasAcceptanceTests" runstate="Runnable" testcasecount="6" result="Passed" start-time="2026-09-29 14:33:00Z" end-time="2026-09-29 14:33:01Z" duration="0.846399" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1022" name="CatalogGiftPrefabAndEditableScenesHaveExpectedContent" fullname="Deadline4Sec.AcceptanceTests.GameExtrasAcceptanceTests.CatalogGiftPrefabAndEditableScenesHaveExpectedContent" methodname="CatalogGiftPrefabAndEditableScenesHaveExpectedContent" classname="Deadline4Sec.AcceptanceTests.GameExtrasAcceptanceTests" runstate="Runnable" seed="2094587232" result="Passed" start-time="2026-09-29 14:32:37Z" end-time="2026-09-29 14:32:38Z" duration="1.371852" asserts="0">
+              <properties />
+            </test-case>
+            <test-case id="1026" name="DeathReviveResultAndGiftBoxFlow" fullname="Deadline4Sec.AcceptanceTests.GameExtrasAcceptanceTests.DeathReviveResultAndGiftBoxFlow" methodname="DeathReviveResultAndGiftBoxFlow" classname="Deadline4Sec.AcceptanceTests.GameExtrasAcceptanceTests" runstate="Runnable" seed="1979639373" result="Passed" start-time="2026-09-29 14:32:38Z" end-time="2026-09-29 14:32:47Z" duration="8.791707" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[Spawn Pattern: Pattern_A_LaneAttack | Easy
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+Spawn Pattern: Pattern_A_LaneAttack | Easy
+Spawn Pattern: Pattern_B_JumpSlide | Easy
+]]></output>
+            </test-case>
+            <test-case id="1027" name="GiftPickupAndDoubleTapKeepTimerScoreAndSwipeRules" fullname="Deadline4Sec.AcceptanceTests.GameExtrasAcceptanceTests.GiftPickupAndDoubleTapKeepTimerScoreAndSwipeRules" methodname="GiftPickupAndDoubleTapKeepTimerScoreAndSwipeRules" classname="Deadline4Sec.AcceptanceTests.GameExtrasAcceptanceTests" runstate="Runnable" seed="425257253" result="Passed" start-time="2026-09-29 14:32:47Z" end-time="2026-09-29 14:32:52Z" duration="4.583564" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[Gift Box collected (run total 1)
+Shield active
+]]></output>
+            </test-case>
+            <test-case id="1024" name="ShieldDoesNotStopTimerAndDashIsNotInvulnerable" fullname="Deadline4Sec.AcceptanceTests.GameExtrasAcceptanceTests.ShieldDoesNotStopTimerAndDashIsNotInvulnerable" methodname="ShieldDoesNotStopTimerAndDashIsNotInvulnerable" classname="Deadline4Sec.AcceptanceTests.GameExtrasAcceptanceTests" runstate="Runnable" seed="891924427" result="Passed" start-time="2026-09-29 14:32:52Z" end-time="2026-09-29 14:32:56Z" duration="4.390872" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+              </properties>
+              <output><![CDATA[Shield active
+Shield break: fatal contact absorbed
+Dash consumable used
+]]></output>
+            </test-case>
+            <test-case id="1025" name="ShieldIgnoresTheSameLingeringContactButNotAnotherHazard" fullname="Deadline4Sec.AcceptanceTests.GameExtrasAcceptanceTests.ShieldIgnoresTheSameLingeringContactButNotAnotherHazard" methodname="ShieldIgnoresTheSameLingeringContactButNotAnotherHazard" classname="Deadline4Sec.AcceptanceTests.GameExtrasAcceptanceTests" runstate="Runnable" seed="960220043" result="Passed" start-time="2026-09-29 14:32:56Z" end-time="2026-09-29 14:33:01Z" duration="4.889239" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Shield active
+Shield break: fatal contact absorbed
+]]></output>
+            </test-case>
+            <test-case id="1023" name="SkinOwnershipCurrencyAndPendingRewardPersistWithoutReroll" fullname="Deadline4Sec.AcceptanceTests.GameExtrasAcceptanceTests.SkinOwnershipCurrencyAndPendingRewardPersistWithoutReroll" methodname="SkinOwnershipCurrencyAndPendingRewardPersistWithoutReroll" classname="Deadline4Sec.AcceptanceTests.GameExtrasAcceptanceTests" runstate="Runnable" seed="1273235004" result="Passed" start-time="2026-09-29 14:33:01Z" end-time="2026-09-29 14:33:01Z" duration="0.011031" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Saving results to: C:/Users/HP/AppData/LocalLow/DefaultCompany/Deadline-4Sec\TestResults.xml
+]]></output>
+            </test-case>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

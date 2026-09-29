@@ -16,7 +16,8 @@ namespace Deadline4Sec
     [RequireComponent(typeof(GameTimer))]
     public sealed class GameFlowManager : MonoBehaviour
     {
-        public enum GameState { Title, Settings, Ready, Playing, GameOver, Result, Tutorial, Upgrades }
+        public enum GameState { Title, Settings, Ready, Playing, GameOver, Result, Tutorial, Upgrades,
+            Dying, RevivePrompt, GiftBoxes }
 
         [Header("Scene references")]
         [SerializeField] private PlayerController playerController;
@@ -51,6 +52,8 @@ namespace Deadline4Sec
         [SerializeField, Min(0.1f)] private float introDuration = 2.2f;
         [SerializeField, Min(0f)] private float goDisplayDuration = 0.5f;
         [SerializeField, Min(0f)] private float resultDelay = 0.4f;
+        [SerializeField, Range(0.5f, 1f)] private float deathPresentationDuration = 0.75f;
+        [SerializeField, Min(1f)] private float revivePromptSeconds = 4f;
 
         private const string BestScoreKey = "Deadline4Sec.BestScore";
         private const string BestDistanceKey = "Deadline4Sec.BestDistance";
@@ -65,6 +68,12 @@ namespace Deadline4Sec
         private CoinWallet wallet;
         private PowerUpManager powerUps;
         private UpgradeMenu upgradeMenu;
+        private RunInventory inventory;
+        private GameExtrasUI extrasUI;
+        private int giftBoxIndex;
+        private int giftBoxTotal;
+        private bool giftBoxRevealed;
+        private bool retryAfterBoxes;
 
         public GameState State { get; private set; } = GameState.Title;
         public bool IsPlaying => State == GameState.Playing ||
@@ -84,6 +93,8 @@ namespace Deadline4Sec
             wallet = GetComponent<CoinWallet>();
             powerUps = GetComponent<PowerUpManager>();
             upgradeMenu = GetComponent<UpgradeMenu>();
+            inventory = GetComponent<RunInventory>();
+            extrasUI = GetComponent<GameExtrasUI>();
             cameraFeedback = FindFirstObjectByType<CameraFeedbackController>();
 
             if (playerController != null)
@@ -117,6 +128,16 @@ namespace Deadline4Sec
 
         private void Start()
         {
+            if (inventory != null && inventory.HasPendingReward)
+            {
+                State = GameState.GiftBoxes;
+                giftBoxTotal = giftBoxIndex = 1;
+                giftBoxRevealed = true;
+                if (titlePanel != null)
+                    titlePanel.SetActive(false);
+                extrasUI?.ShowGiftPanel(1, 1, inventory.ApplyPendingReward(), false);
+                return;
+            }
             if (!startImmediatelyAfterReload)
                 return;
 
@@ -164,6 +185,7 @@ namespace Deadline4Sec
                 wallet.BeginRun();
             if (powerUps != null)
                 powerUps.ResetRunEffects();
+            inventory?.BeginRun();
             gameTimer.BeginRun();
             if (playerController != null)
                 playerController.enabled = true;
@@ -335,7 +357,7 @@ namespace Deadline4Sec
                 return;
 
             gameOverHandled = true;
-            State = GameState.GameOver;
+            State = GameState.Dying;
             if (cameraFeedback != null)
             {
                 cameraFeedback.StopAllFeedback();
@@ -343,10 +365,72 @@ namespace Deadline4Sec
             }
             if (playerController != null)
                 playerController.enabled = false;
-            if (wallet != null)
-                wallet.BankRunCoins();
             if (powerUps != null)
                 powerUps.ResetRunEffects();
+            StartCoroutine(ShowDeathAndPrompt());
+        }
+
+        private IEnumerator ShowDeathAndPrompt()
+        {
+            SetUI(false, false, false);
+            float elapsed = 0f;
+            while (elapsed < deathPresentationDuration)
+            {
+                elapsed += Time.unscaledDeltaTime;
+                playerController?.SetDeathPose(elapsed / deathPresentationDuration);
+                yield return null;
+            }
+            if (inventory != null && !inventory.ReviveUsed)
+            {
+                State = GameState.RevivePrompt;
+                extrasUI?.ShowRevive(revivePromptSeconds);
+                float remaining = revivePromptSeconds;
+                while (State == GameState.RevivePrompt && remaining > 0f)
+                {
+                    remaining -= Time.unscaledDeltaTime;
+                    extrasUI?.SetReviveCountdown(remaining);
+                    yield return null;
+                }
+                if (State != GameState.RevivePrompt)
+                    yield break;
+                extrasUI?.HideRevive();
+            }
+            FinalizeRun();
+        }
+
+        public void UseCouponRevive()
+        {
+            if (State != GameState.RevivePrompt || inventory == null || !inventory.TrySpendCoupon())
+                return;
+            inventory.Revive();
+            extrasUI?.HideRevive();
+            playerController?.RestoreDeathPose();
+            gameTimer.ReviveRun();
+            if (playerController != null)
+                playerController.enabled = true;
+            gameOverHandled = false;
+            State = GameState.Playing;
+            SetUI(true, false, false);
+        }
+
+        public void ClickRewardedAd()
+        {
+            if (State == GameState.RevivePrompt)
+                Debug.Log("Rewarded Ad not implemented yet");
+        }
+
+        public void GiveUpRevive()
+        {
+            if (State != GameState.RevivePrompt)
+                return;
+            extrasUI?.HideRevive();
+            FinalizeRun();
+        }
+
+        private void FinalizeRun()
+        {
+            State = GameState.GameOver;
+            wallet?.BankRunCoins();
             SaveRecordsAndFillResult();
             StartCoroutine(ShowResultAfterDelay());
         }
@@ -396,6 +480,12 @@ namespace Deadline4Sec
         {
             if (State != GameState.GameOver && State != GameState.Result)
                 return;
+            if (inventory != null && inventory.CurrentRunGiftBoxes > 0)
+            {
+                retryAfterBoxes = true;
+                ConfirmResult();
+                return;
+            }
             startImmediatelyAfterReload = true;
             SceneManager.LoadScene(SceneManager.GetActiveScene().path);
         }
@@ -404,7 +494,56 @@ namespace Deadline4Sec
         {
             if (State != GameState.GameOver && State != GameState.Result)
                 return;
+            ConfirmResult();
+        }
+
+        public void ConfirmResult()
+        {
+            if (State != GameState.Result && State != GameState.GameOver)
+                return;
+            giftBoxTotal = inventory != null ? inventory.CurrentRunGiftBoxes : 0;
+            if (giftBoxTotal <= 0)
+            {
+                ReturnToTitle();
+                return;
+            }
+            State = GameState.GiftBoxes;
+            SetUI(false, false, false);
+            giftBoxIndex = 1;
+            giftBoxRevealed = false;
+            extrasUI?.ShowGiftPanel(giftBoxIndex, giftBoxTotal, "", false);
+        }
+
+        public void OpenOrContinueGiftBox()
+        {
+            if (State != GameState.GiftBoxes || inventory == null || giftBoxIndex > giftBoxTotal)
+                return;
+            if (!giftBoxRevealed)
+            {
+                string reward = inventory.RollAndGrantGiftReward();
+                giftBoxRevealed = true;
+                extrasUI?.ShowGiftPanel(giftBoxIndex, giftBoxTotal, reward, false);
+                return;
+            }
+            inventory.ClearPendingReward();
+            giftBoxIndex++;
+            giftBoxRevealed = false;
+            extrasUI?.ShowGiftPanel(giftBoxIndex, giftBoxTotal, "", giftBoxIndex > giftBoxTotal);
+        }
+
+        public void ConfirmAllGiftBoxes()
+        {
+            if (State != GameState.GiftBoxes || giftBoxIndex <= giftBoxTotal)
+                return;
+            ReturnToTitle();
+        }
+
+        private void ReturnToTitle()
+        {
+            extrasUI?.HideGiftPanel();
             startImmediatelyAfterReload = false;
+            if (retryAfterBoxes)
+                startImmediatelyAfterReload = true;
             SceneManager.LoadScene(SceneManager.GetActiveScene().path);
         }
 

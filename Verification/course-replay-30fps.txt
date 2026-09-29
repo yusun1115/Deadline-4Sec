@@ -1,11 +1,11 @@
 seed=12345, timestep=1/30, duration=60, scene=EndlessRun
 ENTER t=1.50 z=31.94 Pattern_A_LaneAttack tier=Easy feet=0.08
-INPUT t=1.70 z=34.36 lane=0 feet=0.08 RequestMoveRight -> 01 Right - Lane Attack dz=2.52
+INPUT t=1.70 z=34.35 lane=0 feet=0.08 RequestMoveRight -> 01 Right - Lane Attack dz=2.52
 REWARD t=1.73 z=34.76 score=100 gap=1.73
 INPUT t=2.13 z=39.60 lane=1 feet=0.08 RequestMoveLeft -> 02 Center - Lane Attack dz=2.27
 REWARD t=2.17 z=40.01 score=200 gap=0.43
 INPUT t=2.53 z=44.46 lane=0 feet=0.08 RequestMoveLeft -> 03 Left - Lane Attack dz=2.41
-REWARD t=2.57 z=44.87 score=300 gap=0.40
+REWARD t=2.57 z=44.86 score=300 gap=0.40
 INPUT t=2.93 z=49.33 lane=-1 feet=0.08 RequestMoveRight -> 04 Center - Lane Attack dz=2.54
 REWARD t=2.97 z=49.73 score=500 gap=0.40
 ENTER t=3.50 z=56.23 Pattern_B_JumpSlide tier=Easy feet=0.08
@@ -74,7 +74,7 @@ INPUT t=16.77 z=223.49 lane=1 feet=0.08 RequestMoveLeft -> 02 Center - Lane Atta
 REWARD t=16.80 z=223.92 score=16500 gap=0.40
 INPUT t=17.17 z=228.69 lane=0 feet=0.08 RequestMoveLeft -> 03 Left - Lane Attack dz=2.18
 REWARD t=17.20 z=229.13 score=17300 gap=0.40
-INPUT t=17.53 z=233.48 lane=-1 feet=0.08 RequestMoveRight -> 04 Center - Lane Attack dz=2.39
+INPUT t=17.53 z=233.47 lane=-1 feet=0.08 RequestMoveRight -> 04 Center - Lane Attack dz=2.40
 REWARD t=17.57 z=233.91 score=18100 gap=0.37
 ENTER t=18.03 z=240.01 Pattern_B_JumpSlide tier=Easy feet=0.08
 INPUT t=18.13 z=241.32 lane=0 feet=0.08 RequestJump -> 01 Jump / Near Miss dz=2.55
@@ -97,7 +97,7 @@ ENTER t=21.53 z=286.16 Pattern_B_JumpSlide tier=Easy feet=0.08
 INPUT t=21.60 z=287.05 lane=0 feet=0.08 RequestJump -> 01 Jump / Near Miss dz=2.82
 REWARD t=21.90 z=291.04 score=24900 gap=0.83
 INPUT t=21.97 z=291.92 lane=0 feet=1.53 RequestSlide -> 02 Slide / Near Miss dz=3.95
-INPUT t=22.50 z=299.04 lane=0 feet=0.08 RequestJump -> 03 Jump / Near Miss dz=2.83
+INPUT t=22.50 z=299.03 lane=0 feet=0.08 RequestJump -> 03 Jump / Near Miss dz=2.84
 REWARD t=22.80 z=303.04 score=26100 gap=0.90
 INPUT t=22.80 z=303.04 lane=0 feet=1.51 RequestMoveRight -> 01 Right - Lane Attack dz=9.83
 INPUT t=23.03 z=306.16 lane=1 feet=1.07 RequestMoveLeft -> 01 Right - Lane Attack dz=6.71
@@ -111,7 +111,7 @@ REWARD t=24.13 z=320.92 score=28500 gap=0.37
 INPUT t=24.47 z=325.40 lane=-1 feet=0.08 RequestMoveRight -> 04 Center - Lane Attack dz=2.47
 REWARD t=24.50 z=325.85 score=29300 gap=0.37
 ENTER t=24.97 z=332.15 Pattern_B_JumpSlide tier=Easy feet=0.08
-INPUT t=25.03 z=333.05 lane=0 feet=0.08 RequestJump -> 01 Jump / Near Miss dz=2.82
+INPUT t=25.03 z=333.04 lane=0 feet=0.08 RequestJump -> 01 Jump / Near Miss dz=2.83
 REWARD t=25.33 z=337.10 score=30500 gap=0.83
 INPUT t=25.37 z=337.55 lane=0 feet=1.53 RequestSlide -> 02 Slide / Near Miss dz=4.32
 INPUT t=25.93 z=345.22 lane=0 feet=0.08 RequestJump -> 03 Jump / Near Miss dz=2.65
@@ -124,11 +124,11 @@ REWARD t=26.80 z=356.99 score=32500 gap=0.57
 INPUT t=27.13 z=361.53 lane=1 feet=0.08 RequestMoveLeft -> 02 Center - Lane Attack dz=2.34
 REWARD t=27.17 z=361.98 score=33300 gap=0.37
 INPUT t=27.50 z=366.53 lane=0 feet=0.08 RequestMoveLeft -> 03 Left - Lane Attack dz=2.34
-REWARD t=27.53 z=366.99 score=34100 gap=0.37
+REWARD t=27.53 z=366.98 score=34100 gap=0.37
 INPUT t=27.87 z=371.54 lane=-1 feet=0.08 RequestMoveRight -> 04 Center - Lane Attack dz=2.33
 REWARD t=27.90 z=371.99 score=34900 gap=0.37
 INPUT t=28.27 z=377.01 lane=0 feet=0.08 RequestJump -> 01 Jump Attack dz=3.86
-ENTER t=28.33 z=377.93 Pattern_C_AirCombo tier=Medium feet=0.59
+ENTER t=28.33 z=377.92 Pattern_C_AirCombo tier=Medium feet=0.59
 REWARD t=28.37 z=378.38 score=35700 gap=0.47
 INPUT t=28.37 z=378.38 lane=0 feet=0.81 RequestJump -> 02 Dash Right dz=6.49
 REWARD t=28.47 z=383.37 score=36500 gap=0.10
@@ -424,4 +424,4 @@ REWARD t=59.53 z=1001.62 score=94100 gap=0.50
 INPUT t=59.57 z=1002.14 lane=1 feet=1.78 RequestMoveLeft -> 01 Lane Enemy Center dz=7.73
 ENTER t=59.83 z=1006.29 Pattern_E_MixedRisk tier=Hard feet=4.96
 INPUT t=59.87 z=1006.81 lane=0 feet=5.23 RequestSlide -> 01 Lane Enemy Center dz=3.06
-FINISH time=60.03276 score=94100 distance=995.5422 rewards=158 maximumRewardGap=1.73
+FINISH time=60.03276 score=94100 distance=995.5424 rewards=158 maximumRewardGap=1.73

@@ -102,7 +102,7 @@ INPUT t=22.78 z=302.83 lane=0 feet=1.55 RequestMoveRight -> 01 Right - Lane Atta
 REWARD t=22.80 z=303.05 score=26100 gap=0.90
 INPUT t=23.02 z=305.95 lane=1 feet=1.26 RequestMoveLeft -> 01 Right - Lane Attack dz=6.92
 ENTER t=23.17 z=307.96 Pattern_A_LaneAttack tier=Easy feet=0.35
-INPUT t=23.35 z=310.42 lane=0 feet=0.08 RequestMoveRight -> 01 Right - Lane Attack dz=2.45
+INPUT t=23.35 z=310.42 lane=0 feet=0.08 RequestMoveRight -> 01 Right - Lane Attack dz=2.46
 REWARD t=23.37 z=310.64 score=26900 gap=0.57
 INPUT t=23.72 z=315.33 lane=1 feet=0.08 RequestMoveLeft -> 02 Center - Lane Attack dz=2.54
 REWARD t=23.73 z=315.56 score=27700 gap=0.37

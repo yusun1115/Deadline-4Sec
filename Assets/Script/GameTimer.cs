@@ -139,6 +139,31 @@ namespace Deadline4Sec
                 gameOverText.gameObject.SetActive(false);
         }
 
+        public void ReviveRun()
+        {
+            isGameOver = false;
+            isRunning = true;
+            maximumTime = BaseDuration;
+            remainingTime = BaseDuration;
+            warningPlayed = false;
+            runStartedFrame = Time.frameCount;
+            if (gameOverText != null)
+                gameOverText.gameObject.SetActive(false);
+            UpdateTimeText();
+        }
+
+        public void TriggerFatalContact() => TriggerFatalContactFrom(null);
+
+        public void TriggerFatalContactFrom(Collider source)
+        {
+            if (!IsRunning)
+                return;
+            RunInventory inventory = GetComponent<RunInventory>();
+            if (inventory != null && inventory.AbsorbFatalContact(source))
+                return;
+            TriggerGameOver();
+        }
+
         public void TriggerGameOver()
         {
             if (isGameOver || !isRunning)

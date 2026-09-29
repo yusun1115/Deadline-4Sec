@@ -640,6 +640,9 @@ namespace Deadline4Sec.AcceptanceTests
         [UnityTest]
         public IEnumerator SwipeRunsOnceAndNonButtonHudDoesNotBlockIt()
         {
+            UnityEditor.SceneManagement.EditorSceneManager.NewScene(
+                UnityEditor.SceneManagement.NewSceneSetup.EmptyScene,
+                UnityEditor.SceneManagement.NewSceneMode.Single);
             yield return new EnterPlayMode();
             CreateFloor();
             Component timer = new GameObject("Timer").AddComponent(Find("GameTimer"));

@@ -123,6 +123,9 @@ namespace Deadline4Sec
         private Vector3 standingCapsuleCenter;
         private Quaternion standingVisualRotation;
         private Vector3 standingVisualPosition;
+        private Transform weaponVisualTransform;
+        private Quaternion standingWeaponRotation;
+        private Vector3 standingWeaponPosition;
         private CameraFeedbackController cameraFeedback;
         private GameFlowManager gameFlow;
         private PowerUpManager powerUps;
@@ -147,6 +150,12 @@ namespace Deadline4Sec
                 standingCapsuleCenter = capsuleCollider.center;
             }
             SetupVisual();
+            weaponVisualTransform = transform.Find("WeaponVisual");
+            if (weaponVisualTransform != null)
+            {
+                standingWeaponRotation = weaponVisualTransform.localRotation;
+                standingWeaponPosition = weaponVisualTransform.localPosition;
+            }
             centerX = transform.position.x;
             if (gameTimer == null)
                 gameTimer = FindFirstObjectByType<GameTimer>();
@@ -772,7 +781,7 @@ namespace Deadline4Sec
                 if (gameTimer != null && !gameTimer.IsGameOver)
                 {
                     Debug.Log("Game Over: Hit Obstacle " + contact.Key.name);
-                    gameTimer.TriggerGameOver();
+                    gameTimer.TriggerFatalContactFrom(contact.Key.GetComponent<Collider>());
                 }
                 break;
             }
@@ -875,7 +884,7 @@ namespace Deadline4Sec
                 return false;
 
             Debug.Log("Game Over: Hit Enemy Without Attack");
-            gameTimer.TriggerGameOver();
+            gameTimer.TriggerFatalContactFrom(collider);
             return true;
         }
 
@@ -1247,6 +1256,23 @@ namespace Deadline4Sec
                 standingVisualPosition = visualTransform.localPosition;
             }
         }
+
+        public void SetDeathPose(float progress)
+        {
+            progress = Mathf.Clamp01(progress);
+            if (visualTransform != null)
+            {
+                visualTransform.localRotation = standingVisualRotation * Quaternion.Euler(0f, 0f, -78f * progress);
+                visualTransform.localPosition = standingVisualPosition + new Vector3(0f, -0.42f * progress, 0f);
+            }
+            if (weaponVisualTransform != null)
+            {
+                weaponVisualTransform.localRotation = standingWeaponRotation * Quaternion.Euler(0f, 0f, -78f * progress);
+                weaponVisualTransform.localPosition = standingWeaponPosition + new Vector3(0f, -0.42f * progress, 0f);
+            }
+        }
+
+        public void RestoreDeathPose() => SetDeathPose(0f);
 
         private void SetSlideVisual(bool sliding)
         {
