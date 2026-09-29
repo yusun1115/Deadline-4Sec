@@ -3,7 +3,7 @@
 - Unity Editor: 6000.3.7f1
 - 실행일: 2026-09-27 (KST)
 - 테스트: `Assets/AcceptanceTests/`의 EditMode/PlayMode 혼합 테스트 29개 (코어·HUD 26개, 실제 씬 흐름 3개)
-- 최신 결과: [acceptance-editor-results.xml](acceptance-editor-results.xml) — **29 통과, 0 실패**, Unity 종료 코드 0
+- 당시 결과: [acceptance-editor-results.xml](acceptance-editor-results.xml) — **29 통과, 0 실패**, Unity 종료 코드 0. 최신 전체 회귀는 문서 하단에 기록했다.
 - C# 빌드: `dotnet build Assembly-CSharp.csproj --no-restore -v:q` — 오류 0개, 기존 SDK 어셈블리 버전 경고 2개
 
 Unity Editor가 원본 프로젝트를 열고 있어서, 게임 스크립트·테스트·씬 변경을 동기화한 별도 검증 프로젝트에서 배치 테스트를 실행했다. 최종 실행은 Direct3D 11 렌더링을 포함한다. 런타임 테스트는 실제 물리 프레임에서 적 공격, 장애물 윗면 접촉, Near Miss, 스톰프, 슬램, 스와이프를 검사한다. 씬 테스트는 `EndlessRun`을 열어 Title→Ready? 연출→Go!, Settings, Result→Retry/Main Menu를 확인한다.
@@ -87,14 +87,14 @@ Unity Editor가 원본 프로젝트를 열고 있어서, 게임 스크립트·�
 - 같은 시드 98765 / 30FPS / 180.01초 재실행 **통과**: 실제 보상 516회, 최대 공백 1.73초, Score 234,800 / Distance 3,367.9m. 최대 자동 전진 속도에서 패턴 A–E 연결·반복 금지·난도 해금을 유지했다. [최종 결과](long-course-results.xml), [입력 기록](course-replay-long.txt).
 - 새 코스 경로도 정상 공개 입력만 사용한다. 적 처치·타이머 초기화·속도 변경·텔레포트를 주입하지 않는다. APK/Android 성능 측정이나 모든 시드/설정의 보장을 의미하지 않는다.
 
-## Android 개발 APK (코인·아이템 반영, 2026-09-28 갱신)
+## 이전 Android 개발 APK 기록 (코인·아이템 반영, 2026-09-28)
 
-- Unity 6000.3.7f1에서 Development + Script Debugging, IL2CPP / ARM64, `EndlessRun` 씬을 빌드했다. 코인·6종 파워업 프리팹, 업그레이드 UI, 기존 타이틀/튜토리얼이 포함된다. 최종 Unity 로그의 `Build Finished, Result: Success`를 확인했다. [빌드 기록](android-build.json).
-- APK: `Builds/Android/Deadline4Sec-Development.apk`, **124,292,014 bytes**. 첫 패키징에서 발생한 약 90MB의 ZIP 빈 공간은 검증 프로젝트의 생성된 Gradle 출력만 정리해 재패키징했다.
+- 당시 Unity 6000.3.7f1에서 Development + Script Debugging, IL2CPP / ARM64, `EndlessRun` 씬을 빌드했다. 코인·6종 파워업 프리팹, 업그레이드 UI, 기존 타이틀/튜토리얼이 포함됐다. 최종 Unity 로그의 `Build Finished, Result: Success`를 확인했다.
+- 당시 APK 기록은 **124,292,014 bytes**다. 첫 패키징에서 발생한 약 90MB의 ZIP 빈 공간은 검증 프로젝트의 생성된 Gradle 출력만 정리해 재패키징했다. 해당 파일은 아래 2026-09-29 빌드로 교체됐다.
 - `apksigner verify --verbose`에서 v2 서명 검증 성공, 서명자 1명. `aapt`에서 최소 API 25, 대상 API 36, `arm64-v8a`, `android.permission.VIBRATE`를 확인했다. 현재 패키지 ID는 `com.UnityTechnologies.com.unity.template.urpblank`다.
-- 최종 BuildPipeline은 성공했으나 직후 `Verification/android-build.json`을 쓰는 단계에서 일시적인 Win32 IO 1224 오류로 배치 명령은 종료 코드 1을 반환했다. APK 자체는 별도 서명·패키지 검사를 통과했고 JSON은 Unity 로그와 최종 파일 정보로 복원했다. 최종 경고 수와 전체 출력 크기는 복원하지 않아 `null`로 기록했다.
-- APK [SHA-256](android-apk-sha256.txt)과 작업 공간의 모든 `Assets` 파일 및 주요 설정 **313개** [SHA-256](android-source-sha256.txt)을 기록했다. 313개 `Assets` 파일은 원본 프로젝트와 검증 프로젝트에서 해시가 일치한다. 검증 프로젝트에 남은 이전 테스트용 추가 파일 6개는 이 목록에 포함하지 않았다.
-- 이 APK는 Android 기기에 설치하거나 실행하지 않았다. 빌드/서명/내용 검사는 실기기 Acceptance 통과 증거가 아니다.
+- 당시 BuildPipeline은 성공했으나 직후 증거 JSON을 쓰는 단계에서 일시적인 Win32 IO 1224 오류로 배치 명령은 종료 코드 1을 반환했다. 당시 APK 자체는 별도 서명·패키지 검사를 통과했다.
+- 당시 원본/검증 프로젝트의 `Assets` 313개 파일 해시가 일치했다. 현재 해시 파일은 아래 2026-09-29 빌드로 갱신됐다.
+- 당시 APK는 Android 기기에 설치하거나 실행하지 않았다. 빌드/서명/내용 검사는 실기기 Acceptance 통과 증거가 아니다.
 
 ## PC 저장의 프로세스 재실행 검증 (2026-09-27)
 
@@ -128,3 +128,10 @@ Unity Editor가 원본 프로젝트를 열고 있어서, 게임 스크립트·�
 - [신규 PC 테스트 5개](coin-powerup-results.xml) 통과: 프리팹·세 씬의 UI/버튼 참조, 코인 정산·비용/레벨 저장·MAX, 타이머 정지/확장, 점수 x2, 질주 적 처치·장애물 무시, 콤보 유지, 자석 수집, 업그레이드 화면 왕복. [480×800 업그레이드 화면](upgrade-menu.png)을 렌더링했다.
 - [전체 회귀 48개](coin-powerup-regression-results.xml) 통과: 기존 코어 조작·장애물 윗면·Stomp/Slam·패턴·튜토리얼/메뉴 테스트를 포함한다. 최종 변경인 Lv.7 `MAX` 버튼 표기와 Editor 전용 코인 테스트 메뉴는 신규 5개 재실행으로 확인했다.
 - 코인/아이템의 실제 플레이 배치 난이도와 Android 터치·성능·저장 복원은 실기기에서 추가 확인이 필요하다.
+
+## 무기 스킨·선물 상자·소비 아이템·부활 (2026-09-29)
+
+- [편집/구현 안내](../GAME_EXTRAS_SETUP.md)에 세 씬의 하이어라키, 보상표/스킨 데이터 자산, 저장 키와 Inspector 참조를 정리했다. `GameExtrasCatalog.asset`의 선물 상자 가중치 합계는 100이며 초기 분포는 25/10/20/8/15/15/7이다.
+- [최종 코드의 신규 PC Acceptance 6개](game-extras-results.xml) 통과: 스킨 구매·장착/저장, 보상표와 중복 지급 방지, 선물 상자 수집의 타이머·점수 독립, 더블 탭과 Swipe 분리, Shield의 동일 적/장애물 연속 접촉 방어와 타이머 0, Dash 치명타, 사망·부활·결과·개봉 전환. 최신 충돌 변경과 직접 관련된 [장애물 회귀 1개](game-extras-obstacle-regression-results.xml), [적 전면 충돌 2개](game-extras-core-extra-results.xml)도 통과했다. 보완 직전 코드의 [전체 Unity 회귀](game-extras-regression-results.xml)는 55개 통과/실패 0개/명시적 두 프로세스 검사 1개 건너뜀이다.
+- 최종 Android 개발 APK는 `Builds/Android/Deadline4Sec-Development.apk`(214,511,887 bytes). Unity 6000.3.7f1 BuildReport `Succeeded`, 오류 0개, 경고 3개. [빌드 JSON](android-build.json)·[APK SHA-256](android-apk-sha256.txt)·[빌드 스냅샷 SHA-256](android-source-sha256.txt)에 기록했다. APK 서명 v2, ARM64, 최소 API 25·대상 API 36, VIBRATE 권한을 검사했다. 원본과 검증 복제본의 기능 관련 자산 351개 및 `ProjectSettings.asset` 해시는 일치한다. 작업 중 별도로 추가된 `Assets/Art/2D/Generated`의 미연결 이미지 일부는 검증 스냅샷에 포함하지 않았다.
+- Android 기기 설치·실행·터치 입력·진동·저장 복원·성능 검사는 사용자 지정 범위에 따라 수행하지 않았다.

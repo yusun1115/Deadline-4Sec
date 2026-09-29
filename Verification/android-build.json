@@ -1,5 +1,5 @@
 {
-    "timestampUtc": "2026-09-28T12:30:43.0462054Z",
+    "timestampUtc": "2026-09-29T14:38:06.0619286Z",
     "unityVersion": "6000.3.7f1",
     "result": "Succeeded",
     "apk": "C:\\UnityProjects\\Deadline-4Sec\\Builds\\Android\\Deadline4Sec-Development.apk",
@@ -7,10 +7,9 @@
     "scenes": [
         "Assets/Scenes/EndlessRun.unity"
     ],
-    "apkSizeBytes": 124292014,
-    "totalBuildOutputSizeBytes": null,
-    "durationSeconds": 45.106,
-    "warnings": null,
-    "errors": 0,
-    "evidenceNote": "Final Gradle package and Unity BuildReport succeeded; evidence JSON write then hit transient Win32 IO 1224. Final APK was independently verified with apksigner and aapt. Duration is Unity PlayerBuildInfo duration."
+    "apkSizeBytes": 214511887,
+    "totalBuildOutputSizeBytes": 2135481911,
+    "durationSeconds": 139.00873049999999,
+    "warnings": 3,
+    "errors": 0
 }

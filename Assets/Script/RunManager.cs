@@ -43,6 +43,7 @@ namespace Deadline4Sec
         private bool practice;
         private float practiceSpeed;
         private PowerUpManager powerUps;
+        private RunInventory inventory;
 
         public event System.Action NearMissRecorded;
 
@@ -65,6 +66,7 @@ namespace Deadline4Sec
             if (gameTimer == null)
                 gameTimer = FindFirstObjectByType<GameTimer>();
             powerUps = FindFirstObjectByType<PowerUpManager>();
+            inventory = FindFirstObjectByType<RunInventory>();
             GameFont.Apply(scoreText);
             GameFont.Apply(comboText);
             GameFont.Apply(distanceText);
@@ -103,7 +105,8 @@ namespace Deadline4Sec
 
             CurrentForwardSpeed = practice ? practiceSpeed : Mathf.Min(maxForwardSpeed,
                 baseForwardSpeed + CurrentRunTime * speedIncreasePerSecond) *
-                (powerUps != null ? powerUps.SpeedMultiplier : 1f);
+                (powerUps != null ? powerUps.SpeedMultiplier : 1f) +
+                (inventory != null ? inventory.DashBonusSpeed : 0f);
             playerController.SetRunForwardSpeed(CurrentForwardSpeed);
             UpdateDebugUI();
         }

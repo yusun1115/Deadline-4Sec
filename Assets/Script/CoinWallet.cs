@@ -41,15 +41,27 @@ namespace Deadline4Sec
             Changed?.Invoke();
         }
 
-        public bool TrySpend(int cost)
+        public bool TrySpend(int cost, bool save = true)
         {
             if (cost < 0 || TotalCoins < cost)
                 return false;
             TotalCoins -= cost;
             PlayerPrefs.SetInt(TotalCoinsKey, TotalCoins);
-            PlayerPrefs.Save();
+            if (save)
+                PlayerPrefs.Save();
             Changed?.Invoke();
             return true;
+        }
+
+        public void CreditTotalCoins(int amount, bool save = true)
+        {
+            if (amount <= 0)
+                return;
+            TotalCoins = TotalCoins > int.MaxValue - amount ? int.MaxValue : TotalCoins + amount;
+            PlayerPrefs.SetInt(TotalCoinsKey, TotalCoins);
+            if (save)
+                PlayerPrefs.Save();
+            Changed?.Invoke();
         }
 
 #if UNITY_EDITOR

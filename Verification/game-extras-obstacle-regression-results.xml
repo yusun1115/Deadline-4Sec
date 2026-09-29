@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="1" result="Passed" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-09-29 14:33:35Z" end-time="2026-09-29 14:33:35Z" duration="0.7037693">
+  <test-suite type="TestSuite" id="1000" name="Deadline-4Sec" fullname="Deadline-4Sec" runstate="Runnable" testcasecount="56" result="Passed" start-time="2026-09-29 14:33:35Z" end-time="2026-09-29 14:33:35Z" duration="0.703769" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <test-suite type="Assembly" id="1068" name="Deadline4Sec.AcceptanceTests.dll" fullname="C:/UnityProjects/Deadline-4Sec/ValidationProject/Library/ScriptAssemblies/Deadline4Sec.AcceptanceTests.dll" runstate="Runnable" testcasecount="54" result="Passed" start-time="2026-09-29 14:33:35Z" end-time="2026-09-29 14:33:35Z" duration="0.622127" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="23728" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestSuite" id="1069" name="Deadline4Sec" fullname="Deadline4Sec" runstate="Runnable" testcasecount="54" result="Passed" start-time="2026-09-29 14:33:35Z" end-time="2026-09-29 14:33:35Z" duration="0.621151" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1070" name="AcceptanceTests" fullname="Deadline4Sec.AcceptanceTests" runstate="Runnable" testcasecount="54" result="Passed" start-time="2026-09-29 14:33:35Z" end-time="2026-09-29 14:33:35Z" duration="0.620295" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestFixture" id="1028" name="ObstaclePrefabAcceptanceTests" fullname="Deadline4Sec.AcceptanceTests.ObstaclePrefabAcceptanceTests" classname="Deadline4Sec.AcceptanceTests.ObstaclePrefabAcceptanceTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-09-29 14:33:35Z" end-time="2026-09-29 14:33:35Z" duration="0.618264" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1029" name="AllThreeProductionObstaclesHaveFatalFacesAndSafeUnrewardedTops" fullname="Deadline4Sec.AcceptanceTests.ObstaclePrefabAcceptanceTests.AllThreeProductionObstaclesHaveFatalFacesAndSafeUnrewardedTops" methodname="AllThreeProductionObstaclesHaveFatalFacesAndSafeUnrewardedTops" classname="Deadline4Sec.AcceptanceTests.ObstaclePrefabAcceptanceTests" runstate="Runnable" seed="1161014566" result="Passed" start-time="2026-09-29 14:33:31Z" end-time="2026-09-29 14:33:35Z" duration="4.498448" asserts="0">
+              <properties>
+                <property name="_JOINTYPE" value="UnityCombinatorial" />
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Game Over: Hit Obstacle Jump Obstacle(Clone)
+Game Over: Hit Obstacle Jump Obstacle(Clone)
+Game Over: Hit Obstacle Slide Obstacle(Clone)
+Game Over: Hit Obstacle Slide Obstacle(Clone)
+Game Over: Hit Obstacle Lane Blocker(Clone)
+Game Over: Hit Obstacle Lane Blocker(Clone)
+Saving results to: C:/Users/HP/AppData/LocalLow/DefaultCompany/Deadline-4Sec\TestResults.xml
+]]></output>
+            </test-case>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

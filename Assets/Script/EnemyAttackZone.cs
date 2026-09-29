@@ -132,7 +132,7 @@ namespace Deadline4Sec
                     ? "Game Over: Ground Enemy Side Attack"
                     : "Game Over: Air Enemy Down Attack";
             Debug.Log(reason);
-            gameTimer.TriggerGameOver();
+            gameTimer.TriggerFatalContactFrom(zoneCollider);
             ClearTrackedPlayer();
         }
 

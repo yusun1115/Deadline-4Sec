@@ -20,6 +20,10 @@ namespace Deadline4Sec
         [SerializeField, Min(10f)] private float minSwipeDistance = 80f;
         [SerializeField] private bool enableMouseSwipeTesting = true;
         [SerializeField] private bool showInputDebugLogs;
+        [Header("Consumable double tap")]
+        [SerializeField, Range(0.15f, 0.5f)] private float doubleTapWindow = 0.32f;
+        [SerializeField, Min(5f)] private float tapMaxMovement = 28f;
+        [SerializeField, Min(5f)] private float tapPairDistance = 90f;
 
         private Vector2 swipeStartPosition;
         private bool trackingTouch;
@@ -27,6 +31,10 @@ namespace Deadline4Sec
         private bool ignoredByUI;
         private int trackedTouchId = -1;
         private bool trackingMouse;
+        private Vector2 lastPointerPosition;
+        private Vector2 lastTapPosition;
+        private float lastTapTime = float.NegativeInfinity;
+        private RunInventory inventory;
 
         private void Awake()
         {
@@ -34,6 +42,7 @@ namespace Deadline4Sec
                 playerController = FindFirstObjectByType<PlayerController>();
             if (gameFlow == null)
                 gameFlow = FindFirstObjectByType<GameFlowManager>();
+            inventory = FindFirstObjectByType<RunInventory>();
         }
 
         private void Update()
@@ -72,7 +81,8 @@ namespace Deadline4Sec
                 }
                 if (tracked != null && tracked.press.isPressed)
                 {
-                    EvaluateSwipe(tracked.position.ReadValue());
+                    lastPointerPosition = tracked.position.ReadValue();
+                    EvaluateSwipe(lastPointerPosition);
                     return;
                 }
                 EndTouch();
@@ -101,7 +111,8 @@ namespace Deadline4Sec
                     }
                     else
                     {
-                        EvaluateSwipe(touch.position);
+                        lastPointerPosition = touch.position;
+                        EvaluateSwipe(lastPointerPosition);
                         return;
                     }
                 }
@@ -135,7 +146,8 @@ namespace Deadline4Sec
                 EndMouse();
                 return;
             }
-            EvaluateSwipe(mouse.position.ReadValue());
+            lastPointerPosition = mouse.position.ReadValue();
+            EvaluateSwipe(lastPointerPosition);
 #elif ENABLE_LEGACY_INPUT_MANAGER
             if (Input.GetMouseButtonDown(0))
                 BeginMouse(Input.mousePosition);
@@ -146,7 +158,8 @@ namespace Deadline4Sec
                 EndMouse();
                 return;
             }
-            EvaluateSwipe(Input.mousePosition);
+            lastPointerPosition = Input.mousePosition;
+            EvaluateSwipe(lastPointerPosition);
 #endif
         }
 
@@ -155,6 +168,7 @@ namespace Deadline4Sec
             trackingTouch = true;
             trackedTouchId = touchId;
             swipeStartPosition = position;
+            lastPointerPosition = position;
             swipeConsumed = false;
             ignoredByUI = IsPointerOverUI(position);
             if (ignoredByUI)
@@ -163,9 +177,7 @@ namespace Deadline4Sec
 
         private void EndTouch()
         {
-            if (!swipeConsumed && !ignoredByUI &&
-                Vector2.Distance(swipeStartPosition, GetLastPointerPosition()) < minSwipeDistance)
-                Log("Swipe ignored: too short");
+            EndPointer();
             trackingTouch = false;
             trackedTouchId = -1;
             swipeConsumed = false;
@@ -176,6 +188,7 @@ namespace Deadline4Sec
         {
             trackingMouse = true;
             swipeStartPosition = position;
+            lastPointerPosition = position;
             swipeConsumed = false;
             ignoredByUI = IsPointerOverUI(position);
             if (ignoredByUI)
@@ -184,9 +197,7 @@ namespace Deadline4Sec
 
         private void EndMouse()
         {
-            if (!swipeConsumed && !ignoredByUI &&
-                Vector2.Distance(swipeStartPosition, GetLastPointerPosition()) < minSwipeDistance)
-                Log("Swipe ignored: too short");
+            EndPointer();
             trackingMouse = false;
             swipeConsumed = false;
             ignoredByUI = false;
@@ -202,6 +213,7 @@ namespace Deadline4Sec
                 return;
 
             swipeConsumed = true;
+            lastTapTime = float.NegativeInfinity;
             if (Mathf.Abs(delta.x) > Mathf.Abs(delta.y))
             {
                 if (delta.x < 0f)
@@ -268,6 +280,35 @@ namespace Deadline4Sec
             return swipeStartPosition;
         }
 
+        private void EndPointer()
+        {
+            if (swipeConsumed || ignoredByUI)
+            {
+                lastTapTime = float.NegativeInfinity;
+                return;
+            }
+            float movement = Vector2.Distance(swipeStartPosition, lastPointerPosition);
+            if (movement > tapMaxMovement)
+            {
+                lastTapTime = float.NegativeInfinity;
+                Log("Input ignored: short drag");
+                return;
+            }
+            float now = Time.unscaledTime;
+            if (now - lastTapTime <= doubleTapWindow &&
+                Vector2.Distance(swipeStartPosition, lastTapPosition) <= tapPairDistance)
+            {
+                lastTapTime = float.NegativeInfinity;
+                if (inventory != null && inventory.TryUseEquipped())
+                    Log("Double tap: consumable used");
+            }
+            else
+            {
+                lastTapTime = now;
+                lastTapPosition = swipeStartPosition;
+            }
+        }
+
         private void ResetTracking()
         {
             trackingTouch = false;
@@ -275,6 +316,7 @@ namespace Deadline4Sec
             trackedTouchId = -1;
             swipeConsumed = false;
             ignoredByUI = false;
+            lastTapTime = float.NegativeInfinity;
         }
 
         private void Log(string message)
@@ -286,6 +328,7 @@ namespace Deadline4Sec
         private void OnValidate()
         {
             minSwipeDistance = Mathf.Max(10f, minSwipeDistance);
+            tapMaxMovement = Mathf.Min(tapMaxMovement, minSwipeDistance * 0.5f);
         }
     }
 }

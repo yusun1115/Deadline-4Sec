@@ -1,0 +1,73 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5f029665a1bed34b894ca9c4ecc3cb3, type: 3}
+  m_Name: GameExtrasCatalog
+  m_EditorClassIdentifier: Assembly-CSharp::Deadline4Sec.GameExtrasCatalog
+  skins:
+  - id: DefaultScythe
+    displayName: DEFAULT SCYTHE
+    coinCost: 0
+    currency: 0
+    currencyCost: 0
+    weaponMaterial: {fileID: 2100000, guid: 7b1e903e5cc8b884395469156a6649ef, type: 2}
+  - id: NeonReaper
+    displayName: NEON REAPER
+    coinCost: 8000
+    currency: 0
+    currencyCost: 0
+    weaponMaterial: {fileID: 2100000, guid: 014253d35b37a4345a90703cc0bb63a1, type: 2}
+  - id: FrostMoon
+    displayName: FROST MOON
+    coinCost: 0
+    currency: 1
+    currencyCost: 30
+    weaponMaterial: {fileID: 2100000, guid: bfa5a7c7b1ad8e64dad570871d9a38e8, type: 2}
+  - id: BloodMoon
+    displayName: BLOOD MOON
+    coinCost: 0
+    currency: 2
+    currencyCost: 30
+    weaponMaterial: {fileID: 2100000, guid: 65b6aedab9770d64fb8c5a4ac97e1ef6, type: 2}
+  - id: CyberDeath
+    displayName: CYBER DEATH
+    coinCost: 0
+    currency: 3
+    currencyCost: 40
+    weaponMaterial: {fileID: 2100000, guid: 90de5b4600ed4fb44b7e5e6ef01f9b04, type: 2}
+  - id: Eclipse
+    displayName: ECLIPSE
+    coinCost: 15000
+    currency: 4
+    currencyCost: 25
+    weaponMaterial: {fileID: 2100000, guid: cdcfc51afddaea448838c4ebf908c392, type: 2}
+  rewards:
+  - kind: 0
+    amount: 300
+    weight: 25
+  - kind: 0
+    amount: 800
+    weight: 10
+  - kind: 1
+    amount: 3
+    weight: 20
+  - kind: 2
+    amount: 1
+    weight: 8
+  - kind: 3
+    amount: 1
+    weight: 15
+  - kind: 4
+    amount: 1
+    weight: 15
+  - kind: 4
+    amount: 2
+    weight: 7
