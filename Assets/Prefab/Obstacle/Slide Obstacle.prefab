@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 4444503629890957720}
   - component: {fileID: 2500593315507205523}
   - component: {fileID: 7422554849132696134}
+  - component: {fileID: 2263360185659534701}
   m_Layer: 8
   m_Name: Slide Obstacle
   m_TagString: Untagged
@@ -127,3 +128,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Deadline4Sec.Obstacle
   obstacleType: 2
   nearMissMargin: {x: 0.95, y: 0.3, z: 0.48}
+--- !u!114 &2263360185659534701
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 455918065397298697}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad3707ec1bd96794280dc28c6dde0de1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Deadline4Sec.ObstacleVisual
+  modelPrefab: {fileID: 1806376807565619788, guid: 7dd7052fa2810ee49ac2187eaef6c763, type: 3}
+  modelEuler: {x: 0, y: 0, z: 0}
+  fallbackMaterial: {fileID: 2100000, guid: 685fc420b624590469c2b5874816771e, type: 2}
+  fill: 1

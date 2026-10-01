@@ -80,8 +80,15 @@ namespace Deadline4Sec.AcceptanceTests
                 GameObject manager = GameObject.Find("GameManager");
                 Assert.IsNotNull(manager.GetComponent(TypeOf("RunInventory")), path);
                 Assert.IsNotNull(manager.GetComponent(TypeOf("GameExtrasUI")), path);
-                Assert.AreEqual(6, canvas.Find("UpgradePanel").GetComponentsInChildren(
+                // Skins have their own screen since 2026-10-01; items stay on Upgrades.
+                Assert.AreEqual(6, canvas.Find("SkinPanel").GetComponentsInChildren(
                     TypeOf("SkinShopRow"), true).Length, path);
+                Assert.AreEqual(0, canvas.Find("UpgradePanel").GetComponentsInChildren(
+                    TypeOf("SkinShopRow"), true).Length, path);
+                Assert.AreEqual("OpenSkins", canvas.Find("TitlePanel/SkinButton")
+                    .GetComponent<Button>().onClick.GetPersistentMethodName(0), path);
+                Assert.AreEqual("CloseSkins", canvas.Find("SkinPanel/BackButton")
+                    .GetComponent<Button>().onClick.GetPersistentMethodName(0), path);
                 Assert.AreEqual(2, canvas.Find("UpgradePanel").GetComponentsInChildren(
                     TypeOf("ConsumableShopRow"), true).Length, path);
                 Assert.IsNotNull(canvas.Find("RevivePanel/CouponButton"), path);

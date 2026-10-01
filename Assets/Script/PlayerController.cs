@@ -20,6 +20,9 @@ namespace Deadline4Sec
         public bool IsSliding => isSliding;
         public bool IsHoming => isHomingDash;
         public bool IsFastFalling => isFastFalling;
+        public bool IsGroundSlamming => isGroundSlamming;
+        public float VerticalSpeed => verticalSpeed;
+        public float DeathPoseProgress { get; private set; }
         [Header("Forward movement")]
         [SerializeField, Min(0f)] private float forwardSpeed = 11.2f;
         private float runForwardSpeed = -1f;
@@ -442,7 +445,7 @@ namespace Deadline4Sec
                 attackDirection = direction > 0 ? 1 : -1;
                 attackTimeRemaining = attackDuration;
                 if (cameraFeedback != null)
-                    cameraFeedback.PlayMovement();
+                    cameraFeedback.PlayMovement(direction > 0 ? PlayerAction.Right : PlayerAction.Left);
                 ActionPerformed?.Invoke(direction > 0 ? PlayerAction.Right : PlayerAction.Left);
             }
 
@@ -1047,7 +1050,7 @@ namespace Deadline4Sec
                 StopAirDash();
                 Debug.Log("Normal Jump");
                 if (cameraFeedback != null)
-                    cameraFeedback.PlayMovement();
+                    cameraFeedback.PlayMovement(PlayerAction.Jump);
                 ActionPerformed?.Invoke(PlayerAction.Jump);
             }
             else
@@ -1097,7 +1100,7 @@ namespace Deadline4Sec
                     ActionPerformed?.Invoke(PlayerAction.FastFall);
                 }
                 if (cameraFeedback != null)
-                    cameraFeedback.PlayMovement();
+                    cameraFeedback.PlayMovement(PlayerAction.FastFall);
             }
         }
 
@@ -1215,7 +1218,7 @@ namespace Deadline4Sec
             SetSlideVisual(true);
             ActionPerformed?.Invoke(PlayerAction.Slide);
             if (cameraFeedback != null)
-                cameraFeedback.PlayMovement();
+                cameraFeedback.PlayMovement(PlayerAction.Slide);
         }
 
         private void EndSlide()
@@ -1239,7 +1242,8 @@ namespace Deadline4Sec
             {
                 MeshFilter sourceMesh = GetComponent<MeshFilter>();
                 MeshRenderer sourceRenderer = GetComponent<MeshRenderer>();
-                if (sourceMesh != null && sourceRenderer != null)
+                // A disabled root renderer means a character model replaced the graybox.
+                if (sourceMesh != null && sourceRenderer != null && sourceRenderer.enabled)
                 {
                     GameObject visual = new GameObject("PlayerVisual");
                     visual.transform.SetParent(transform, false);
@@ -1260,6 +1264,7 @@ namespace Deadline4Sec
         public void SetDeathPose(float progress)
         {
             progress = Mathf.Clamp01(progress);
+            DeathPoseProgress = progress;
             if (visualTransform != null)
             {
                 visualTransform.localRotation = standingVisualRotation * Quaternion.Euler(0f, 0f, -78f * progress);

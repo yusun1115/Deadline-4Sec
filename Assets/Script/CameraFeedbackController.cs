@@ -78,7 +78,16 @@ namespace Deadline4Sec
         private AudioClip warningClip;
         private AudioClip gameOverClip;
         private AudioClip uiClip;
+        private AudioClip coinClip;
+        private AudioClip jumpClip;
+        private AudioClip slideClip;
+        private AudioClip fastFallClip;
+        private readonly System.Collections.Generic.List<AudioClip> generatedClips =
+            new System.Collections.Generic.List<AudioClip>();
+        private SoundLibrary soundLibrary;
         private CombatVisualFeedback visualFeedback;
+        private CombatParticles particles;
+        private EnemyDeathFx deathFx;
 
         private void Awake()
         {
@@ -99,6 +108,10 @@ namespace Deadline4Sec
             visualFeedback = GetComponent<CombatVisualFeedback>();
             if (visualFeedback == null)
                 visualFeedback = gameObject.AddComponent<CombatVisualFeedback>();
+            particles = GetComponent<CombatParticles>();
+            if (particles == null)
+                particles = gameObject.AddComponent<CombatParticles>();
+            deathFx = (TryGetComponent(out EnemyDeathFx existingEnemyDeathFx) ? existingEnemyDeathFx : gameObject.AddComponent<EnemyDeathFx>());
         }
 
         private void Update()
@@ -182,6 +195,8 @@ namespace Deadline4Sec
 
             visualFeedback.PlayKill(impactPoint, attackName == "Stomp Attack",
                 attackName == "Homing Dash Attack");
+            if (particles != null)
+                particles.PlayKill(impactPoint, attackName);
 
             if (attackName == "Stomp Attack")
             {
@@ -212,6 +227,8 @@ namespace Deadline4Sec
                 return;
             PlayFovPulse(homingFovBoost, homingFovDuration);
             visualFeedback.PlayHoming(start, target);
+            if (particles != null)
+                particles.PlayHoming(start, target);
             PlaySound(homingClip);
         }
 
@@ -222,6 +239,8 @@ namespace Deadline4Sec
 
             PlayShake(groundSlamShake);
             visualFeedback.PlaySlam(point, radius);
+            if (particles != null)
+                particles.PlaySlam(point, radius);
             PlayHitStop(groundSlamHitStop);
             PlayFovPulse(groundSlamFovKick, groundSlamFovDuration);
             PlaySound(slamClip);
@@ -234,15 +253,32 @@ namespace Deadline4Sec
             {
                 PlayShake(nearMissShake);
                 visualFeedback.PlayNearMiss(point);
+                if (particles != null)
+                    particles.PlayNearMiss(point);
                 PlaySound(nearMissClip);
                 Vibrate(15, 45);
             }
         }
 
-        public void PlayMovement()
+        public void PlayMovement(PlayerController.PlayerAction action = PlayerController.PlayerAction.Left)
+        {
+            if (!CanPlayFeedback())
+                return;
+            switch (action)
+            {
+                case PlayerController.PlayerAction.Jump: PlaySound(jumpClip); break;
+                case PlayerController.PlayerAction.Slide: PlaySound(slideClip); break;
+                case PlayerController.PlayerAction.FastFall:
+                case PlayerController.PlayerAction.SlamStart: PlaySound(fastFallClip); break;
+                default: PlaySound(movementClip); break;
+            }
+        }
+
+        public void PlayPickup(bool powerUp)
         {
             if (CanPlayFeedback())
-                PlaySound(movementClip);
+                PlaySound(powerUp ? Pick(soundLibrary != null ? soundLibrary.powerUp : null, "Power Up", 880f, 0.16f)
+                    : coinClip);
         }
 
         public void PlayTimerWarning()
@@ -265,6 +301,13 @@ namespace Deadline4Sec
             PlaySound(uiClip);
         }
 
+        // Menu feedback plays outside gameplay, so it skips the IsPlaying gate.
+        public void PlayMenuResult(bool success)
+        {
+            PlaySound(success ? Pick(soundLibrary != null ? soundLibrary.powerUp : null, "Power Up", 880f, 0.16f)
+                : warningClip);
+        }
+
         private void SetupAudio()
         {
             feedbackAudio = GetComponent<AudioSource>();
@@ -272,16 +315,32 @@ namespace Deadline4Sec
                 feedbackAudio = gameObject.AddComponent<AudioSource>();
             feedbackAudio.playOnAwake = false;
             feedbackAudio.spatialBlend = 0f;
-            feedbackAudio.volume = 0.5f;
-            movementClip = CreateTone("Move", 390f, 0.055f);
-            homingClip = CreateTone("Homing", 780f, 0.1f);
-            killClip = CreateTone("Kill", 620f, 0.085f);
-            stompClip = CreateTone("Stomp", 180f, 0.13f);
-            slamClip = CreateTone("Ground Slam", 100f, 0.24f);
-            nearMissClip = CreateTone("Near Miss", 910f, 0.11f);
-            warningClip = CreateTone("Timer Warning", 260f, 0.18f);
-            gameOverClip = CreateTone("Game Over", 135f, 0.34f);
-            uiClip = CreateTone("UI Click", 560f, 0.045f);
+            soundLibrary = SoundLibrary.Instance;
+            SoundLibrary l = soundLibrary;
+            feedbackAudio.volume = l != null ? l.sfxVolume : 0.5f;
+            movementClip = Pick(l != null ? l.laneMove : null, "Move", 390f, 0.055f);
+            jumpClip = Pick(l != null ? l.jump : null, "Jump", 470f, 0.07f);
+            slideClip = Pick(l != null ? l.slide : null, "Slide", 300f, 0.09f);
+            fastFallClip = Pick(l != null ? l.fastFall : null, "Fast Fall", 240f, 0.08f);
+            homingClip = Pick(l != null ? l.homing : null, "Homing", 780f, 0.1f);
+            killClip = Pick(l != null ? l.kill : null, "Kill", 620f, 0.085f);
+            stompClip = Pick(l != null ? l.stomp : null, "Stomp", 180f, 0.13f);
+            slamClip = Pick(l != null ? l.groundSlam : null, "Ground Slam", 100f, 0.24f);
+            nearMissClip = Pick(l != null ? l.nearMiss : null, "Near Miss", 910f, 0.11f);
+            warningClip = Pick(l != null ? l.timerWarning : null, "Timer Warning", 260f, 0.18f);
+            gameOverClip = Pick(l != null ? l.gameOver : null, "Game Over", 135f, 0.34f);
+            uiClip = Pick(l != null ? l.uiClick : null, "UI Click", 560f, 0.045f);
+            coinClip = Pick(l != null ? l.coin : null, "Coin", 1320f, 0.06f);
+        }
+
+        // Use the authored clip when present; otherwise a tracked placeholder tone.
+        private AudioClip Pick(AudioClip authored, string name, float frequency, float duration)
+        {
+            if (authored != null)
+                return authored;
+            AudioClip tone = CreateTone(name, frequency, duration);
+            generatedClips.Add(tone);
+            return tone;
         }
 
         private static AudioClip CreateTone(string name, float frequency, float duration)
@@ -305,7 +364,11 @@ namespace Deadline4Sec
         private void PlaySound(AudioClip clip)
         {
             if (GamePreferences.SoundEnabled && feedbackAudio != null && clip != null)
+            {
+                float jitter = soundLibrary != null ? soundLibrary.pitchVariation : 0f;
+                feedbackAudio.pitch = 1f + Random.Range(-jitter, jitter);
                 feedbackAudio.PlayOneShot(clip);
+            }
         }
 
         private static void Vibrate(long milliseconds, int amplitude)
@@ -343,6 +406,10 @@ namespace Deadline4Sec
         {
             if (visualFeedback != null)
                 visualFeedback.Clear();
+            if (particles != null)
+                particles.Clear();
+            if (deathFx != null)
+                deathFx.Clear();
             CompleteRunIntro();
             shakeTimeRemaining = 0f;
             shakeIntensity = 0f;
@@ -428,15 +495,10 @@ namespace Deadline4Sec
 
         private void OnDestroy()
         {
-            Destroy(movementClip);
-            Destroy(homingClip);
-            Destroy(killClip);
-            Destroy(stompClip);
-            Destroy(slamClip);
-            Destroy(nearMissClip);
-            Destroy(warningClip);
-            Destroy(gameOverClip);
-            Destroy(uiClip);
+            // Only placeholder tones are runtime objects; authored clips are assets.
+            foreach (AudioClip clip in generatedClips)
+                Destroy(clip);
+            generatedClips.Clear();
         }
 
         private void OnValidate()

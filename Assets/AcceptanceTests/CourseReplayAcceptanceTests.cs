@@ -133,11 +133,9 @@ namespace Deadline4Sec.AcceptanceTests
                 Assert.Less(frames, frameLimit);
                 Assert.IsFalse((bool)Read(timer, "IsGameOver"));
                 Assert.Greater(rewardCount, 20);
-                Assert.That(entered, Does.Contain("Pattern_A_LaneAttack"));
-                Assert.That(entered, Does.Contain("Pattern_B_JumpSlide"));
-                Assert.That(entered, Does.Contain("Pattern_C_AirCombo"));
-                Assert.That(entered, Does.Contain("Pattern_D_Stomp"));
-                Assert.That(entered, Does.Contain("Pattern_E_MixedRisk"));
+                // The library grew from 5 to 17 patterns (2026-10-01); a run no longer
+                // visits every prefab, so require variety instead of the original five.
+                Assert.GreaterOrEqual(entered.Count, 6, "The course should mix many different patterns.");
                 trace.AppendLine($"FINISH time={Read(run, "CurrentRunTime")} score={Read(run, "CurrentScore")} distance={Read(run, "Distance")} rewards={rewardCount} maximumRewardGap={maximumRewardGap.ToString("F2", CultureInfo.InvariantCulture)}");
             }
             finally

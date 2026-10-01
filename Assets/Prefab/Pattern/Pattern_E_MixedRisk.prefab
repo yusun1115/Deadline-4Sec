@@ -60,7 +60,7 @@ MonoBehaviour:
   laneWidth: 2.5
   difficulty: 2
   category: 4
-  entryState: 2
+  entryState: 0
   exitState: 0
 --- !u!1001 &2381146470242814355
 PrefabInstance:

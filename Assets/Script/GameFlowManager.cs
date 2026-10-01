@@ -17,7 +17,7 @@ namespace Deadline4Sec
     public sealed class GameFlowManager : MonoBehaviour
     {
         public enum GameState { Title, Settings, Ready, Playing, GameOver, Result, Tutorial, Upgrades,
-            Dying, RevivePrompt, GiftBoxes }
+            Dying, RevivePrompt, GiftBoxes, Skins }
 
         [Header("Scene references")]
         [SerializeField] private PlayerController playerController;
@@ -47,6 +47,7 @@ namespace Deadline4Sec
         [SerializeField] private TMP_Text vibrationSettingText;
         [SerializeField] private Button[] menuButtons;
         [SerializeField] private GameObject upgradePanel;
+        [SerializeField] private GameObject skinPanel;
 
         [Header("Flow timing (unscaled seconds)")]
         [SerializeField, Min(0.1f)] private float introDuration = 2.2f;
@@ -123,6 +124,8 @@ namespace Deadline4Sec
                 tutorialSkipConfirmation.SetActive(false);
             if (upgradePanel != null)
                 upgradePanel.SetActive(false);
+            if (skinPanel != null)
+                skinPanel.SetActive(false);
             ShowTitle();
         }
 
@@ -248,6 +251,25 @@ namespace Deadline4Sec
                 ShowTitle();
         }
 
+        public void OpenSkins()
+        {
+            if (State != GameState.Title || skinPanel == null)
+                return;
+            State = GameState.Skins;
+            if (titlePanel != null)
+                titlePanel.SetActive(false);
+            skinPanel.SetActive(true);
+            if (upgradeMenu != null)
+                upgradeMenu.Refresh();
+            extrasUI?.Refresh();
+        }
+
+        public void CloseSkins()
+        {
+            if (State == GameState.Skins)
+                ShowTitle();
+        }
+
         public void StartTutorial()
         {
             if (State != GameState.Title && State != GameState.Settings)
@@ -340,6 +362,8 @@ namespace Deadline4Sec
                 settingsPanel.SetActive(false);
             if (upgradePanel != null)
                 upgradePanel.SetActive(false);
+            if (skinPanel != null)
+                skinPanel.SetActive(false);
             if (titlePanel != null)
                 titlePanel.SetActive(true);
             if (upgradeMenu != null)

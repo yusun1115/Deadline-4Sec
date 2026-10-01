@@ -22,6 +22,9 @@ namespace Deadline4Sec
                 return;
             collected = true;
             manager.Activate(itemType);
+            CameraFeedbackController feedback = FindFirstObjectByType<CameraFeedbackController>();
+            if (feedback != null)
+                feedback.PlayPickup(true);
             gameObject.SetActive(false);
         }
 

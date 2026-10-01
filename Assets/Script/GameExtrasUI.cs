@@ -119,12 +119,17 @@ namespace Deadline4Sec
                 giftOpenButton.SetActive(!allOpened);
             if (giftConfirmButton != null)
                 giftConfirmButton.SetActive(allOpened);
+            if (giftPanel.TryGetComponent(out GiftChestPresenter presenter))
+                presenter.Show(reward, allOpened);
         }
 
         public void HideGiftPanel()
         {
-            if (giftPanel != null)
-                giftPanel.SetActive(false);
+            if (giftPanel == null)
+                return;
+            if (giftPanel.TryGetComponent(out GiftChestPresenter presenter))
+                presenter.Hide();
+            giftPanel.SetActive(false);
         }
     }
 }

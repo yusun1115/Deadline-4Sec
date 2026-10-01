@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 266001057465957050}
   - component: {fileID: 9171346061811249499}
   - component: {fileID: 3846370354237658697}
+  - component: {fileID: 2849442727145554605}
   m_Layer: 0
   m_Name: EnemyAir
   m_TagString: Untagged
@@ -129,6 +130,25 @@ MonoBehaviour:
   enemyType: 1
   stompDetectionWidthMultiplier: 1.8
   stompDetectionHeight: 0.8
+--- !u!114 &2849442727145554605
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6018150547170071618}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce9ea830385b02d4da2c6efd288a5ffe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Deadline4Sec.EnemyVisual
+  modelPrefab: {fileID: 5017530553665896198, guid: 3810c5140073e1941a42885b53207d5c, type: 3}
+  modelYaw: -90
+  threatRange: 7
+  groundVisualHeight: 1.6
+  airVisualHeight: 1.7
+  outlineColor: {r: 1, g: 0.38, b: 0.72, a: 1}
+  markerColor: {r: 1, g: 0.15, b: 0.5, a: 0.9}
 --- !u!1 &6516467571439334473
 GameObject:
   m_ObjectHideFlags: 0
