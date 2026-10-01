@@ -143,8 +143,13 @@ namespace Deadline4Sec.AcceptanceTests
 
             Component run = Get("RunManager");
             Camera camera = Camera.main;
-            Vector3 gameplayCameraPosition = camera.transform.localPosition;
-            Quaternion gameplayCameraRotation = camera.transform.localRotation;
+            // Since 2026-10-01 the title shows a front close-up, so the gameplay
+            // framing is read from the camera rig rather than the title view.
+            Component rig = Get("CameraFeedbackController");
+            Vector3 gameplayCameraPosition = (Vector3)rig.GetType().GetField("baseLocalPosition",
+                BindingFlags.NonPublic | BindingFlags.Instance).GetValue(rig);
+            Quaternion gameplayCameraRotation = (Quaternion)rig.GetType().GetField("baseLocalRotation",
+                BindingFlags.NonPublic | BindingFlags.Instance).GetValue(rig);
             float startZ = player.transform.position.z;
             flow.GetType().GetMethod("StartGame").Invoke(flow, null);
             Assert.AreEqual("Ready", flow.GetType().GetProperty("State").GetValue(flow).ToString());

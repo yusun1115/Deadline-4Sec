@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 8379879780931669132}
   - component: {fileID: 1639929668971851226}
   - component: {fileID: 8203138666083686653}
+  - component: {fileID: 6415787552046693587}
   m_Layer: 8
   m_Name: Lane Blocker
   m_TagString: Untagged
@@ -127,3 +128,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Deadline4Sec.Obstacle
   obstacleType: 0
   nearMissMargin: {x: 0.96, y: 0.47, z: 0.43}
+--- !u!114 &6415787552046693587
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6534274263350961315}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad3707ec1bd96794280dc28c6dde0de1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Deadline4Sec.ObstacleVisual
+  modelPrefab: {fileID: 98593400841437173, guid: 19bb2258fccce6548afbf6a72fd65fb4, type: 3}
+  modelEuler: {x: 0, y: 180, z: 0}
+  fallbackMaterial: {fileID: 2100000, guid: 685fc420b624590469c2b5874816771e, type: 2}
+  fill: 1

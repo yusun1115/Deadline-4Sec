@@ -11,6 +11,8 @@ namespace Deadline4Sec
         [SerializeField] private TMP_Text priceText;
         [SerializeField] private TMP_Text actionText;
         [SerializeField] private Button actionButton;
+        [SerializeField] private Image swatch;
+        [SerializeField] private GameObject equippedMark;
 
         public void BuyOrEquip()
         {
@@ -41,6 +43,15 @@ namespace Deadline4Sec
                 actionText.text = equipped ? "EQUIPPED" : owned ? "EQUIP" : "BUY";
             if (actionButton != null)
                 actionButton.interactable = !equipped;
+            // Cards tint the scythe icon with the skin's blade color.
+            if (swatch != null && skin.weaponMaterial != null && skin.weaponMaterial.HasProperty("_BaseColor"))
+            {
+                Color c = skin.weaponMaterial.GetColor("_BaseColor");
+                c.a = owned ? 1f : 0.45f;
+                swatch.color = c;
+            }
+            if (equippedMark != null)
+                equippedMark.SetActive(equipped);
         }
     }
 }

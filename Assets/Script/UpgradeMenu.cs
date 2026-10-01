@@ -9,6 +9,7 @@ namespace Deadline4Sec
     {
         [SerializeField] private TMP_Text titleCoinText;
         [SerializeField] private TMP_Text upgradeCoinText;
+        [SerializeField] private TMP_Text skinCoinText;
         [SerializeField] private TMP_Text gameplayCoinText;
         [SerializeField] private TMP_Text activeEffectsText;
         [SerializeField] private PowerUpUpgradeRow[] rows;
@@ -60,8 +61,12 @@ namespace Deadline4Sec
             string balance = "COIN " + wallet.TotalCoins.ToString("N0", CultureInfo.InvariantCulture);
             if (titleCoinText != null)
                 titleCoinText.text = balance;
+            // Upgrade/Skin screens show a coin icon next to the number.
+            string amount = wallet.TotalCoins.ToString("N0", CultureInfo.InvariantCulture);
             if (upgradeCoinText != null)
-                upgradeCoinText.text = balance;
+                upgradeCoinText.text = amount;
+            if (skinCoinText != null)
+                skinCoinText.text = amount;
             if (gameplayCoinText != null)
                 gameplayCoinText.text = "COIN " + wallet.CurrentRunCoins.ToString("N0", CultureInfo.InvariantCulture);
             if (rows != null)

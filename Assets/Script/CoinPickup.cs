@@ -39,6 +39,9 @@ namespace Deadline4Sec
             collected = true;
             wallet.Collect(amount);
             Debug.Log("Coin +" + amount);
+            CameraFeedbackController feedback = FindFirstObjectByType<CameraFeedbackController>();
+            if (feedback != null)
+                feedback.PlayPickup(false);
             gameObject.SetActive(false);
         }
 

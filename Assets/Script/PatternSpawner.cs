@@ -27,6 +27,11 @@ namespace Deadline4Sec
         [SerializeField] private int fixedSeed = 12345;
         [SerializeField] private bool showDebugLogs;
 
+        [Header("Pickup rarity (coins always appear)")]
+        [SerializeField, Range(0f, 1f)] private float powerUpChance = 0.3f;
+        [SerializeField, Range(0f, 1f)] private float giftBoxChance = 0.18f;
+        [SerializeField, Min(0)] private int maxPowerUpsPerPattern = 1;
+
         [Header("Graybox floor per pattern")]
         [SerializeField] private bool createFloorUnderPatterns = true;
         [SerializeField, Min(1f)] private float floorWidth = 8.6f;
@@ -40,6 +45,8 @@ namespace Deadline4Sec
         private readonly List<CoursePattern> candidates = new List<CoursePattern>();
         private readonly List<float> opportunityPositions = new List<float>();
         private System.Random random;
+        // Separate stream so pickup rolls never change which patterns a seed produces.
+        private System.Random pickupRandom;
         private CoursePattern previousPrefab;
         private CoursePattern.PatternCategory previousCategory;
         private int categoryStreak;
@@ -61,6 +68,7 @@ namespace Deadline4Sec
             if (gameTimer == null)
                 gameTimer = FindFirstObjectByType<GameTimer>();
             random = useFixedSeed ? new System.Random(fixedSeed) : new System.Random();
+            pickupRandom = useFixedSeed ? new System.Random(fixedSeed + 7919) : new System.Random();
             nextStartZ = transform.position.z;
             ApplyExistingFloorMaterials();
         }
@@ -224,6 +232,7 @@ namespace Deadline4Sec
                 new Vector3(transform.position.x, transform.position.y, startZ),
                 transform.rotation, transform);
             instance.name = prefab.name;
+            ThinOutPickups(instance);
             if (createFloorUnderPatterns)
                 AddGrayboxFloor(instance, startZ);
 
@@ -238,6 +247,25 @@ namespace Deadline4Sec
 
             if (showDebugLogs)
                 Debug.Log("Spawn Pattern: " + prefab.name + " | " + prefab.Difficulty);
+        }
+
+        // Authored pickups are candidates, not guarantees: each power-up and gift
+        // box survives with its chance (own seeded stream, so fixed seeds replay
+        // the same course), and at most one power-up stays per pattern.
+        private void ThinOutPickups(CoursePattern instance)
+        {
+            int keptPowerUps = 0;
+            foreach (PowerUpPickup pickup in instance.GetComponentsInChildren<PowerUpPickup>(true))
+            {
+                bool keep = keptPowerUps < maxPowerUpsPerPattern && pickupRandom.NextDouble() < powerUpChance;
+                if (keep)
+                    keptPowerUps++;
+                else
+                    pickup.gameObject.SetActive(false);
+            }
+            foreach (GiftBoxPickup gift in instance.GetComponentsInChildren<GiftBoxPickup>(true))
+                if (pickupRandom.NextDouble() >= giftBoxChance)
+                    gift.gameObject.SetActive(false);
         }
 
         private void AddGrayboxFloor(CoursePattern instance, float startZ)

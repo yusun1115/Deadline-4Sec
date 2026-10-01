@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 6939714765998771219}
   - component: {fileID: 3556139026263967386}
   - component: {fileID: 9117646262326835809}
+  - component: {fileID: 8742937205554572434}
   m_Layer: 8
   m_Name: Jump Obstacle
   m_TagString: Untagged
@@ -127,3 +128,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Deadline4Sec.Obstacle
   obstacleType: 1
   nearMissMargin: {x: 0.96, y: 0.22, z: 0.25}
+--- !u!114 &8742937205554572434
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8406721521335497708}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad3707ec1bd96794280dc28c6dde0de1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Deadline4Sec.ObstacleVisual
+  modelPrefab: {fileID: 5002250495962975390, guid: ba442c154c523ae4db75130e21bd21fe, type: 3}
+  modelEuler: {x: 0, y: 180, z: 0}
+  fallbackMaterial: {fileID: 2100000, guid: 685fc420b624590469c2b5874816771e, type: 2}
+  fill: 1
