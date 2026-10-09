@@ -33,6 +33,8 @@ namespace Deadline4Sec
         public bool IsGameOver => isGameOver;
         public bool IsRunning => isRunning && !isGameOver;
         public event Action<float> TimerReset;
+        // Presentation only: the run ended on a hazard rather than at 0 seconds.
+        public bool EndedByContact { get; private set; }
 
         private void Awake()
         {
@@ -47,7 +49,8 @@ namespace Deadline4Sec
                 RectTransform rect = timeText.rectTransform;
                 rect.anchorMin = rect.anchorMax = new Vector2(0.5f, 1f);
                 rect.pivot = new Vector2(0.5f, 1f);
-                rect.anchoredPosition = new Vector2(0f, -24f);
+                // Callifont digits sit high in their line box; -33 centres them in the frame.
+                rect.anchoredPosition = new Vector2(0f, -33f);
                 rect.sizeDelta = new Vector2(260f, 140f);
                 timeText.fontSize = 76;
                 timeText.resizeTextForBestFit = true;
@@ -98,6 +101,7 @@ namespace Deadline4Sec
             remainingTime = maximumTime;
             warningPlayed = false;
             isRunning = true;
+            EndedByContact = false;
             runStartedFrame = Time.frameCount;
             UpdateTimeText();
         }
@@ -143,6 +147,7 @@ namespace Deadline4Sec
         {
             isGameOver = false;
             isRunning = true;
+            EndedByContact = false;
             maximumTime = BaseDuration;
             remainingTime = BaseDuration;
             warningPlayed = false;
@@ -161,6 +166,7 @@ namespace Deadline4Sec
             RunInventory inventory = GetComponent<RunInventory>();
             if (inventory != null && inventory.AbsorbFatalContact(source))
                 return;
+            EndedByContact = true;
             TriggerGameOver();
         }
 

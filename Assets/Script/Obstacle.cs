@@ -77,7 +77,7 @@ namespace Deadline4Sec
                     if (runManager != null)
                         runManager.RecordNearMiss();
                     if (cameraFeedback != null)
-                        cameraFeedback.PlayNearMiss(current.center);
+                        cameraFeedback.PlayNearMiss(current.center, obstacleBounds.center);
                 }
             }
 

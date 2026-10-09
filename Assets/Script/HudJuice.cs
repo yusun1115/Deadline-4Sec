@@ -4,9 +4,9 @@ using UnityEngine.UI;
 
 namespace Deadline4Sec
 {
-    // Presentation-only HUD motion: floating "+score" popups at kills, a combo
-    // punch tinted by multiplier tier, a timer pop on every 4-second reset and a
-    // critical-time pulse. Reads game state; never writes it.
+    // Presentation-only HUD motion: floating "+score" popups at kills (tinted by
+    // multiplier tier), the ComboBadge and a timer pop on every 4-second reset
+    // (plus the pulses PowerUpFx/MomentFx add). Reads game state; never writes it.
     public sealed class HudJuice : MonoBehaviour
     {
         private const int PopupCount = 10;
@@ -25,6 +25,7 @@ namespace Deadline4Sec
             public RectTransform Rect;
             public Vector3 World;
             public float Start;
+            public float Scale = 1f;
             public bool Active;
         }
 
@@ -32,6 +33,7 @@ namespace Deadline4Sec
         private GameTimer timer;
         private PlayerController player;
         private GameFlowManager flow;
+        private PowerUpManager powerUps;
         private Camera view;
         private RectTransform hud;
         private Canvas canvas;
@@ -41,13 +43,10 @@ namespace Deadline4Sec
         private readonly Popup[] popups = new Popup[PopupCount];
         private int nextPopup;
         private int lastScore;
-        private int lastCombo;
         private Vector3 lastKillPoint;
         private float lastKillTime = -10f;
-        private float comboPunchStart = -10f;
         private float timerPopStart = -10f;
         private Vector3 timerBaseScale = Vector3.one;
-        private Vector3 comboBaseScale = Vector3.one;
         private TMP_Text countdownText;
         private string lastCountdown;
         private float countdownPopStart = -10f;
@@ -73,6 +72,7 @@ namespace Deadline4Sec
             timer = FindFirstObjectByType<GameTimer>();
             flow = FindFirstObjectByType<GameFlowManager>();
             player = FindFirstObjectByType<PlayerController>();
+            powerUps = FindFirstObjectByType<PowerUpManager>();
             view = Camera.main;
             GameObject canvasObject = GameObject.Find("Canvas");
             if (canvasObject == null)
@@ -89,12 +89,16 @@ namespace Deadline4Sec
 
             if (timerText != null)
                 timerBaseScale = timerText.rectTransform.localScale;
+            // The brush-stroke ComboBadge replaces the plain "COMBO xN" label,
+            // which RunManager still writes to but no longer shows.
             if (comboText != null)
-                comboBaseScale = comboText.rectTransform.localScale;
+                comboText.enabled = false;
+            ComboBadge.Create(hud, run);
 
             for (int i = 0; i < PopupCount; i++)
             {
                 GameObject go = new GameObject("ScorePopup", typeof(RectTransform), typeof(TextMeshProUGUI));
+                go.AddComponent<NumericLabel>();
                 go.transform.SetParent(hud, false);
                 TextMeshProUGUI text = go.GetComponent<TextMeshProUGUI>();
                 GameFont.Apply(text);
@@ -133,6 +137,11 @@ namespace Deadline4Sec
 
         private void OnTimerReset(float previous) => timerPopStart = Time.unscaledTime;
 
+        // Extra timer scale set by PowerUpFx (Time Heart beats).
+        public float ExtraTimerPop { get; set; }
+        // Extra timer scale set by MomentFx (last-second pressure, near-miss bounce).
+        public float MomentTimerPop { get; set; }
+
         private void LateUpdate()
         {
             if (run == null || hud == null)
@@ -146,17 +155,14 @@ namespace Deadline4Sec
             {
                 Vector3 at = now - lastKillTime < 0.3f ? lastKillPoint
                     : player != null ? player.transform.position + new Vector3(0f, 2f, 1.5f) : Vector3.zero;
-                SpawnPopup("+" + (score - lastScore), at, TierColors[TierIndex()]);
+                // Soul Amplifier: bigger, golden numbers.
+                bool amplified = powerUps != null && powerUps.ScoreMultiplier > 1;
+                SpawnPopup("+" + (score - lastScore), at,
+                    amplified ? new Color(1f, 0.85f, 0.3f) : TierColors[TierIndex()], amplified ? 1.6f : 1f);
                 lastScore = score;
             }
 
-            int combo = run.CurrentCombo;
-            if (combo > lastCombo)
-                comboPunchStart = now;
-            lastCombo = combo;
-
             UpdatePopups(now);
-            UpdateCombo(now);
             UpdateTimer(now);
             UpdateCountdown(now);
         }
@@ -183,10 +189,11 @@ namespace Deadline4Sec
             return Mathf.Clamp(m - 1, 0, TierColors.Length - 1);
         }
 
-        private void SpawnPopup(string label, Vector3 world, Color color)
+        private void SpawnPopup(string label, Vector3 world, Color color, float scale)
         {
             Popup p = popups[nextPopup];
             nextPopup = (nextPopup + 1) % PopupCount;
+            p.Scale = scale;
             p.Text.text = label;
             p.Text.color = color;
             p.World = world;
@@ -219,21 +226,11 @@ namespace Deadline4Sec
                 float rise = 90f * (1f - (1f - t) * (1f - t));
                 p.Rect.anchoredPosition = local + new Vector2(0f, rise) - hud.rect.center;
                 float pop = t < 0.15f ? Mathf.Lerp(0.4f, 1.25f, t / 0.15f) : Mathf.Lerp(1.25f, 1f, (t - 0.15f) / 0.2f);
-                p.Rect.localScale = Vector3.one * Mathf.Max(pop, 1f - Mathf.Max(0f, t - 0.7f));
+                p.Rect.localScale = Vector3.one * (Mathf.Max(pop, 1f - Mathf.Max(0f, t - 0.7f)) * p.Scale);
                 Color c = p.Text.color;
                 c.a = 1f - Mathf.Clamp01((t - 0.55f) / 0.45f);
                 p.Text.color = c;
             }
-        }
-
-        private void UpdateCombo(float now)
-        {
-            if (comboText == null)
-                return;
-            float t = (now - comboPunchStart) / 0.22f;
-            float punch = t < 1f ? 1f + Mathf.Sin(t * Mathf.PI) * (0.35f + 0.05f * Mathf.Min(lastCombo, 6)) : 1f;
-            comboText.rectTransform.localScale = comboBaseScale * punch;
-            comboText.color = lastCombo > 0 ? TierColors[TierIndex()] : new Color(1f, 1f, 1f, 0.55f);
         }
 
         private void UpdateTimer(float now)
@@ -244,9 +241,8 @@ namespace Deadline4Sec
             float t = (now - timerPopStart) / 0.25f;
             if (t < 1f)
                 pop += Mathf.Sin(t * Mathf.PI) * 0.28f;
-            bool critical = timer.IsRunning && timer.RemainingTime <= 1f;
-            if (critical)
-                pop += (Mathf.Sin(now * 18f) * 0.5f + 0.5f) * 0.12f;
+            // Last-second pressure pulse and the near-miss bounce come from MomentFx.
+            pop += ExtraTimerPop + MomentTimerPop;
             timerText.rectTransform.localScale = timerBaseScale * pop;
             if (timerFrame != null)
                 timerFrame.localScale = Vector3.one * (1f + (pop - 1f) * 0.5f);

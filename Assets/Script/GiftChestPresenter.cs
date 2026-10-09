@@ -23,6 +23,8 @@ namespace Deadline4Sec
         [SerializeField] private Sprite dashIcon;
         [SerializeField] private Sprite couponIcon;
         [SerializeField] private Sprite skinCurrencyIcon;
+        // Indexed by SkinCurrency - 1 (FrostShard, BloodShard, CyberCore, EclipseFragment).
+        [SerializeField] private Sprite[] currencyIcons = new Sprite[4];
 
         private GameObject stage;
         private Transform chest;
@@ -53,9 +55,9 @@ namespace Deadline4Sec
                 stateStart = Time.unscaledTime;
                 if (rewardIcon != null)
                 {
-                    rewardIcon.sprite = IconFor(reward, out bool skinCurrency);
-                    // Skin currency borrows the skin icon, tinted to read as a gem.
-                    rewardIcon.color = skinCurrency ? new Color(1f, 0.55f, 0.85f) : Color.white;
+                    rewardIcon.sprite = IconFor(reward, out bool fallback);
+                    // Without its own icon a currency borrows the skin icon, tinted to read as a gem.
+                    rewardIcon.color = fallback ? new Color(1f, 0.55f, 0.85f) : Color.white;
                     rewardIcon.rectTransform.localScale = Vector3.zero;
                 }
             }
@@ -86,14 +88,19 @@ namespace Deadline4Sec
                 opened = false;
         }
 
-        private Sprite IconFor(string reward, out bool skinCurrency)
+        // Reward strings come from RunInventory: "COIN +300", "SHIELD +1", "DASH +1",
+        // "REVIVECOUPON +1" or "<SkinCurrency> +3" (e.g. "FrostShard +3").
+        private Sprite IconFor(string reward, out bool fallback)
         {
-            skinCurrency = false;
+            fallback = false;
             if (reward.StartsWith("COIN")) return coinIcon;
             if (reward.StartsWith("SHIELD")) return shieldIcon;
             if (reward.StartsWith("DASH")) return dashIcon;
             if (reward.StartsWith("REVIVE")) return couponIcon != null ? couponIcon : coinIcon;
-            skinCurrency = true;
+            for (int i = 0; currencyIcons != null && i < currencyIcons.Length; i++)
+                if (currencyIcons[i] != null && reward.StartsWith(((SkinCurrency)(i + 1)).ToString()))
+                    return currencyIcons[i];
+            fallback = true;
             return skinCurrencyIcon != null ? skinCurrencyIcon : coinIcon;
         }
 

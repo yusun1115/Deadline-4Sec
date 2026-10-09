@@ -50,6 +50,10 @@ namespace Deadline4Sec
         public int CurrentScore { get; private set; }
         public int CurrentCombo { get; private set; }
         public int BestCombo { get; private set; }
+        // Presentation only (combo gauge): share of the combo timeout still left.
+        // A Combo Seal keeps lastSuccessTime moving, so the gauge holds still.
+        public float ComboTimeLeft01 => CurrentCombo > 0
+            ? Mathf.Clamp01(1f - (Time.time - lastSuccessTime) / comboTimeout) : 0f;
         public float Distance { get; private set; }
         public float CurrentRunTime { get; private set; }
         public float CurrentForwardSpeed { get; private set; }
@@ -156,7 +160,9 @@ namespace Deadline4Sec
             NearMissRecorded?.Invoke();
             if (nearMissText != null)
             {
-                nearMissText.text = "NEAR MISS +" + nearMissPoints;
+                // The points pop up separately (HudJuice); MomentFx moves this
+                // label to the obstacle's side of the screen.
+                nearMissText.text = "NEAR MISS!";
                 nearMissText.gameObject.SetActive(true);
                 nearMissVisibleUntil = Time.unscaledTime + 0.75f;
             }
@@ -207,7 +213,7 @@ namespace Deadline4Sec
         private void UpdateDebugUI()
         {
             if (scoreText != null)
-                scoreText.text = "SCORE " + CurrentScore.ToString(CultureInfo.InvariantCulture);
+                scoreText.text = CurrentScore.ToString("N0", CultureInfo.InvariantCulture); // number only (HUD pill)
             if (comboText != null)
                 comboText.text = "COMBO x" + CurrentCombo.ToString(CultureInfo.InvariantCulture);
             if (distanceText != null)

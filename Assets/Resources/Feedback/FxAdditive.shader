@@ -9,6 +9,8 @@ Shader "Deadline4Sec/FxAdditive"
         _Ribbon ("Ribbon (trail) Mode", Range(0, 1)) = 0
         // 0 keeps a transparent render target's alpha untouched (gift chest stage).
         _AlphaWrite ("Alpha Write", Range(0, 1)) = 1
+        // Multiplies the vertex color (power-up rings fade through a property block).
+        _Tint ("Tint", Color) = (1, 1, 1, 1)
     }
     SubShader
     {
@@ -25,6 +27,7 @@ Shader "Deadline4Sec/FxAdditive"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             CBUFFER_START(UnityPerMaterial)
                 float _Softness, _Core, _Ribbon, _AlphaWrite;
+                half4 _Tint;
             CBUFFER_END
             struct Attributes { float4 positionOS : POSITION; half4 color : COLOR; float2 uv : TEXCOORD0; };
             struct Varyings { float4 positionCS : SV_POSITION; half4 color : COLOR; float2 uv : TEXCOORD0; };
@@ -42,7 +45,7 @@ Shader "Deadline4Sec/FxAdditive"
                 float a = pow(saturate(1 - d), _Softness);
                 float core = pow(saturate(1 - d * 1.8), 3) * _Core;
                 half3 col = i.color.rgb * a + core * i.color.a;
-                return half4(col * i.color.a, _AlphaWrite);
+                return half4(col * i.color.a * _Tint.rgb * _Tint.a, _AlphaWrite);
             }
             ENDHLSL
         }

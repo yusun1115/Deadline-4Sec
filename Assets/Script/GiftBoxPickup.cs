@@ -8,6 +8,9 @@ namespace Deadline4Sec
         [SerializeField, Min(0f)] private float rotationSpeed = 75f;
         private bool collected;
 
+        // Presentation hook: HudStats flies a box from here into the HUD counter.
+        public static event System.Action<Vector3> Collected;
+
         private void OnEnable() => collected = false;
         private void Update() => transform.Rotate(Vector3.up, rotationSpeed * Time.deltaTime, Space.World);
 
@@ -21,6 +24,7 @@ namespace Deadline4Sec
                 return;
             collected = true;
             inventory.CollectGiftBox();
+            Collected?.Invoke(transform.position);
             Debug.Log("Gift Box collected (run total " + inventory.CurrentRunGiftBoxes + ")");
             gameObject.SetActive(false);
         }

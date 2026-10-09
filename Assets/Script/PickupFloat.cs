@@ -16,6 +16,7 @@ namespace Deadline4Sec
         private Vector3 baseScale;
         private float phase;
         private Transform view;
+        private CoinPickup coin;
 
         private void Awake()
         {
@@ -27,6 +28,7 @@ namespace Deadline4Sec
                 baseScale = bobTarget.localScale;
             }
             phase = (transform.position.x * 1.7f + transform.position.z * 0.37f) % 6.28f;
+            TryGetComponent(out coin);
         }
 
         private void LateUpdate()
@@ -34,8 +36,8 @@ namespace Deadline4Sec
             float t = Time.time * bobSpeed + phase;
             if (bobTarget != null)
             {
-                bobTarget.localPosition = basePosition + Vector3.up * (Mathf.Sin(t) * bobHeight);
-                bobTarget.localScale = baseScale * (1f + Mathf.Sin(t * 2f) * pulse);
+                bobTarget.localPosition = basePosition + Vector3.up * (Mathf.Sin(t) * bobHeight) + MagnetArc();
+                bobTarget.localScale = baseScale * (1f + Mathf.Sin(t * 2f) * pulse) * MagnetShrink();
             }
             if (billboard != null)
             {
@@ -45,5 +47,24 @@ namespace Deadline4Sec
                     billboard.rotation = Quaternion.LookRotation(billboard.position - view.position, Vector3.up);
             }
         }
+
+        // Soul Magnet: the collider flies straight (pickup timing unchanged) while
+        // the visual swings out sideways and up on an arc that closes at the player.
+        private Vector3 MagnetArc()
+        {
+            if (coin == null || !coin.BeingPulled)
+                return Vector3.zero;
+            Vector3 to = coin.PullTarget - transform.position;
+            to.y = 0f;
+            if (to.sqrMagnitude < 0.0001f)
+                return Vector3.zero;
+            float side = transform.position.x >= coin.PullTarget.x ? 1f : -1f;
+            float bend = Mathf.Sin(coin.PullProgress * Mathf.PI);
+            Vector3 world = (Vector3.Cross(Vector3.up, to.normalized) * -side * 1.1f + Vector3.up * 0.6f) * bend;
+            return transform.InverseTransformVector(world);
+        }
+
+        private float MagnetShrink() =>
+            coin != null && coin.BeingPulled ? Mathf.Lerp(1f, 0.55f, coin.PullProgress) : 1f;
     }
 }

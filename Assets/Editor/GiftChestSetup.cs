@@ -121,12 +121,35 @@ namespace Deadline4Sec.Editor
             so.FindProperty("coinIcon").objectReferenceValue = Sprite("icon_coin_gold");
             so.FindProperty("shieldIcon").objectReferenceValue = Sprite("icon_shield");
             so.FindProperty("dashIcon").objectReferenceValue = Sprite("icon_dash");
-            so.FindProperty("couponIcon").objectReferenceValue = Sprite("powerup_time_heart");
+            so.FindProperty("couponIcon").objectReferenceValue = Sprite("icon_revive_coupon") ?? Sprite("powerup_time_heart");
             so.FindProperty("skinCurrencyIcon").objectReferenceValue = Sprite("UI/icon_skin");
+            SerializedProperty currencies = so.FindProperty("currencyIcons");
+            currencies.arraySize = CurrencyIcons.Length;
+            for (int i = 0; i < CurrencyIcons.Length; i++)
+                currencies.GetArrayElementAtIndex(i).objectReferenceValue = Sprite(CurrencyIcons[i]);
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 
-        private static Sprite Sprite(string name) => AssetDatabase.LoadAssetAtPath<Sprite>(Generated + name + ".png");
+        // Same order as SkinCurrency (FrostShard, BloodShard, CyberCore, EclipseFragment).
+        private static readonly string[] CurrencyIcons =
+        {
+            "icon_currency_frost_shard", "icon_currency_blood_shard",
+            "icon_currency_cyber_core", "icon_currency_eclipse_fragment",
+        };
+
+        private static Sprite Sprite(string name)
+        {
+            string path = Generated + name + ".png";
+            if (AssetImporter.GetAtPath(path) is TextureImporter importer && importer.textureType != TextureImporterType.Sprite)
+            {
+                importer.textureType = TextureImporterType.Sprite;
+                importer.spriteImportMode = SpriteImportMode.Single;
+                importer.alphaIsTransparency = true;
+                importer.mipmapEnabled = false;
+                importer.SaveAndReimport();
+            }
+            return AssetDatabase.LoadAssetAtPath<Sprite>(path);
+        }
 
         private static T Child<T>(Transform parent, string name) where T : Graphic
         {

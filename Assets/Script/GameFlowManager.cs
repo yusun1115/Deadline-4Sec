@@ -54,6 +54,7 @@ namespace Deadline4Sec
         [SerializeField, Min(0f)] private float goDisplayDuration = 0.5f;
         [SerializeField, Min(0f)] private float resultDelay = 0.4f;
         [SerializeField, Range(0.5f, 1f)] private float deathPresentationDuration = 0.75f;
+        [SerializeField, Range(0f, 0.75f)] private float deathHudHold = 0.35f;
         [SerializeField, Min(1f)] private float revivePromptSeconds = 4f;
 
         private const string BestScoreKey = "Deadline4Sec.BestScore";
@@ -144,8 +145,8 @@ namespace Deadline4Sec
             if (!startImmediatelyAfterReload)
                 return;
 
-            startImmediatelyAfterReload = false;
             StartGame();
+            startImmediatelyAfterReload = false;
         }
 
         private void Update()
@@ -204,7 +205,12 @@ namespace Deadline4Sec
                 return;
 
             if (titlePanel != null)
+            {
+                // A Retry reload starts straight away; there is no title to fly out.
+                if (!startImmediatelyAfterReload)
+                    TitleOutro.Play(titlePanel);
                 titlePanel.SetActive(false);
+            }
             if (settingsPanel != null)
                 settingsPanel.SetActive(false);
             SetUI(false, true, false);
@@ -282,6 +288,7 @@ namespace Deadline4Sec
             }
             if (tutorial == null)
                 tutorial = gameObject.AddComponent<TutorialController>();
+            TitleOutro.Play(titlePanel);
             titlePanel.SetActive(false);
             settingsPanel.SetActive(false);
             State = GameState.Tutorial;
@@ -396,14 +403,22 @@ namespace Deadline4Sec
 
         private IEnumerator ShowDeathAndPrompt()
         {
-            SetUI(false, false, false);
+            // The HUD freezes on the fatal moment for a beat before it clears.
+            bool hudCleared = false;
             float elapsed = 0f;
             while (elapsed < deathPresentationDuration)
             {
                 elapsed += Time.unscaledDeltaTime;
+                if (!hudCleared && elapsed >= deathHudHold)
+                {
+                    SetUI(false, false, false);
+                    hudCleared = true;
+                }
                 playerController?.SetDeathPose(elapsed / deathPresentationDuration);
                 yield return null;
             }
+            if (!hudCleared)
+                SetUI(false, false, false);
             if (inventory != null && !inventory.ReviveUsed)
             {
                 State = GameState.RevivePrompt;
@@ -552,7 +567,13 @@ namespace Deadline4Sec
             inventory.ClearPendingReward();
             giftBoxIndex++;
             giftBoxRevealed = false;
-            extrasUI?.ShowGiftPanel(giftBoxIndex, giftBoxTotal, "", giftBoxIndex > giftBoxTotal);
+            // After the last box the run moves straight on; no "all opened" confirm screen.
+            if (giftBoxIndex > giftBoxTotal)
+            {
+                ConfirmAllGiftBoxes();
+                return;
+            }
+            extrasUI?.ShowGiftPanel(giftBoxIndex, giftBoxTotal, "", false);
         }
 
         public void ConfirmAllGiftBoxes()

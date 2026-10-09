@@ -11,8 +11,20 @@ namespace Deadline4Sec
         [SerializeField, Min(0f)] private float rotationSpeed = 100f;
         [SerializeField, Min(0.1f)] private float magnetCollectDistance = 0.9f;
         private bool collected;
+        private float pullStartDistance;
 
-        private void OnEnable() { collected = false; Active.Add(this); }
+        // Presentation only (PickupFloat bends the visual on a curve while pulled).
+        public bool BeingPulled { get; private set; }
+        public float PullProgress { get; private set; }
+        public Vector3 PullTarget { get; private set; }
+
+        private void OnEnable()
+        {
+            collected = false;
+            BeingPulled = false;
+            PullProgress = 0f;
+            Active.Add(this);
+        }
         private void OnDisable() => Active.Remove(this);
         private void Update() => transform.Rotate(Vector3.up, rotationSpeed * Time.deltaTime, Space.World);
 
@@ -26,7 +38,14 @@ namespace Deadline4Sec
         {
             if (collected)
                 return;
+            if (!BeingPulled)
+            {
+                BeingPulled = true;
+                pullStartDistance = Mathf.Max(0.01f, Vector3.Distance(transform.position, target));
+            }
             transform.position = Vector3.MoveTowards(transform.position, target, step);
+            PullTarget = target;
+            PullProgress = Mathf.Clamp01(1f - Vector3.Distance(transform.position, target) / pullStartDistance);
             if ((transform.position - target).sqrMagnitude <= magnetCollectDistance * magnetCollectDistance)
                 Collect(wallet);
         }

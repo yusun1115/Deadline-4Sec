@@ -68,7 +68,7 @@ namespace Deadline4Sec
             if (skinCoinText != null)
                 skinCoinText.text = amount;
             if (gameplayCoinText != null)
-                gameplayCoinText.text = "COIN " + wallet.CurrentRunCoins.ToString("N0", CultureInfo.InvariantCulture);
+                gameplayCoinText.text = wallet.CurrentRunCoins.ToString("N0", CultureInfo.InvariantCulture); // icon pill
             if (rows != null)
                 foreach (PowerUpUpgradeRow row in rows)
                     if (row != null)

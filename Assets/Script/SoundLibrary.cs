@@ -28,6 +28,27 @@ namespace Deadline4Sec
         public AudioClip coin;
         public AudioClip powerUp;
 
+        // Power-up presentation (PowerUpFx). Empty slots use synthesized placeholders.
+        [Header("Power-ups")]
+        public AudioClip freezeStart;
+        public AudioClip freezeShatter;
+        public AudioClip amplifierStart;
+        public AudioClip rushStart;
+        public AudioClip rushDrone;
+        public AudioClip rushSlash;
+        public AudioClip magnetHum;
+        public AudioClip magnetZip;
+        public AudioClip chainLock;
+        public AudioClip chainBreak;
+        public AudioClip heartbeat;
+        public AudioClip heartSurge;
+
+        // Moment presentation (MomentFx). Empty slots use synthesized placeholders.
+        [Header("Moments")]
+        public AudioClip nearMissChime;
+        public AudioClip pressureTick;
+        public AudioClip deathImpact;
+
         [Header("UI")]
         public AudioClip uiClick;
 

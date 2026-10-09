@@ -72,7 +72,7 @@ namespace Deadline4Sec
             sparks = CreateSystem("Sparks", 240, ParticleSystemRenderMode.Stretch, 0.035f);
             wisps = CreateSystem("Soul Wisps", 120, ParticleSystemRenderMode.Billboard, 0f);
             dust = CreateSystem("Dust", 160, ParticleSystemRenderMode.Billboard, 0f);
-            speedLines = CreateSystem("Speed Lines", 80, ParticleSystemRenderMode.Stretch, 0.02f);
+            speedLines = CreateSystem("Speed Lines", 160,ParticleSystemRenderMode.Stretch, 0.02f);
             ParticleSystem.MainModule speedMain = speedLines.main;
             speedMain.simulationSpace = ParticleSystemSimulationSpace.Local;
             speedLines.transform.SetParent(transform, false);
@@ -178,6 +178,50 @@ namespace Deadline4Sec
             trailUntil = Time.unscaledTime + 0.25f;
         }
 
+        // ---------------- power-up hooks (PowerUpFx) ----------------
+
+        // 0..1 while Reaper Rush runs: denser, brighter speed lines and a
+        // permanently lit scythe trail.
+        public float RushBoost { get; set; }
+
+        // Reaper Rush contact kill: a big crossed double slash and a spark spray.
+        public void PlayRushSlash(Vector3 point)
+        {
+            Quaternion facing = Quaternion.LookRotation(view.transform.forward, Vector3.up);
+            float roll = Random.Range(-20f, 20f);
+            PlaySlash(point, facing * Quaternion.Euler(0f, 0f, roll + 35f), 1.9f, HotWhite, 0.2f);
+            PlaySlash(point, facing * Quaternion.Euler(0f, 0f, roll - 55f), 1.7f, Pink, 0.22f, true);
+            Burst(sparks, point, 34, 14f, new Vector2(0.08f, 0.2f), new Vector2(0.2f, 0.4f), Pink, HotWhite, 0.3f);
+        }
+
+        // Generic soul burst for power-up pickups.
+        public void PlayBurst(Vector3 point, Color a, Color b, int count, float speed, float size)
+        {
+            Burst(sparks, point, count, speed, new Vector2(size * 0.5f, size), new Vector2(0.25f, 0.5f), a, b, 0.3f);
+            Burst(wisps, point, count / 3, speed * 0.25f, new Vector2(size * 2f, size * 4f), new Vector2(0.4f, 0.8f), a, b, 0.6f);
+        }
+
+        // Soul Magnet: a few wisps on a circle drifting into the centre. `carry`
+        // is the run velocity so they keep pace with the player.
+        public void EmitInward(Vector3 centre, float radius, Color color, Vector3 carry)
+        {
+            for (int i = 0; i < 2; i++)
+            {
+                float angle = Random.value * Mathf.PI * 2f;
+                Vector3 offset = new Vector3(Mathf.Cos(angle), Random.Range(-0.5f, 0.6f), Mathf.Sin(angle)) * radius;
+                float life = Random.Range(0.35f, 0.5f);
+                var p = new ParticleSystem.EmitParams
+                {
+                    position = centre + offset,
+                    velocity = carry - offset / life,
+                    startSize = Random.Range(0.12f, 0.22f),
+                    startLifetime = life,
+                    startColor = Color.Lerp(color, HotWhite, Random.value * 0.4f),
+                };
+                wisps.Emit(p, 1);
+            }
+        }
+
         // ---------------- internals ----------------
 
         private void OnPlayerAction(PlayerController.PlayerAction action)
@@ -225,7 +269,8 @@ namespace Deadline4Sec
             }
 
             if (scytheTrail != null)
-                scytheTrail.emitting = Playing && (now < trailUntil || (player != null && player.IsHoming));
+                scytheTrail.emitting = Playing && (now < trailUntil || RushBoost > 0.05f ||
+                                                   (player != null && player.IsHoming));
 
             UpdateSpeedLines();
         }
@@ -239,6 +284,7 @@ namespace Deadline4Sec
             float rate = Mathf.Lerp(4f, 26f, speedT);
             if (player != null && (player.IsHoming || player.IsGroundSlamming))
                 rate += 40f;
+            rate += 75f * RushBoost;
             int count = Mathf.FloorToInt(rate * Time.unscaledDeltaTime + Random.value);
             for (int i = 0; i < count; i++)
             {
@@ -246,10 +292,10 @@ namespace Deadline4Sec
                 var p = new ParticleSystem.EmitParams
                 {
                     position = new Vector3(ring.x, ring.y * 0.75f + 0.5f, Random.Range(18f, 26f)),
-                    velocity = new Vector3(0f, 0f, -Random.Range(55f, 75f)),
-                    startSize = Random.Range(0.02f, 0.04f),
+                    velocity = new Vector3(0f, 0f, -Random.Range(55f, 75f) * (1f + RushBoost * 0.5f)),
+                    startSize = Random.Range(0.02f, 0.04f) * (1f + RushBoost),
                     startLifetime = 0.45f,
-                    startColor = new Color(0.85f, 0.75f, 1f, 0.35f),
+                    startColor = Color.Lerp(new Color(0.85f, 0.75f, 1f, 0.35f), new Color(1f, 0.45f, 0.8f, 0.8f), RushBoost),
                 };
                 speedLines.Emit(p, 1);
             }

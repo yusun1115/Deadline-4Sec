@@ -69,7 +69,7 @@ namespace Deadline4Sec
             if (inventory == null)
                 return;
             if (giftHudText != null)
-                giftHudText.text = "GIFT BOX x" + inventory.CurrentRunGiftBoxes;
+                giftHudText.text = inventory.CurrentRunGiftBoxes.ToString(); // icon pill; HudStats counts boxes in flight
             if (couponText != null)
                 couponText.text = "REVIVE COUPON x" + inventory.CouponCount;
             if (couponButton != null)

@@ -3,4 +3,6 @@
   <Project Path="Tripo3D.UnityBridge.Editor.csproj" />
   <Project Path="Assembly-CSharp.csproj" />
   <Project Path="Deadline4Sec.AcceptanceTests.csproj" />
+  <Project Path="Assembly-CSharp-firstpass.csproj" />
+  <Project Path="Deadline4Sec.Editor.DOTweenDefine.csproj" />
 </Solution>

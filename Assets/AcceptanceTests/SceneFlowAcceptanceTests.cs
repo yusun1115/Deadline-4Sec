@@ -302,13 +302,21 @@ namespace Deadline4Sec.AcceptanceTests
             Assert.IsNotNull(font);
             Font source = (Font)fontType.GetProperty("sourceFontFile").GetValue(font);
             Assert.AreEqual("GFCRedSpirit-Bold", source.name);
+            // 2026-10-04 request: in-game number labels (marked NumericLabel) use
+            // CallifontSharpie-Bold; every other text stays GFCRedSpirit-Bold.
+            UnityEngine.Object numberFont = Resources.Load("Fonts/CallifontSharpie-Bold SDF", fontType);
+            Assert.IsNotNull(numberFont);
+            Font numberSource = (Font)fontType.GetProperty("sourceFontFile").GetValue(numberFont);
+            Assert.AreEqual("CallifontSharpie-Bold", numberSource.name);
+            Type numericType = Type.GetType("Deadline4Sec.NumericLabel, Assembly-CSharp");
             Type textType = Type.GetType("TMPro.TMP_Text, Unity.TextMeshPro");
             foreach (UnityEngine.Object label in UnityEngine.Object.FindObjectsByType(textType,
                 FindObjectsInactive.Include, FindObjectsSortMode.None))
-                Assert.AreSame(font, textType.GetProperty("font").GetValue(label), label.name);
+                Assert.AreSame(((Component)label).GetComponent(numericType) != null ? numberFont : font,
+                    textType.GetProperty("font").GetValue(label), label.name);
             foreach (UnityEngine.UI.Text label in UnityEngine.Object.FindObjectsByType<UnityEngine.UI.Text>(
                 FindObjectsInactive.Include, FindObjectsSortMode.None))
-                Assert.AreSame(source, label.font, label.name);
+                Assert.AreSame(label.GetComponent(numericType) != null ? numberSource : source, label.font, label.name);
         }
 
         private static GameObject TitlePanel(Component flow)

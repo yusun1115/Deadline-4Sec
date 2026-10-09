@@ -56,6 +56,9 @@ namespace Deadline4Sec
         private float introElapsed;
         private float introDuration;
         private readonly Vector3 introSidePosition = new Vector3(6f, 2.4f, -0.5f);
+        private Vector3 impulseDirection;
+        private float impulseStart = -10f;
+        private const float NearMissImpulseSize = 0.07f;
         private float shakeIntensity;
         private float shakeTimeRemaining;
         private float shakeInitialDuration;
@@ -159,7 +162,7 @@ namespace Deadline4Sec
             }
             if (gameFlow == null || !gameFlow.IsPlaying || shakeTimeRemaining <= 0f)
             {
-                transform.localPosition = baseLocalPosition;
+                transform.localPosition = baseLocalPosition + NearMissImpulse();
                 return;
             }
 
@@ -167,8 +170,17 @@ namespace Deadline4Sec
             float sampleTime = Time.unscaledTime * shakeFrequency;
             float x = Mathf.PerlinNoise(noiseSeedX, sampleTime) * 2f - 1f;
             float y = Mathf.PerlinNoise(noiseSeedY, sampleTime) * 2f - 1f;
-            transform.localPosition = baseLocalPosition +
+            transform.localPosition = baseLocalPosition + NearMissImpulse() +
                 new Vector3(x, y, 0f) * shakeIntensity * fade;
+        }
+
+        // Near miss: a very light out-and-back sway away from the obstacle.
+        private Vector3 NearMissImpulse()
+        {
+            float t = (Time.unscaledTime - impulseStart) / 0.18f;
+            if (t < 0f || t >= 1f || gameFlow == null || !gameFlow.IsPlaying)
+                return Vector3.zero;
+            return impulseDirection * (NearMissImpulseSize *Mathf.Sin(t * Mathf.PI) * (1f - t * 0.5f));
         }
 
         public void BeginRunIntro(float duration)
@@ -247,11 +259,27 @@ namespace Deadline4Sec
             Vibrate(90, 220);
         }
 
-        public void PlayNearMiss(Vector3 point)
+        public void PlayNearMiss(Vector3 point) => PlayNearMiss(point, point);
+
+        // `hazard` is the obstacle's centre: the camera gives a small sideways
+        // nudge away from it and MomentFx draws its edge flash on that side.
+        public event System.Action<Vector3, Vector3> NearMissed;
+
+        public void PlayNearMiss(Vector3 point, Vector3 hazard)
         {
             if (CanPlayFeedback())
             {
-                PlayShake(nearMissShake);
+                float side = hazard.x - point.x;
+                if (Mathf.Abs(side) > 0.3f)
+                {
+                    impulseDirection = Vector3.right * -Mathf.Sign(side);
+                    impulseStart = Time.unscaledTime;
+                }
+                else
+                {
+                    PlayShake(nearMissShake);
+                }
+                NearMissed?.Invoke(point, hazard);
                 visualFeedback.PlayNearMiss(point);
                 if (particles != null)
                     particles.PlayNearMiss(point);
@@ -366,7 +394,8 @@ namespace Deadline4Sec
             if (GamePreferences.SoundEnabled && feedbackAudio != null && clip != null)
             {
                 float jitter = soundLibrary != null ? soundLibrary.pitchVariation : 0f;
-                feedbackAudio.pitch = 1f + Random.Range(-jitter, jitter);
+                bool scoring = clip == killClip || clip == stompClip || clip == nearMissClip;
+                feedbackAudio.pitch = 1f + Random.Range(-jitter, jitter) + (scoring ? ScorePitchBias : 0f);
                 feedbackAudio.PlayOneShot(clip);
             }
         }
@@ -418,6 +447,8 @@ namespace Deadline4Sec
             temporaryFovTimeRemaining = 0f;
             temporaryFovStart = 0f;
             temporaryFovDuration = 0f;
+            FovBias = 0f;
+            ScorePitchBias = 0f;
             transform.localPosition = baseLocalPosition;
             if (targetCamera != null)
                 targetCamera.fieldOfView = baseSpeedFov;
@@ -452,6 +483,17 @@ namespace Deadline4Sec
             hitStopUntil = Mathf.Max(hitStopUntil, Time.realtimeSinceStartup + duration);
         }
 
+        // Power-up presentation hooks (PowerUpFx): a lasting FOV offset (Reaper Rush),
+        // a one-off FOV kick, and a pitch lift for scoring sounds (Soul Amplifier).
+        public float FovBias { get; set; }
+        public float ScorePitchBias { get; set; }
+
+        public void PunchFov(float amount, float duration)
+        {
+            if (CanPlayFeedback())
+                PlayFovPulse(amount, duration);
+        }
+
         private void PlayFovPulse(float amount, float duration)
         {
             temporaryFov = amount;
@@ -483,7 +525,7 @@ namespace Deadline4Sec
                     runManager.BaseForwardSpeed) / range);
             }
             float speedFov = Mathf.Lerp(baseSpeedFov, maxSpeedFov, speedT);
-            float targetFov = speedFov + temporaryFov;
+            float targetFov = speedFov + temporaryFov + FovBias;
             targetCamera.fieldOfView = Mathf.Lerp(targetCamera.fieldOfView,
                 targetFov, 1f - Mathf.Exp(-fovSmoothSpeed * unscaledDelta));
         }
