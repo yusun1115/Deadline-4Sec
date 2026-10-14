@@ -8,13 +8,14 @@ using UnityEngine.UI;
 
 namespace Deadline4Sec.Editor
 {
-    // In-game numbers use CallifontSharpie-Bold (2026-10-04 request): builds its
-    // TMP SDF asset next to the game font and marks the HUD number labels with
-    // NumericLabel so GameFont gives them that font at runtime too.
+    // In-game numbers use HiKR-ExtraBold, italic (2026-10-11; replaced
+    // CallifontSharpie-Bold from 2026-10-04): builds its TMP SDF asset next to
+    // the game font and marks the HUD number labels with NumericLabel so
+    // GameFont gives them that font and slant at runtime too.
     public static class NumberFontSetup
     {
-        private const string SourcePath = "Assets/Font/CallifontSharpie-Bold.ttf";
-        private const string AssetPath = "Assets/Resources/Fonts/CallifontSharpie-Bold SDF.asset";
+        private const string SourcePath = "Assets/Font/HiKR-ExtraBold.ttf";
+        private const string AssetPath = "Assets/Resources/Fonts/HiKR-ExtraBold SDF.asset";
 
         private static readonly string[] ScenePaths =
         {
@@ -23,14 +24,13 @@ namespace Deadline4Sec.Editor
             "Assets/Scenes/TestScene.unity",
         };
 
-        // GameplayUI labels that show numbers, with sizes for Callifont, whose
-        // glyphs sit about 30% smaller in the em box than GFCRedSpirit's
-        // (0 = keep; the timer already best-fits its frame).
+        // GameplayUI labels that show numbers. Sizes are owned by the HUD layout
+        // (HudLayoutSetup pills, the timer's best fit), so 0 = keep.
         private static readonly string[] NumberLabels =
         {
             "SurvivalTimer", "ScoreText", "DistanceText", "RunCoinText", "GiftBoxCountText",
         };
-        private static readonly int[] NumberLabelSizes = { 0, 44, 34, 38, 32 };
+        private static readonly int[] NumberLabelSizes = { 0, 0, 0, 0, 0 };
 
         [MenuItem("Deadline 4 Sec/UI/Apply Number Font To HUD")]
         public static void Apply()
@@ -85,7 +85,7 @@ namespace Deadline4Sec.Editor
                 throw new InvalidOperationException(SourcePath + " is missing.");
             TMP_FontAsset font = TMP_FontAsset.CreateFontAsset(source, 90, 9, GlyphRenderMode.SDFAA, 1024, 1024,
                 AtlasPopulationMode.Dynamic);
-            font.name = "CallifontSharpie-Bold SDF";
+            font.name = System.IO.Path.GetFileNameWithoutExtension(AssetPath);
             AssetDatabase.CreateAsset(font, AssetPath);
             font.atlasTexture.name = font.name + " Atlas";
             AssetDatabase.AddObjectToAsset(font.atlasTexture, font);
@@ -107,7 +107,7 @@ namespace Deadline4Sec.Editor
                 ascii.Append(c);
             font.TryAddCharacters(ascii.ToString(), out string missing);
             if (!string.IsNullOrEmpty(missing))
-                Debug.LogWarning("CallifontSharpie-Bold lacks: " + missing);
+                Debug.LogWarning(source.name + " lacks: " + missing);
             EditorUtility.SetDirty(font);
             AssetDatabase.SaveAssets();
             AssetDatabase.ImportAsset(AssetPath);

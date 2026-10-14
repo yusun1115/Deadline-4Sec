@@ -3,14 +3,13 @@ using UnityEngine;
 
 namespace Deadline4Sec.Editor
 {
-    // Assigns the imported Casual Game Sounds / Demonic Dynamic Music clips to
+    // Assigns the imported Casual Game Sounds clips and the Sound/BGM music to
     // the SoundLibrary and sets mobile-friendly import settings. Picks were made
     // from each clip's length, envelope and pitch contour; swap any slot in the
     // SoundLibrary inspector if a different take fits better.
     public static class AudioSetup
     {
         private const string SfxFolder = "Assets/Casual Game Sounds U6/CasualGameSounds/";
-        private const string MusicFolder = "Assets/Demonic Dynamic Music pack/Assets/";
         private const string LibraryPath = "Assets/Resources/Audio/SoundLibrary.asset";
 
         [MenuItem("Deadline 4 Sec/Audio/Assign Imported Sounds To Library")]
@@ -34,20 +33,51 @@ namespace Deadline4Sec.Editor
             library.nearMiss = Sfx(34);     // bright swish
             library.timerWarning = Sfx(15); // steady beep
             library.gameOver = Sfx(24);     // descending fail
-            library.coin = Sfx(27);         // bright ding
+            library.coin = SoulClip();      // Soul pickup (2026-10-11: retro coin)
             library.powerUp = Sfx(8);       // rising power-up
             library.uiClick = Sfx(21);      // tight click
-            library.titleMusic = Music("whispers.wav");
-            library.runMusic = Music("demonic level 3 raw.wav");
+            library.titleMusic = MusicAt(MainScreenBgm);
+            library.runMusic = MusicAt(InGameBgm);
             library.sfxVolume = 0.85f;
             library.musicVolume = 0.45f;
             EditorUtility.SetDirty(library);
             AssetDatabase.SaveAssets();
         }
 
-        private static AudioClip Sfx(int number)
+        // Soul pickup sound only; the other slots are left as they are.
+        [MenuItem("Deadline 4 Sec/Audio/Assign Soul Pickup Sound")]
+        public static void AssignSoulSound()
         {
-            string path = SfxFolder + "DM-CGS-" + number.ToString("00") + ".wav";
+            SoundLibrary library = AssetDatabase.LoadAssetAtPath<SoundLibrary>(LibraryPath);
+            if (library == null)
+                throw new System.InvalidOperationException(LibraryPath + " is missing.");
+            library.coin = SoulClip();
+            EditorUtility.SetDirty(library);
+            AssetDatabase.SaveAssets();
+        }
+
+        // Title and in-game music (2026-10-11: Sound/BGM).
+        private const string MainScreenBgm = "Assets/Sound/BGM/BGM_MainScreen.mp3";
+        private const string InGameBgm = "Assets/Sound/BGM/BGM_InGame.mp3";
+
+        [MenuItem("Deadline 4 Sec/Audio/Assign BGM")]
+        public static void AssignBgm()
+        {
+            SoundLibrary library = AssetDatabase.LoadAssetAtPath<SoundLibrary>(LibraryPath);
+            if (library == null)
+                throw new System.InvalidOperationException(LibraryPath + " is missing.");
+            library.titleMusic = MusicAt(MainScreenBgm);
+            library.runMusic = MusicAt(InGameBgm);
+            EditorUtility.SetDirty(library);
+            AssetDatabase.SaveAssets();
+        }
+
+        private static AudioClip SoulClip() => Sfx("Assets/Sound/SFX/driken5482-retro-coin-4-236671.mp3");
+
+        private static AudioClip Sfx(int number) => Sfx(SfxFolder + "DM-CGS-" + number.ToString("00") + ".wav");
+
+        private static AudioClip Sfx(string path)
+        {
             AudioImporter importer = AssetImporter.GetAtPath(path) as AudioImporter;
             if (importer != null)
             {
@@ -64,9 +94,8 @@ namespace Deadline4Sec.Editor
             return AssetDatabase.LoadAssetAtPath<AudioClip>(path);
         }
 
-        private static AudioClip Music(string file)
+        private static AudioClip MusicAt(string path)
         {
-            string path = MusicFolder + file;
             AudioImporter importer = AssetImporter.GetAtPath(path) as AudioImporter;
             if (importer != null)
             {

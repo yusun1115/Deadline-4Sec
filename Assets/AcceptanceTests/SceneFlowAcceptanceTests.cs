@@ -302,12 +302,13 @@ namespace Deadline4Sec.AcceptanceTests
             Assert.IsNotNull(font);
             Font source = (Font)fontType.GetProperty("sourceFontFile").GetValue(font);
             Assert.AreEqual("GFCRedSpirit-Bold", source.name);
-            // 2026-10-04 request: in-game number labels (marked NumericLabel) use
-            // CallifontSharpie-Bold; every other text stays GFCRedSpirit-Bold.
-            UnityEngine.Object numberFont = Resources.Load("Fonts/CallifontSharpie-Bold SDF", fontType);
+            // In-game number labels (marked NumericLabel) use HiKR-ExtraBold
+            // (2026-10-11; CallifontSharpie-Bold from 2026-10-04); every other
+            // text stays GFCRedSpirit-Bold.
+            UnityEngine.Object numberFont = Resources.Load("Fonts/HiKR-ExtraBold SDF", fontType);
             Assert.IsNotNull(numberFont);
             Font numberSource = (Font)fontType.GetProperty("sourceFontFile").GetValue(numberFont);
-            Assert.AreEqual("CallifontSharpie-Bold", numberSource.name);
+            Assert.AreEqual("HiKR-ExtraBold", numberSource.name);
             Type numericType = Type.GetType("Deadline4Sec.NumericLabel, Assembly-CSharp");
             Type textType = Type.GetType("TMPro.TMP_Text, Unity.TextMeshPro");
             foreach (UnityEngine.Object label in UnityEngine.Object.FindObjectsByType(textType,

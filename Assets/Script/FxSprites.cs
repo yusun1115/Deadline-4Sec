@@ -14,6 +14,13 @@ namespace Deadline4Sec
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void ResetCache() => Cache.Clear();
 
+        // Every sprite, so the loading screen can build them before the first run.
+        public static readonly Func<Sprite>[] All =
+        {
+            () => Vignette, () => Frost, () => Glow, () => Ring, () => Shard, () => Crack,
+            () => ChainLink, () => Padlock, () => EdgeGlow, () => Streak,
+        };
+
         public static Sprite Vignette => Get("fx_vignette", 256, 256, VignetteAlpha);
         public static Sprite Frost => Get("fx_frost", 256, 256, FrostAlpha);
         public static Sprite Glow => Get("fx_glow", 128, 128, GlowAlpha);

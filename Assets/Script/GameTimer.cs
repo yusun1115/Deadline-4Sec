@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Globalization;
 using UnityEngine;
 using UnityEngine.UI;
@@ -33,8 +33,32 @@ namespace Deadline4Sec
         public bool IsGameOver => isGameOver;
         public bool IsRunning => isRunning && !isGameOver;
         public event Action<float> TimerReset;
-        // Presentation only: the run ended on a hazard rather than at 0 seconds.
-        public bool EndedByContact { get; private set; }
+        public enum DeathReason { TimerExpired, Collision }
+
+        // Presentation only: why the last run ended (collision vs. reaching 0 s).
+        public DeathReason LastDeathReason { get; private set; }
+
+        // Classic Mode: the run is live (IsRunning) but the 4-second rule is off —
+        // no countdown, reset, warning, Time Heart or timeout, and no timer HUD.
+        public bool IsUntimed => untimed;
+        private bool untimed;
+
+        public void SetUntimed(bool value)
+        {
+            untimed = value;
+            if (timeText != null)
+            {
+                timeText.gameObject.SetActive(!value);
+                Transform frame = timeText.transform.parent != null ? timeText.transform.parent.Find("TimerFrame") : null;
+                if (frame != null)
+                    frame.gameObject.SetActive(!value);
+            }
+            if (value)
+            {
+                maximumTime = BaseDuration;
+                remainingTime = BaseDuration;
+            }
+        }
 
         private void Awake()
         {
@@ -49,14 +73,15 @@ namespace Deadline4Sec
                 RectTransform rect = timeText.rectTransform;
                 rect.anchorMin = rect.anchorMax = new Vector2(0.5f, 1f);
                 rect.pivot = new Vector2(0.5f, 1f);
-                // Callifont digits sit high in their line box; -33 centres them in the frame.
-                rect.anchoredPosition = new Vector2(0f, -33f);
+                // Places the number font's digits in the middle of the frame
+                // (-24, was -33: HiKR-ExtraBold sat ~9 units low — 2026-10-11).
+                rect.anchoredPosition = new Vector2(0f, -24f);
                 rect.sizeDelta = new Vector2(260f, 140f);
                 timeText.fontSize = 76;
                 timeText.resizeTextForBestFit = true;
                 timeText.resizeTextMinSize = 42;
                 timeText.resizeTextMaxSize = 76;
-                timeText.fontStyle = FontStyle.Normal;
+                // Font and slant come from GameFont (number font, italic).
                 timeText.alignment = TextAnchor.MiddleCenter;
                 timeText.raycastTarget = false;
             }
@@ -72,7 +97,7 @@ namespace Deadline4Sec
 
         private void Tick(float deltaTime)
         {
-            if (!IsRunning || Time.frameCount == runStartedFrame)
+            if (!IsRunning || untimed || Time.frameCount == runStartedFrame)
                 return;
 
             PowerUpManager powerUps = GetComponent<PowerUpManager>();
@@ -101,7 +126,7 @@ namespace Deadline4Sec
             remainingTime = maximumTime;
             warningPlayed = false;
             isRunning = true;
-            EndedByContact = false;
+            LastDeathReason = DeathReason.TimerExpired;
             runStartedFrame = Time.frameCount;
             UpdateTimeText();
         }
@@ -109,7 +134,7 @@ namespace Deadline4Sec
         // Enemy kills and near misses reset only an active run.
         public void ResetTimer()
         {
-            if (!IsRunning)
+            if (!IsRunning || untimed)
                 return;
 
             float previous = remainingTime;
@@ -121,6 +146,9 @@ namespace Deadline4Sec
 
         public void BeginPractice()
         {
+            // The tutorial always teaches the 4-second rule.
+            if (untimed)
+                SetUntimed(false);
             isGameOver = false;
             isRunning = false;
             if (gameOverText != null)
@@ -130,6 +158,8 @@ namespace Deadline4Sec
 
         public void SetTemporaryMaximum(float seconds, bool refill)
         {
+            if (untimed)
+                return;
             maximumTime = Mathf.Max(BaseDuration, seconds);
             remainingTime = refill ? maximumTime : Mathf.Min(remainingTime, maximumTime);
             warningPlayed = false;
@@ -147,7 +177,7 @@ namespace Deadline4Sec
         {
             isGameOver = false;
             isRunning = true;
-            EndedByContact = false;
+            LastDeathReason = DeathReason.TimerExpired;
             maximumTime = BaseDuration;
             remainingTime = BaseDuration;
             warningPlayed = false;
@@ -166,7 +196,7 @@ namespace Deadline4Sec
             RunInventory inventory = GetComponent<RunInventory>();
             if (inventory != null && inventory.AbsorbFatalContact(source))
                 return;
-            EndedByContact = true;
+            LastDeathReason = DeathReason.Collision;
             TriggerGameOver();
         }
 

@@ -13,9 +13,11 @@ namespace Deadline4Sec
     //   Last second — from 1.5 s left: dark red edge pulse and vignette, the timer
     //                growing and pulsing harder, a red glow at ≤1 s, ticks and
     //                heartbeats that speed up toward zero.
-    //   Death      — impact flash, one hard camera shake, a brief freeze into slow
-    //                motion, colours draining, a heavy low impact. A collision gets
-    //                the full hit; running out of time gets a softer version.
+    //   Death      — collision: white-pink impact flash, one hard camera shake, a
+    //                0.08 s hit stop into slow motion, a heavy low impact.
+    //                Timer expiry: no flash or shake; the 0.00 timer punches and
+    //                glows red, the world winds down, a low power-down thud.
+    //                Both drain the colours (GameTimer.LastDeathReason decides).
     // Presentation only: reads game state and never changes rules.
     [DefaultExecutionOrder(300)] // after the camera rig has posed the camera
     public sealed class MomentFx : MonoBehaviour
@@ -333,10 +335,11 @@ namespace Deadline4Sec
                 rect.position = timerFrame.TransformPoint(timerFrame.rect.center);
                 rect.sizeDelta = new Vector2(timerFrame.rect.width * 1.25f, timerFrame.rect.height * 2.2f) *
                                  (1f + 0.15f * beat);
-                Alpha(timerGlow, (critical ? 0.55f : 0.2f) * pressure + 0.3f * beat * pressure);
+                float expired = dying && !deathByContact ? Mathf.Clamp01(1f - (now - deathStart - 0.2f) / 0.3f) : 0f;
+                Alpha(timerGlow, Mathf.Max((critical ? 0.55f : 0.2f) * pressure + 0.3f * beat * pressure, 0.9f * expired));
             }
             if (juice != null)
-                juice.MomentTimerPop = pressure * 0.22f + pressure * 0.16f * beat + NearBounce(now);
+                juice.MomentTimerPop = pressure * 0.22f + pressure * 0.16f * beat + NearBounce(now) + TimerDeathPop(now);
         }
 
         // ---------------- death ----------------
@@ -345,14 +348,19 @@ namespace Deadline4Sec
         {
             dying = true;
             deathStart = now;
-            deathByContact = timer != null && timer.EndedByContact;
+            deathByContact = timer != null && timer.LastDeathReason == GameTimer.DeathReason.Collision;
             Vector2 random = Random.insideUnitCircle.normalized;
             shakeDirection = new Vector3(random.x, random.y * 0.6f, 0f);
+            // Collision: a hard hit. Timer expiry: a low power-down thud.
             Play(library != null ? library.deathImpact : null, "DeathImpact",
-                deathByContact ? 1f : 0.6f, deathByContact ? 1f : 1.15f);
+                deathByContact ? 1f : 0.55f, deathByContact ? 1f : 0.7f);
             if (deathFlash != null)
-                deathFlash.color = deathByContact ? new Color(1f, 0.97f, 0.95f, 0f) : new Color(1f, 0.15f, 0.2f, 0f);
+                deathFlash.color = new Color(1f, 0.86f, 0.93f, 0f); // white-pink impact
         }
+
+        // Timer expiry: the frozen 0.00 punches twice while the HUD holds.
+        private float TimerDeathPop(float now) =>
+            dying && !deathByContact ? 0.45f * Kick(now - deathStart) + 0.3f * Kick(now - deathStart - 0.22f) : 0f;
 
         private void UpdateDeath(float now, float dt)
         {
@@ -368,23 +376,31 @@ namespace Deadline4Sec
 
             float t = now - deathStart;
 
-            // Impact flash
-            Alpha(deathFlash, dying && t < 0.2f ? (1f - t / 0.2f) * (deathByContact ? 0.9f : 0.55f) : 0f);
-
-            // One hard shake, decaying fast.
-            if (dying && t < 0.45f && Camera.main != null)
+            // Collision only: a short impact flash and one hard shake.
+            Alpha(deathFlash, dying && deathByContact && t < 0.1f ? (1f - t / 0.1f) * 0.85f : 0f);
+            if (dying && deathByContact && t < 0.45f && Camera.main != null)
             {
-                float amount = (deathByContact ? 0.45f : 0.15f) * Mathf.Exp(-t * 9f);
+                float amount = 0.45f * Mathf.Exp(-t * 9f);
                 float wobble = Mathf.Sin(t * 70f);
                 Vector3 jitter = new Vector3(Mathf.PerlinNoise(t * 40f, 1.3f) - 0.5f, Mathf.PerlinNoise(2.7f, t * 40f) - 0.5f, 0f);
                 Camera.main.transform.localPosition += (shakeDirection * wobble + jitter) * amount;
             }
 
-            // Freeze, then slow motion easing back to normal speed.
-            if (dying && t < 0.6f && flow.State == GameFlowManager.GameState.Dying)
+            // Collision: hit stop, then slow motion easing back to normal speed.
+            // Timer expiry: no freeze; the world winds down like it is powering off.
+            if (dying && t < 0.7f && flow.State == GameFlowManager.GameState.Dying)
             {
-                float freeze = deathByContact ? 0.1f : 0.04f;
-                Time.timeScale = t < freeze ? 0f : Mathf.Lerp(0.2f, 1f, Mathf.SmoothStep(0f, 1f, (t - freeze) / (0.6f - freeze)));
+                if (deathByContact)
+                {
+                    const float hitStop = 0.08f;
+                    Time.timeScale = t < hitStop ? 0f
+                        : Mathf.Lerp(0.2f, 1f, Mathf.SmoothStep(0f, 1f, (t - hitStop) / (0.6f - hitStop)));
+                }
+                else
+                {
+                    Time.timeScale = t < 0.45f ? Mathf.Lerp(1f, 0.25f, t / 0.45f)
+                        : Mathf.Lerp(0.25f, 1f, (t - 0.45f) / 0.25f);
+                }
                 managingTimeScale = true;
             }
             else if (managingTimeScale)

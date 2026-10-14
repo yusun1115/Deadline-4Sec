@@ -6,7 +6,7 @@ using DG.Tweening;
 
 namespace Deadline4Sec
 {
-    // Title ??run transition (2026-10-04 request): the moment a run starts the
+    // Title -> run transition (2026-10-04 request): the moment a run starts the
     // title buttons vanish, the logo and top frame fly up off-screen and the
     // bottom frame drops away. The saved TitlePanel is still hidden at once as
     // before (flow tests and the Inspector-edited layout rely on that); stand-in

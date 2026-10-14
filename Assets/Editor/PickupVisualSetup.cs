@@ -43,6 +43,7 @@ namespace Deadline4Sec.Editor
 
             AddFloat(PickupFolder + "Coin.prefab", null, 0.1f);
             AddCoinGlow();
+            UseSoulModel();
             UseGiftChest();
             AddFloat(PickupFolder + "GiftBox.prefab", null, 0.15f);
             foreach (var p in PowerUps)
@@ -52,6 +53,85 @@ namespace Deadline4Sec.Editor
                     Glow(orb, p.glow * 0.5f, p.glow * 1.3f);
                 Sprite icon = AssetDatabase.LoadAssetAtPath<Sprite>(IconFolder + p.icon + ".png");
                 AddFloat(PickupFolder + p.prefab + ".prefab", icon, 0.15f);
+            }
+            AssetDatabase.SaveAssets();
+        }
+
+        // Power-up pickups only (icon size, billboard, orb hidden); coins and
+        // the gift chest are left as they are.
+        [MenuItem("Deadline 4 Sec/Art/Apply Power-Up Pickup Icons")]
+        public static void ApplyPowerUpIcons()
+        {
+            foreach (var p in PowerUps)
+            {
+                Sprite icon = AssetDatabase.LoadAssetAtPath<Sprite>(IconFolder + p.icon + ".png");
+                AddFloat(PickupFolder + p.prefab + ".prefab", icon, 0.15f);
+            }
+            AssetDatabase.SaveAssets();
+        }
+
+        // The coin pickup shows the Soul model (2026-10-11; in-game the currency
+        // is called Soul). The prefab keeps its name, trigger and CoinPickup so
+        // patterns and saves are untouched: the old disc "Visual" is hidden and
+        // a "SoulModel" (Assets/Art/3DModel/Props/Soul.fbx) sits under the bob
+        // pivot, centred on the trigger, with a pale-blue halo behind it.
+        private const string SoulModelPath = "Assets/Art/3DModel/Props/Soul.fbx";
+        private const float SoulHeight = 1.15f;
+        private static readonly Color SoulGlowColor = new Color(0.45f, 0.8f, 1f, 0.5f);
+
+        [MenuItem("Deadline 4 Sec/Art/Apply Soul Pickup Model")]
+        public static void UseSoulModel()
+        {
+            GameObject model = AssetDatabase.LoadAssetAtPath<GameObject>(SoulModelPath);
+            if (model == null)
+                throw new System.InvalidOperationException(SoulModelPath + " is missing.");
+            Texture baseMap = AssetDatabase.LoadAssetAtPath<Texture>("Assets/Art/3DModel/Texture/soul_basecolor.JPEG");
+            const string matPath = "Assets/Art/Materials/PowerUps/Soul.mat";
+            Material mat = AssetDatabase.LoadAssetAtPath<Material>(matPath);
+            if (mat == null)
+            {
+                mat = new Material(Shader.Find("Universal Render Pipeline/Unlit"));
+                AssetDatabase.CreateAsset(mat, matPath);
+            }
+            mat.SetTexture("_BaseMap", baseMap);
+            mat.SetColor("_BaseColor", Color.white);
+            EditorUtility.SetDirty(mat);
+
+            string prefabPath = PickupFolder + "Coin.prefab";
+            GameObject root = PrefabUtility.LoadPrefabContents(prefabPath);
+            try
+            {
+                Transform pivot = root.transform.Find("FloatPivot") ?? root.transform;
+                Transform disc = pivot.Find("Visual");
+                if (disc != null && disc.TryGetComponent(out Renderer discRenderer))
+                    discRenderer.enabled = false;
+                Transform existing = pivot.Find("SoulModel");
+                if (existing != null)
+                    Object.DestroyImmediate(existing.gameObject);
+                GameObject soul = (GameObject)PrefabUtility.InstantiatePrefab(model);
+                soul.name = "SoulModel";
+                soul.transform.SetParent(pivot, false);
+                foreach (Renderer r in soul.GetComponentsInChildren<Renderer>(true))
+                {
+                    r.sharedMaterial = mat;
+                    r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+                    r.receiveShadows = false;
+                }
+                // Size and centre from the model's own bounds (pivot is at its feet).
+                soul.transform.localPosition = Vector3.zero;
+                soul.transform.localScale = Vector3.one;
+                Bounds bounds = soul.GetComponentInChildren<Renderer>().bounds;
+                float scale = SoulHeight / Mathf.Max(0.01f, bounds.size.y);
+                soul.transform.localScale = Vector3.one * scale;
+                soul.transform.localPosition = -(bounds.center - soul.transform.position) * scale;
+                Transform glow = pivot.Find("Glow");
+                if (glow != null && glow.TryGetComponent(out SpriteRenderer glowRenderer))
+                    glowRenderer.color = SoulGlowColor;
+                PrefabUtility.SaveAsPrefabAsset(root, prefabPath);
+            }
+            finally
+            {
+                PrefabUtility.UnloadPrefabContents(root);
             }
             AssetDatabase.SaveAssets();
         }
@@ -86,7 +166,7 @@ namespace Deadline4Sec.Editor
                 }
                 sr.sprite = quad;
                 sr.sharedMaterial = glow;
-                sr.color = new Color(1f, 0.62f, 0.15f, 0.55f);
+                sr.color = SoulGlowColor;
                 float size = quad != null ? Mathf.Max(quad.bounds.size.x, quad.bounds.size.y) : 1f;
                 sr.transform.localScale = Vector3.one * (CoinGlowSize / Mathf.Max(0.01f, size));
                 Transform coinVisual = pivot.Find("Visual");
@@ -252,9 +332,14 @@ namespace Deadline4Sec.Editor
                     sr.transform.localPosition = Vector3.zero;
                     sr.sortingOrder = 5;
                     billboard = sr.transform;
-                    // The orb becomes a glowing shell around the icon.
+                    // Only the 2D icon shows (2026-10-11): the 3D orb overlapped it.
+                    // The orb object stays for its size; its renderer is off.
                     if (visual != null)
+                    {
                         visual.localScale = Vector3.one * PowerUpOrbSize;
+                        if (visual.TryGetComponent(out Renderer orbRenderer))
+                            orbRenderer.enabled = false;
+                    }
                     SetTriggerRadius(root, 0.8f);
                 }
                 PickupFloat floater = (root.TryGetComponent(out PickupFloat existingPickupFloat) ? existingPickupFloat : root.AddComponent<PickupFloat>());

@@ -9,16 +9,23 @@
 | Art/1–3, Run All Reaper Setup Steps | Mixamo 애니메이션 Humanoid 변환 → `Reaper.controller` 생성 → 세 씬의 Player에 Reaper 모델 장착 |
 | Art/Apply Gothic Environment To Gameplay Scenes | 철로 바닥 셰이더, 밤하늘, 안개, 조명, 후처리, 배경 실루엣(`Environment`) |
 | Art/Apply Gothic UI Skin To Scenes | 고딕 버튼·패널·타이머 프레임 스킨, HUD 배치 |
-| Art/Polish Pickup Visuals | 발광 코인·선물상자, 아이콘이 보이는 파워업 구슬, 떠다니는 움직임. 크기(2026-10-02 확대): 아이콘 1.55m, 코인 지름 1m, 상자 1.6배, 획득 반경도 함께 키움. 다시 실행해도 크기가 누적되지 않음 |
+| Art/Polish Pickup Visuals | 발광 코인·선물상자, 아이콘이 보이는 파워업 구슬, 떠다니는 움직임. 크기(2026-10-02 확대): 아이콘 1.55m, 코인 지름 1m, 상자 1.6배, 획득 반경도 함께 키움. 다시 실행해도 크기가 누적되지 않음. 2026-10-11: 파워업은 2D 아이콘만 보이고 3D 구슬(`Visual`) 렌더러는 꺼짐 — 파워업만 다시 적용하려면 `Art/Apply Power-Up Pickup Icons` |
 | Art/Convert Tripo GLBs In TripoRaw | `/TripoRaw/*.glb`를 1.2만 폴리곤 + 버텍스 컬러 프리팹으로 변환 (Reconvert = 덮어쓰기) |
 | Art/Apply Enemy Visuals | 적 프리팹에 `EnemyVisual` 연결 (Tripo 프리팹이 있으면 사용, 없으면 절차적 외형) |
 | Art/Apply Obstacle Visuals | 장애물 프리팹에 `ObstacleVisual` 연결 (모델을 판정 박스에 맞춰 늘림, 없으면 고딕 석재) |
 | UI/Apply Title, Upgrade And Skin Layout | 타이틀(정면 클로즈업, 왼쪽 위 설정, 하단 SKIN/UPGRADE, 코인 숨김), 업그레이드(아이템·소비템만), 스킨 화면(왼쪽 캐릭터, 오른쪽 낫 카드) 배치. 아이콘은 `UI/AI/ai_*.png`가 있으면 우선 사용 |
 | Art/Draw Menu Icons / Cut White Background From AI Icons | 메뉴 아이콘 SDF 생성 / OpenRouter 아이콘의 흰 배경 제거 |
 | Course/Build Extended Pattern Library | 신규 패턴 12종 + 세트피스(시계탑 게이트, 고딕 아치, 화물칸 1·2량)를 생성하고 세 씬의 PatternSpawner에 등록. 다시 실행하면 같은 이름의 패턴을 덮어씀 |
+| UI/Apply Mode Select | (2026-10-11 개편) 타이틀의 예전 `< DEADLINE >` 선택기를 지우고 전체화면 팝업 `TitlePanel/ModeSelectPopup`(비활성) 생성: 왼쪽 클래식·오른쪽 데드라인 아트(`Art/2D/ModeSelect_*.png`) + 데코 라인, 하단 패널(모드 이름 흰색 / 태그라인 핑크 / 설명) + SELECT 버튼. On Click: `ModeSelect_Btn` → `ModeSelectUI.Open`, 각 아트 → `ChooseClassic/ChooseDeadline`, SELECT → `Confirm`(모드 적용 후 타이틀로). 선택 안 된 쪽은 `UIGrayscale` 셰이더로 흑백+어둡게. 데드라인 아트의 터치 영역은 `ModeSplitHitArea`(대각선 경계 topX/bottomX)로 잘라 왼쪽 터치는 클래식으로 감. 문구는 ModeSelectUI 인스펙터에서 편집. 세 씬 적용(`ModeSelect_Btn`은 EndlessRun에만 있음) |
+| Course/Build Train Patterns | 서브웨이 서퍼 스타일 전철: `Train`(멈춰있는 전철, 2.2×2.8×14m, 정면·측면 충돌 즉사, 지붕 착지 안전, 점프로 못 올라감) / `Train Ramp`(앞에 경사로 — 경사로는 Obstacle 밖 형제 오브젝트라 닿아도 안전, 지붕보다 0.15m 높게 끝나 지붕으로 내려섬) + 패턴 R(Easy 전철 사이 통로)·S(Medium 가운데 경사로 전철 + 양옆 전철)·T(Hard 전철 피하고 다른 레인 경사로 전철 오르기) 생성·세 씬 등록. 활성 씬이 저장된 상태에서 실행 |
+| UI/Apply Result Screen Layout | 결과창 정보 계층(큰 SCORE → 거리/콤보/시간 3열 → NEW BEST → PERSONAL BEST → RUN REWARD → MAIN MENU \| RETRY 가로 버튼) + 뒤 어두운 오버레이 + `ResultPresenter` 연결. 기존 오브젝트 이름·참조·On Click 유지, ConfirmButton은 비활성(2026-10-09 OPEN REWARDS 제거 요청 — 상자는 두 버튼 모두 기존 상자 오픈 흐름을 먼저 거침). 세 씬 적용 |
+| UI/Build Loading Scene | `Assets/Scenes/Loading.unity` 생성(키아트 + LOADING... + bg/fill/frame 게이지 + 랜덤 팁) 후 Build Settings 0번에 배치. 다시 실행해도 인스펙터에 적은 팁 목록은 유지 |
 | UI/Apply Number Font To HUD | CallifontSharpie-Bold TMP 에셋 생성(`Resources/Fonts/CallifontSharpie-Bold SDF`) + HUD 숫자 라벨(타이머·점수·거리·코인·선물상자 수)에 `NumericLabel` 부착·크기 보정 |
 | UI/Apply Gift Chest Opening | 선물상자 개봉 화면: 회전 선버스트 배경 + 3D 상자 뷰 + 보상 아이콘. 기존 텍스트/버튼 이름·연결은 유지, 배치만 화면 비율 기준으로 변경 |
 | Audio/Assign Imported Sounds To Library | Casual Game Sounds / Demonic Music을 `SoundLibrary`에 배정, 모바일 임포트 설정 |
+| Art/Apply Soul Pickup Model | (2026-10-11) Coin 프리팹의 외형을 `3DModel/Props/Soul.fbx`로 교체: 기존 원판 `Visual` 렌더러는 끄고 `FloatPivot/SoulModel`(높이 1.15m, 트리거 중앙 정렬, URP Unlit `Materials/PowerUps/Soul.mat`) 추가, 후광은 하늘색. 프리팹 이름·트리거·`CoinPickup`·패턴 배치·저장 키는 그대로. 화면 표기는 Coin → Soul(SOUL MAGNET, `SOUL +300`, 업그레이드 잔액, 스킨 가격, "Soul이 부족합니다!") |
+| Audio/Assign Soul Pickup Sound | Soul 획득음을 `Sound/SFX/driken5482-retro-coin-4-236671`로 지정(SoundLibrary `coin` 슬롯). 0.7초 안에 연속으로 먹으면 한 번마다 반음씩 올라가 최대 12단계(1옥타브)에서 유지, 끊기면 원래 음높이로 — `CameraFeedbackController`의 전용 보이스 3개라 다른 효과음 피치는 안 바뀜 |
+| Audio/Assign BGM | (2026-10-11) 타이틀 음악 = `Sound/BGM/BGM_MainScreen`, 인게임 음악 = `Sound/BGM/BGM_InGame` (SoundLibrary `titleMusic`/`runMusic`, 스트리밍). 전환·페이드·게임오버 덕킹은 기존 `MusicDirector` 그대로 |
 
 ## 새 런타임 컴포넌트
 
@@ -34,8 +41,8 @@
 - `GiftChestPresenter` — GiftOpeningPanel에 부착. y=-500의 전용 무대(레이어 31)에 절차적 보물상자를 만들어 전용 카메라→RenderTexture→`ChestView`로 표시. 닫힘: 흔들림·점프, 탭: 0.4초 떨림 → 뚜껑 열림 + 별 파티클 + 선버스트 섬광 → 보상 아이콘이 솟아오름. 보상 지급은 기존 RunInventory 그대로이며 보상 문자열로 아이콘만 고른다(COIN/SHIELD/DASH/REVIVE/스킨 재화).
 - `TitleOutro` (2026-10-04) — 시작 순간 타이틀 버튼은 즉시 사라지고 Titlelogo·TitleFrame은 위로, TitleFrame (1)은 아래로 InBack 곡선으로 날아감. 저장된 TitlePanel은 기존처럼 바로 비활성화하고 복사본만 움직인 뒤 삭제(테스트·Inspector 배치 보존). Retry 재시작 땐 생략. DOTween이 임포트되면 `Editor/DOTweenDefine`이 `DEADLINE_DOTWEEN` 심볼을 자동 추가해 DOTween으로 재생, 없으면 같은 곡선을 자체 재생. (2026-10-04 DOTween 임포트 완료 → 현재 DOTween 경로 사용. 검증용 복사본은 심볼이 저장된 ProjectSettings로 동기화해야 테스트 도중 재컴파일이 안 일어남.)
 - `TitleShowcaseCamera` 핸드오프 — 타이틀 정면 클로즈업에서 Ready? 측면 카메라로 1.15초 동안 캐릭터 주위를 궤도로 돌며 넘어감(FOV 42→게임 FOV). 시작 프레임 히치에 건너뛰지 않도록 인트로와 같은 0.05초 클램프 시간 사용.
-- `ComboBadge` (2026-10-04) — 오른쪽 아래 붓 터치 위에 등급 단어 + 손글씨 콤보 수. 1–9 Cool!(파랑) / 10–24 Great!(초록) / 25–49 Fantastic!(주황→빨강) / 50+ Unstoppable!(무지개 애니메이션). 기존 `ComboText`는 숨김(RunManager는 그대로 갱신). 붓 이미지는 `Resources/HUD/combo_brush` 스프라이트가 있으면 사용, 없으면 절차 생성.
-- 폰트 규칙 변경(2026-10-04 사용자 요청): `NumericLabel`이 붙은 인게임 숫자 라벨만 CallifontSharpie-Bold, 나머지는 GFCRedSpirit-Bold. `GameFont.Apply`가 마커를 보고 고르며 폰트 테스트도 같은 규칙으로 갱신.
+- `ComboBadge` (2026-10-04) — 오른쪽 아래 붓 터치 위에 등급 단어 + 손글씨 콤보 수. 1–9 Cool!(파랑) / 10–24 Great!(초록) / 25–49 Fantastic!(주황→빨강) / 50+ Unstoppable!(무지개 애니메이션). 크기 0.85배(2026-10-11, 이전 1.25배 — 캐릭터를 가리지 않게). 기존 `ComboText`는 숨김(RunManager는 그대로 갱신). 붓 이미지는 `Resources/HUD/combo_brush` 스프라이트가 있으면 사용, 없으면 절차 생성.
+- 폰트 규칙 변경(2026-10-04, 2026-10-11 갱신): `NumericLabel`이 붙은 인게임 숫자 라벨만 HiKR-ExtraBold + 기울임(이탤릭, 이전엔 CallifontSharpie-Bold), 나머지는 GFCRedSpirit-Bold. `GameFont.Apply`가 마커를 보고 고르며 폰트 테스트도 같은 규칙으로 갱신.
 - `PowerUpFx` (2026-10-05) — 아이템 6종의 획득/지속/종료 연출. PowerUpManager 상태만 읽고 규칙은 건드리지 않음(PowerUpManager 오브젝트에 자동 부착).
   - 빙결 시계: `쩡` + 푸른 플래시 + 타이머에서 얼음 파편 / 타이머 얼음막·결정·하늘색 숫자 + 화면 가장자리 성에 / 남은 0.7초부터 금이 가고 종료 시 `파삭` 파편.
   - 영혼 증폭기: 위로 퍼지는 금색 링 3개 + `x2 SCORE!` / Score·Combo 뒤 금빛 오라, 점수 팝업 1.6배 금색, 처치·니어미스 사운드 피치 +0.18 / 오라 빠른 수축.
@@ -49,10 +56,21 @@
   - Timer 0초 직전: 남은 1.5초부터 화면 가장자리 어두운 붉은 Pulse/Vignette, 타이머 확대 + 점점 빨라지는 맥동, 1초 이하 붉은 발광, 0.42→0.11초 간격 Tick + 격박 Heartbeat. 빙결 중엔 꺼짐. (HudJuice의 기존 1초 이하 맥동을 대체)
   - 충돌 사망: 흰 Impact Flash 0.2초, 강한 1회 Shake, 0.1초 정지 → 0.2배 슬로우 → 0.6초에 정상 속도, 채도·노출 다운(런타임 Volume, 부활/재시작 시 복귀), 강한 Hit + 저음 Impact. 시간 초과 사망은 붉은 플래시·약한 흔들림의 가벼운 버전. 구분은 `GameTimer.EndedByContact`(읽기 전용).
   - 사망 시 HUD는 `deathHudHold`(0.35초) 동안 멈춘 채 남았다가 Death/Revive로 전환(GameFlowManager).
-- 인게임 HUD 배치(2026-10-05, 메뉴 `UI/Apply In-Game HUD Layout`) — 오른쪽 상단에 점수·코인·선물상자 순서의 라운드 알약(`ui_hud_pill.png`, 9-slice) + 작은 코인/상자 아이콘(`icon_gift_small.png` 절차 생성). 라벨은 숫자만 표시(RunManager/UpgradeMenu/GameExtrasUI 문자열 변경), 거리·소모아이템·활성 아이템 목록은 숨김. 타이머 숫자는 프레임 중앙에 오도록 -33. 기존 라벨 이름·경로·참조는 유지하고 알약/아이콘은 형제 오브젝트로 배치.
+- 인게임 HUD 배치(2026-10-05, 메뉴 `UI/Apply In-Game HUD Layout`) — 오른쪽 상단에 점수·코인·선물상자 순서의 라운드 알약(`ui_hud_pill.png`, 9-slice) + 작은 코인/상자 아이콘(`icon_gift_small.png` 절차 생성). 라벨은 숫자만 표시(RunManager/UpgradeMenu/GameExtrasUI 문자열 변경), 거리·소모아이템·활성 아이템 목록은 숨김. 타이머 숫자는 프레임 중앙에 오도록 -24(2026-10-11 HiKR 폰트 기준, 이전 -33). 기존 라벨 이름·경로·참조는 유지하고 알약/아이콘은 형제 오브젝트로 배치.
   - 다시 실행해도 그리기 순서가 알약 → 아이콘 → 라벨로 유지됨(2026-10-05 수정: 재실행 시 알약이 글자를 덮던 문제).
   - 선물상자를 모두 열면 'ALL BOXES OPENED' 확인 창 없이 바로 다음 화면으로 넘어감(GameFlowManager.OpenOrContinueGiftBox).
   - `HudStats`: 선물상자 0개면 알약 숨김 → 첫 상자 획득 시 오른쪽에서 슬라이드 인. 획득 위치에서 상자 아이콘이 곡선으로 날아가 도착할 때 카운트 +1(펀치 + 짧은 효과음). 코인 아이콘 펀치. 상자 획득 이벤트는 `GiftBoxPickup.Collected`.
+- `LoadingScreen` (2026-10-09) — 첫 실행 로딩. 게이지는 실제 작업에 연동: 0–15% 합성 사운드·이펙트 스프라이트·폰트 미리 생성, 15–75% EndlessRun 비동기 로드(additive), 75–95% 활성화(Awake), 95–100% 첫 프레임(Start) 후 0.25초 페이드아웃하고 로딩 씬 언로드. 게이지는 실제 진행도 이하로만 부드럽게 따라감(`barSpeed`). 팁은 `LoadingCanvas`의 LoadingScreen › Tips에서 편집, 실행마다 랜덤. 로딩 카메라는 MainCamera 태그 없음(게임 씬 스크립트가 자기 카메라를 찾도록).
+- `ResultPresenter` (2026-10-09, gameover.md) — 결과창 연출 전용. 오버레이(검정 0.6) + 프레임 팝(0.85→1.03→1.00, `resultAppearDuration` 0.23s / `resultOvershootScale`) → GAME OVER → 점수 카운트업(`scoreCountDuration` 0.65s, ease-out, 틱 사운드) → 3열 기록 → NEW BEST(카운트 끝난 뒤, 기록 갱신 시에만 팝+사운드) → 개인 최고 → 보상 → 버튼 순. 약 1.4초에 버튼 활성(그 전엔 터치 막힘), 화면 탭 시 즉시 최종 상태. 버튼은 상자 유무와 무관하게 MAIN MENU | RETRY. 화면이 짧으면 프레임 자동 축소. 사운드 훅 4개(open/scoreTick/newBest/button) — 비우면 임시 합성음/무음.
+  - GameFlowManager는 값만 채우고(라벨 문구 제거) `Prepare/Play` 호출. 기록 저장·보상·흐름 로직은 그대로.
+  - 사망 원인: `GameTimer.LastDeathReason`(Collision / TimerExpired). 충돌 = 흰분홍 플래시 0.1s + 강한 흔들림 + 0.08s 히트스톱 → 슬로우. 타이머 0 = 플래시·흔들림 없음, 0.00 타이머 두 번 펀치 + 붉은 발광, 세상이 0.25배까지 느려졌다 복귀(전원 꺼지는 느낌). 둘 다 채도·밝기 다운(MomentFx 런타임 Volume).
+- Classic Mode (2026-10-10, ClassicMode.md) — 같은 씬·같은 콘텐츠, 4초 Survival Timer만 끔.
+  - `GameModeState`(GameMode.cs): `CurrentGameMode`(메뉴 선택, 기본 Deadline, 세션 동안 유지·앱 실행/Play마다 Deadline으로 초기화) / `CurrentRunMode`(StartGame에서 고정, 튜토리얼은 항상 Deadline). `IsDeadlineMode/IsClassicMode/IsClassicRun`.
+  - 분기 위치: `GameTimer.SetUntimed`(GameFlowManager.BeginFlow에서 호출) 한 곳이 카운트다운·리셋(처치/Near Miss)·경고·Time Heart·타임아웃·타이머 UI를 모두 끔. `PatternSpawner.ThinOutPickups`가 스폰 시 Freeze Clock/Time Heart 제거(난수는 그대로 소비), `PowerUpManager.Activate` 안전장치.
+  - 기록 키: Deadline = 기존 `Deadline4Sec.BestScore/BestDistance/BestCombo`(기존 저장·PC 영속성 프로브 그대로, 마이그레이션 불필요), Classic = 같은 이름 + `_Classic`. `RecordKeys`.
+  - Result: "DEADLINE SCORE / DEADLINE BEST" 또는 "CLASSIC ..." 캡션, NEW BEST는 해당 모드 기록끼리만 비교.
+  - 향후 연결점: `GameFlowManager.RunFinished`(static event, `RunRecord` — Mode/Score/Distance/BestCombo/RunTime/NewBest) → 리더보드 제출·업적 판정은 여기서 Mode로 분기.
+  - 테스트: `ClassicModeAcceptanceTests` 2개(타이머 없음+점수·사망 유지+타이머 아이템 제외 / 모드별 기록 분리).
 - `ComboBadge` 게이지 — 콤보 타임아웃 남은 비율(`RunManager.ComboTimeLeft01`, 읽기 전용 추가).
 - `Dev/DevAutoPilot` — 에디터 전용 자동 플레이(시각 QA용). 빌드에 포함되지 않음.
 
@@ -62,6 +80,8 @@
 - 화물칸(`Train Wagon`, `Train Wagon Double`)은 폭 8.6m·높이 1m의 Jump 장애물이다. 앞면은 충돌 사망, 지붕은 착지·달리기 안전. 루트가 앞면에 있어 거리 판정이 앞면 기준.
 - 세트피스(시계탑 게이트, 고딕 아치)는 콜라이더 없는 장식이다.
 - 패턴 안 아이템/상자는 후보일 뿐이다: `PatternSpawner`의 `powerUpChance`(0.3)·`giftBoxChance`(0.18)·`maxPowerUpsPerPattern`(1)로 생성 시 남길지 결정한다. 코인은 항상 나온다. 별도 시드 스트림이라 고정 시드의 코스 순서는 그대로다.
+- 전철(2026-10-10): `Obstacle.ObstacleType.RampTrain` 추가(경사로 전철 라벨). 전철의 Near Miss 좌우 여유는 0.35m — 옆 레인을 달리는 것만으로는 Near Miss가 아니고, 정면 직전에 레인을 바꿔 스칠 때만 인정. 리플레이 봇 규칙상 단독 전철은 왼쪽(-1) 레인 또는 좌우 쌍으로, 지붕 위엔 공중 적만, 지붕에서 떨어진 뒤 지상 적은 착지 지점(최고 속도 ~18m) 이후에 배치. Reaper Rush는 지붕도 통과하므로 지붕 위에 두지 않음.
+- 기존 코스 특성 메모: Air로 끝나는 패턴(C·D·J·L·M·O·P) 뒤엔 Air/Any 입장 패턴만 올 수 있어, 한 번 공중 패턴 흐름에 들어가면 지상 패턴(전철 포함)으로 돌아오지 않음. 지상 복귀용 Air→Ground 패턴이 있으면 해결됨(미적용).
 - 배치 규칙(리플레이 봇 기준): 연속 점프 금지(점프 체공 ~8m), 지상 적은 인접 레인으로 ≥5m 간격, 높은 공중 콤보 직후에는 Ground 입장 패턴만.
 
 ## Tripo 사용 기록

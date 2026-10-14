@@ -14,7 +14,7 @@ namespace Deadline4Sec.Editor
     // patterns A–E (ground enemies in adjacent lanes ≥5m apart, obstacles ≥6m).
     // Set pieces are decoration only: no colliders except the train wagons,
     // which are ordinary Jump obstacles (front = hit, roof = safe to run on).
-    public static class PatternLibraryBuilder
+    public static partial class PatternLibraryBuilder
     {
         private const string PatternFolder = "Assets/Prefab/Pattern/";
         private const string DecorFolder = "Assets/Prefab/Decor/";

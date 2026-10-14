@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Deadline4Sec
 {
     // Modal result message for the upgrade screen ("업그레이드에 성공하였습니다!" /
-    // "Coin이 부족합니다!"). Tapping OK or the dim backdrop closes it.
+    // "Soul이 부족합니다!"). Tapping OK or the dim backdrop closes it.
     public sealed class UpgradePopup : MonoBehaviour
     {
         [SerializeField] private TMP_Text messageText;

@@ -16,6 +16,14 @@ namespace Deadline4Sec
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void ResetCache() => Cache.Clear();
 
+        // Every recipe, so the loading screen can build them before the first run.
+        public static readonly string[] All =
+        {
+            "FreezeStart", "FreezeShatter", "AmplifierStart", "RushStart", "RushDrone", "RushSlash",
+            "MagnetHum", "MagnetZip", "ChainLock", "ChainBreak", "Heartbeat", "HeartSurge",
+            "NearChime", "Tick", "DeathImpact",
+        };
+
         public static AudioClip Get(string name)
         {
             if (Cache.TryGetValue(name, out AudioClip clip) && clip != null)

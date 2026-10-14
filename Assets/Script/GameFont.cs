@@ -8,8 +8,8 @@ namespace Deadline4Sec
     public static class GameFont
     {
         public const string ResourcePath = "Fonts/GFCRedSpirit-Bold SDF";
-        // In-game numbers only (labels carrying NumericLabel).
-        public const string NumberResourcePath = "Fonts/CallifontSharpie-Bold SDF";
+        // In-game numbers only (labels carrying NumericLabel), slanted (italic).
+        public const string NumberResourcePath = "Fonts/HiKR-ExtraBold SDF";
         private static TMP_FontAsset fontAsset;
         private static TMP_FontAsset numberAsset;
 
@@ -28,18 +28,21 @@ namespace Deadline4Sec
         {
             if (text == null)
                 return;
-            TMP_FontAsset asset = text.TryGetComponent(out NumericLabel _) ? NumberAsset : Asset;
+            bool number = text.TryGetComponent(out NumericLabel _);
+            TMP_FontAsset asset = number ? NumberAsset : Asset;
             text.font = asset;
             text.fontSharedMaterial = asset.material;
-            text.fontStyle = FontStyles.Normal; // The source TTF is already Bold.
+            // Both TTFs are already heavy; numbers lean forward (italic).
+            text.fontStyle = number ? FontStyles.Italic : FontStyles.Normal;
         }
 
         public static void Apply(Text text)
         {
             if (text == null)
                 return;
-            text.font = (text.TryGetComponent(out NumericLabel _) ? NumberAsset : Asset).sourceFontFile;
-            text.fontStyle = FontStyle.Normal;
+            bool number = text.TryGetComponent(out NumericLabel _);
+            text.font = (number ? NumberAsset : Asset).sourceFontFile;
+            text.fontStyle = number ? FontStyle.Italic : FontStyle.Normal;
         }
     }
 }

@@ -60,7 +60,8 @@ namespace Deadline4Sec
             rect.pivot = new Vector2(1f, 0f);
             rect.anchoredPosition = new Vector2(-18f, 0f);
             rect.sizeDelta = new Vector2(330f, 190f);
-            rect.localScale = Vector3.one * 1.25f;
+            // 0.85 (was 1.25 — 2026-10-11: kept clear of the runner).
+            rect.localScale = Vector3.one * 0.85f;
             ComboBadge badge = go.AddComponent<ComboBadge>();
             badge.Build(run);
             return badge;
@@ -84,10 +85,11 @@ namespace Deadline4Sec
             brush.color = BrushColor;
             brush.raycastTarget = false;
 
-            // Callifont is a light hand-lettered face: big, dilated, thin white rim.
-            count = Label("Count", new Vector2(0.5f, 0f), new Vector2(18f, 56f), new Vector2(240f, 150f), -4f, 150f, true);
+            // HiKR-ExtraBold is already heavy (and italic via GameFont): no extra
+            // dilation, just a white rim so the ink digits read on the brush.
+            count = Label("Count", new Vector2(0.5f, 0f), new Vector2(18f, 56f), new Vector2(240f, 130f), -4f, 110f, true);
             count.color = Ink;
-            count.fontSharedMaterial = Outlined(count.font.material, Color.white, 0.1f, false, 0.3f);
+            count.fontSharedMaterial = Outlined(count.font.material, Color.white, 0.18f, false, 0f);
 
             // Combo timeout gauge along the bottom of the brush; violet and frozen
             // while a Combo Seal holds the combo.

@@ -23,11 +23,26 @@ MonoBehaviour:
   nearMiss: {fileID: 8300000, guid: 881e3f52c86c94f26a60718d35627cd8, type: 3}
   timerWarning: {fileID: 8300000, guid: 0c008ee3ee72a4362a35be25fa5de043, type: 3}
   gameOver: {fileID: 8300000, guid: 657578e4be6b64dbf9b09deada272e55, type: 3}
-  coin: {fileID: 8300000, guid: 5039414d94a6e4e70a5ab9e8833e992a, type: 3}
+  coin: {fileID: 8300000, guid: 9a571c93154119d459d07f71782d8af1, type: 3}
   powerUp: {fileID: 8300000, guid: 4e1ff8faed12a475eba9be0e46072269, type: 3}
+  freezeStart: {fileID: 0}
+  freezeShatter: {fileID: 0}
+  amplifierStart: {fileID: 0}
+  rushStart: {fileID: 0}
+  rushDrone: {fileID: 0}
+  rushSlash: {fileID: 0}
+  magnetHum: {fileID: 0}
+  magnetZip: {fileID: 0}
+  chainLock: {fileID: 0}
+  chainBreak: {fileID: 0}
+  heartbeat: {fileID: 0}
+  heartSurge: {fileID: 0}
+  nearMissChime: {fileID: 0}
+  pressureTick: {fileID: 0}
+  deathImpact: {fileID: 0}
   uiClick: {fileID: 8300000, guid: ffb159a21c8a04135a5616979c828fab, type: 3}
-  titleMusic: {fileID: 8300000, guid: 7ee44152ec6586a479cb2b3a1f3ffd88, type: 3}
-  runMusic: {fileID: 8300000, guid: 6c1eb80ab40520648a11c9c375b859f7, type: 3}
+  titleMusic: {fileID: 8300000, guid: feef1bae0a169f3428a93e6f7b05dc98, type: 3}
+  runMusic: {fileID: 8300000, guid: 8a20811cfd2dc4e4d9c3dee203e10d7b, type: 3}
   sfxVolume: 0.85
   musicVolume: 0.45
   pitchVariation: 0.06

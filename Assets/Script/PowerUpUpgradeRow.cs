@@ -30,7 +30,7 @@ namespace Deadline4Sec
             FindFirstObjectByType<UpgradeMenu>()?.Refresh();
             UpgradePopup popup = FindFirstObjectByType<UpgradePopup>(FindObjectsInactive.Include);
             if (popup != null)
-                popup.Show(upgraded ? "업그레이드에 성공하였습니다!" : "Coin이 부족합니다!", upgraded);
+                popup.Show(upgraded ? "업그레이드에 성공하였습니다!" : "Soul이 부족합니다!", upgraded);
         }
 
         public void Refresh(PowerUpManager manager, CoinWallet wallet)
@@ -77,7 +77,7 @@ namespace Deadline4Sec
                 case PowerUpType.FreezeClock: return "TIMER FREEZE";
                 case PowerUpType.SoulAmplifier: return "SCORE x2";
                 case PowerUpType.ReaperRush: return "REAPER RUSH";
-                case PowerUpType.SoulMagnet: return "COIN MAGNET";
+                case PowerUpType.SoulMagnet: return "SOUL MAGNET";
                 case PowerUpType.ComboSeal: return "COMBO HOLD";
                 default: return "TIME HEART";
             }

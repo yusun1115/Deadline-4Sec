@@ -8,7 +8,8 @@ namespace Deadline4Sec
     {
         public static readonly HashSet<Obstacle> Active = new HashSet<Obstacle>();
         // Labels for arranging test cubes. Avoidance is decided only by collision.
-        public enum ObstacleType { LaneBlocker, JumpObstacle, SlideObstacle }
+        // RampTrain: a tall train with a ramp in front; run up the ramp onto the roof.
+        public enum ObstacleType { LaneBlocker, JumpObstacle, SlideObstacle, RampTrain }
 
         [SerializeField] private ObstacleType obstacleType;
         [Header("Near miss zone (extra space outside the solid collider)")]
@@ -170,7 +171,8 @@ namespace Deadline4Sec
             Gizmos.DrawWireCube(nearZone.center, nearZone.size);
 
             Gizmos.color = obstacleType == ObstacleType.LaneBlocker ? Color.red :
-                obstacleType == ObstacleType.JumpObstacle ? Color.yellow : Color.cyan;
+                obstacleType == ObstacleType.JumpObstacle ? Color.yellow :
+                obstacleType == ObstacleType.RampTrain ? new Color(1f, 0.5f, 0f) : Color.cyan;
             Gizmos.matrix = hazard.transform.localToWorldMatrix;
             Gizmos.DrawWireCube(hazard.center, hazard.size);
             Gizmos.matrix = Matrix4x4.identity;

@@ -49,7 +49,7 @@ namespace Deadline4Sec
             string effect = type == PowerUpType.FreezeClock ? "TIMER FREEZE" :
                 type == PowerUpType.SoulAmplifier ? "SCORE x2" :
                 type == PowerUpType.ReaperRush ? "INVINCIBLE RUSH" :
-                type == PowerUpType.SoulMagnet ? "COIN MAGNET" : "COMBO HOLD";
+                type == PowerUpType.SoulMagnet ? "SOUL MAGNET" : "COMBO HOLD";
             return effect + " / " + Duration(type, level).ToString("0.#") + "s";
         }
 

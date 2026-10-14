@@ -247,7 +247,7 @@ namespace Deadline4Sec.Editor
 
         private static Transform CreateCoinLabel(Transform parent, string name, Vector2 topRightOffset)
         {
-            TMP_Text label = Label(parent, name, "COIN 0", Vector2.zero,
+            TMP_Text label = Label(parent, name, "SOUL 0", Vector2.zero,
                 new Vector2(260, 60), 30);
             RectTransform rect = label.rectTransform;
             rect.anchorMin = rect.anchorMax = Vector2.one;

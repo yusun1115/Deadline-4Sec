@@ -88,12 +88,12 @@ namespace Deadline4Sec
                 opened = false;
         }
 
-        // Reward strings come from RunInventory: "COIN +300", "SHIELD +1", "DASH +1",
+        // Reward strings come from RunInventory: "SOUL +300", "SHIELD +1", "DASH +1",
         // "REVIVECOUPON +1" or "<SkinCurrency> +3" (e.g. "FrostShard +3").
         private Sprite IconFor(string reward, out bool fallback)
         {
             fallback = false;
-            if (reward.StartsWith("COIN")) return coinIcon;
+            if (reward.StartsWith("SOUL")) return coinIcon;
             if (reward.StartsWith("SHIELD")) return shieldIcon;
             if (reward.StartsWith("DASH")) return dashIcon;
             if (reward.StartsWith("REVIVE")) return couponIcon != null ? couponIcon : coinIcon;

@@ -33,7 +33,7 @@ namespace Deadline4Sec
             if (priceText != null)
             {
                 priceText.text = owned ? "OWNED" :
-                    (skin.coinCost > 0 ? skin.coinCost.ToString("N0") + " COIN" : "") +
+                    (skin.coinCost > 0 ? skin.coinCost.ToString("N0") + " SOUL" : "") +
                     (skin.currencyCost > 0 ? "  " + skin.currency + " " +
                         inventory.CurrencyCount(skin.currency) + "/" + skin.currencyCost : "");
                 if (skinIndex == 0)

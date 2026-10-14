@@ -257,8 +257,8 @@ namespace Deadline4Sec
                 Changed?.Invoke();
             }
             return reward.kind == GiftRewardKind.SkinCurrency
-                ? currency == SkinCurrency.None ? "COIN +300" : currency + " +" + amount
-                : reward.kind == GiftRewardKind.Coin ? "COIN +" + amount
+                ? currency == SkinCurrency.None ? "SOUL +300" : currency + " +" + amount
+                : reward.kind == GiftRewardKind.Coin ? "SOUL +" + amount
                 : reward.kind == GiftRewardKind.ReviveCoupon ? "REVIVE COUPON +" + amount
                 : reward.kind.ToString().ToUpperInvariant() + " +" + amount;
         }

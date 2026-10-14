@@ -57,9 +57,6 @@ namespace Deadline4Sec
         [SerializeField, Range(0f, 0.75f)] private float deathHudHold = 0.35f;
         [SerializeField, Min(1f)] private float revivePromptSeconds = 4f;
 
-        private const string BestScoreKey = "Deadline4Sec.BestScore";
-        private const string BestDistanceKey = "Deadline4Sec.BestDistance";
-        private const string BestComboKey = "Deadline4Sec.BestCombo";
         private const string TutorialCompletedKey = "Deadline4Sec.TutorialCompleted";
         private bool gameOverHandled;
         private CameraFeedbackController cameraFeedback;
@@ -78,6 +75,11 @@ namespace Deadline4Sec
         private bool retryAfterBoxes;
 
         public GameState State { get; private set; } = GameState.Title;
+        // The mode this run is played under (locked at StartGame).
+        public GameMode CurrentRunMode => GameModeState.CurrentRunMode;
+        // Raised once per finished run after records are saved — the single hook
+        // for future leaderboard submits and achievements (branch on Mode).
+        public static event Action<RunRecord> RunFinished;
         public bool IsPlaying => State == GameState.Playing ||
             (State == GameState.Tutorial && !skipConfirmationOpen && tutorial != null && tutorial.IsFeedbackActive);
         public bool CanReceiveInput => State == GameState.Playing ||
@@ -190,6 +192,7 @@ namespace Deadline4Sec
             if (powerUps != null)
                 powerUps.ResetRunEffects();
             inventory?.BeginRun();
+            gameTimer.SetUntimed(GameModeState.IsClassicRun);
             gameTimer.BeginRun();
             if (playerController != null)
                 playerController.enabled = true;
@@ -213,6 +216,8 @@ namespace Deadline4Sec
             }
             if (settingsPanel != null)
                 settingsPanel.SetActive(false);
+            // The run keeps the mode chosen on the title (also across Retry reloads).
+            GameModeState.LockRun(GameModeState.CurrentGameMode);
             SetUI(false, true, false);
             StartCoroutine(BeginFlow());
         }
@@ -288,6 +293,7 @@ namespace Deadline4Sec
             }
             if (tutorial == null)
                 tutorial = gameObject.AddComponent<TutorialController>();
+            GameModeState.LockRun(GameMode.Deadline); // the tutorial teaches the 4-second rule
             TitleOutro.Play(titlePanel);
             titlePanel.SetActive(false);
             settingsPanel.SetActive(false);
@@ -480,6 +486,8 @@ namespace Deadline4Sec
             yield return new WaitForSecondsRealtime(resultDelay);
             State = GameState.Result;
             SetUI(false, false, true);
+            if (resultPanel != null && resultPanel.TryGetComponent(out ResultPresenter presenter))
+                presenter.Play();
         }
 
         private void SaveRecordsAndFillResult()
@@ -489,30 +497,40 @@ namespace Deadline4Sec
             int bestCombo = runManager != null ? runManager.BestCombo : 0;
             float runTime = runManager != null ? runManager.CurrentRunTime : 0f;
 
-            int savedScore = PlayerPrefs.GetInt(BestScoreKey, 0);
-            float savedDistance = PlayerPrefs.GetFloat(BestDistanceKey, 0f);
-            int savedCombo = PlayerPrefs.GetInt(BestComboKey, 0);
+            // Records are kept per mode and never compared across modes.
+            GameMode mode = GameModeState.CurrentRunMode;
+            string scoreKey = RecordKeys.BestScore(mode), distanceKey = RecordKeys.BestDistance(mode);
+            string comboKey = RecordKeys.BestCombo(mode);
+            int savedScore = PlayerPrefs.GetInt(scoreKey, 0);
+            float savedDistance = PlayerPrefs.GetFloat(distanceKey, 0f);
+            int savedCombo = PlayerPrefs.GetInt(comboKey, 0);
             bool newBestScore = score > savedScore;
             bool newBestDistance = distance > savedDistance;
 
             if (newBestScore)
-                PlayerPrefs.SetInt(BestScoreKey, score);
+                PlayerPrefs.SetInt(scoreKey, score);
             if (newBestDistance)
-                PlayerPrefs.SetFloat(BestDistanceKey, distance);
+                PlayerPrefs.SetFloat(distanceKey, distance);
             if (bestCombo > savedCombo)
-                PlayerPrefs.SetInt(BestComboKey, bestCombo);
+                PlayerPrefs.SetInt(comboKey, bestCombo);
             PlayerPrefs.Save();
 
             int bestScore = Mathf.Max(savedScore, score);
             float bestDistance = Mathf.Max(savedDistance, distance);
-            SetText(resultScoreText, "SCORE        " + score.ToString("N0", CultureInfo.InvariantCulture));
-            SetText(resultDistanceText, "DISTANCE       " + Mathf.FloorToInt(distance) + "m");
-            SetText(resultBestComboText, "BEST COMBO      x" + bestCombo);
-            SetText(resultSurvivalTimeText, "TIME          " + FormatTime(runTime));
-            SetText(bestScoreText, "BEST SCORE   " + bestScore.ToString("N0", CultureInfo.InvariantCulture));
-            SetText(bestDistanceText, "BEST DISTANCE  " + Mathf.FloorToInt(bestDistance) + "m");
+            // Values only; the captions are separate labels in the result layout.
+            SetText(resultScoreText, score.ToString("N0", CultureInfo.InvariantCulture));
+            SetText(resultDistanceText, Mathf.FloorToInt(distance).ToString("N0", CultureInfo.InvariantCulture) + "m");
+            SetText(resultBestComboText, "x" + bestCombo);
+            SetText(resultSurvivalTimeText, FormatTime(runTime));
+            SetText(bestScoreText, bestScore.ToString("N0", CultureInfo.InvariantCulture));
+            SetText(bestDistanceText, Mathf.FloorToInt(bestDistance).ToString("N0", CultureInfo.InvariantCulture) + "m");
             if (newBestText != null)
                 newBestText.gameObject.SetActive(newBestScore || newBestDistance);
+            // The presenter (if present) counts the score up and reveals NEW BEST afterwards.
+            if (resultPanel != null && resultPanel.TryGetComponent(out ResultPresenter presenter))
+                presenter.Prepare(score, newBestScore || newBestDistance,
+                    wallet != null ? wallet.CurrentRunCoins : 0, inventory != null ? inventory.CurrentRunGiftBoxes : 0, mode);
+            RunFinished?.Invoke(new RunRecord(mode, score, distance, bestCombo, runTime, newBestScore, newBestDistance));
         }
 
         public void Retry()
@@ -699,7 +717,7 @@ namespace Deadline4Sec
 
         private static string FormatTime(float seconds)
         {
-            int wholeSeconds = Mathf.FloorToInt(seconds);
+            int wholeSeconds = Mathf.Max(0, Mathf.FloorToInt(seconds));
             return (wholeSeconds / 60).ToString("00") + ":" + (wholeSeconds % 60).ToString("00");
         }
 

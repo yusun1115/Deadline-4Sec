@@ -58,7 +58,7 @@ namespace Deadline4Sec
                 powerUps = GetComponent<PowerUpManager>();
             if (wallet == null)
                 return;
-            string balance = "COIN " + wallet.TotalCoins.ToString("N0", CultureInfo.InvariantCulture);
+            string balance = "SOUL " + wallet.TotalCoins.ToString("N0", CultureInfo.InvariantCulture);
             if (titleCoinText != null)
                 titleCoinText.text = balance;
             // Upgrade/Skin screens show a coin icon next to the number.

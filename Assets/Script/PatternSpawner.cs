@@ -255,9 +255,14 @@ namespace Deadline4Sec
         private void ThinOutPickups(CoursePattern instance)
         {
             int keptPowerUps = 0;
+            // Classic has no Survival Timer, so Freeze Clock / Time Heart never
+            // spawn (decided once here; the roll still happens so the rest of the
+            // course matches Deadline's).
+            bool classic = GameModeState.IsClassicRun;
             foreach (PowerUpPickup pickup in instance.GetComponentsInChildren<PowerUpPickup>(true))
             {
-                bool keep = keptPowerUps < maxPowerUpsPerPattern && pickupRandom.NextDouble() < powerUpChance;
+                bool keep = keptPowerUps < maxPowerUpsPerPattern && pickupRandom.NextDouble() < powerUpChance &&
+                            !(classic && GameModeState.IsTimerPowerUp(pickup.ItemType));
                 if (keep)
                     keptPowerUps++;
                 else

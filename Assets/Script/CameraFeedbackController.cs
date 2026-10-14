@@ -82,6 +82,14 @@ namespace Deadline4Sec
         private AudioClip gameOverClip;
         private AudioClip uiClip;
         private AudioClip coinClip;
+        // Soul pickups: back-to-back pickups climb a semitone each (2026-10-11),
+        // on their own voices so the climb never bends the other sounds.
+        private const float SoulChainWindow = 0.7f;
+        private const int SoulChainMaxSteps = 12;
+        private readonly AudioSource[] soulVoices = new AudioSource[3];
+        private int soulVoiceIndex;
+        private int soulChain;
+        private float lastSoulTime = -10f;
         private AudioClip jumpClip;
         private AudioClip slideClip;
         private AudioClip fastFallClip;
@@ -304,9 +312,25 @@ namespace Deadline4Sec
 
         public void PlayPickup(bool powerUp)
         {
-            if (CanPlayFeedback())
-                PlaySound(powerUp ? Pick(soundLibrary != null ? soundLibrary.powerUp : null, "Power Up", 880f, 0.16f)
-                    : coinClip);
+            if (!CanPlayFeedback())
+                return;
+            if (powerUp)
+                PlaySound(Pick(soundLibrary != null ? soundLibrary.powerUp : null, "Power Up", 880f, 0.16f));
+            else
+                PlaySoulPickup();
+        }
+
+        private void PlaySoulPickup()
+        {
+            float now = Time.time;
+            soulChain = now - lastSoulTime <= SoulChainWindow ? soulChain + 1 : 0;
+            lastSoulTime = now;
+            AudioSource voice = soulVoices[soulVoiceIndex];
+            soulVoiceIndex = (soulVoiceIndex + 1) % soulVoices.Length;
+            if (!GamePreferences.SoundEnabled || voice == null || coinClip == null)
+                return;
+            voice.pitch = Mathf.Pow(2f, Mathf.Min(soulChain, SoulChainMaxSteps) / 12f);
+            voice.PlayOneShot(coinClip);
         }
 
         public void PlayTimerWarning()
@@ -358,7 +382,15 @@ namespace Deadline4Sec
             warningClip = Pick(l != null ? l.timerWarning : null, "Timer Warning", 260f, 0.18f);
             gameOverClip = Pick(l != null ? l.gameOver : null, "Game Over", 135f, 0.34f);
             uiClip = Pick(l != null ? l.uiClick : null, "UI Click", 560f, 0.045f);
-            coinClip = Pick(l != null ? l.coin : null, "Coin", 1320f, 0.06f);
+            coinClip = Pick(l != null ? l.coin : null, "Soul", 1320f, 0.06f);
+            for (int i = 0; i < soulVoices.Length; i++)
+            {
+                AudioSource voice = gameObject.AddComponent<AudioSource>();
+                voice.playOnAwake = false;
+                voice.spatialBlend = 0f;
+                voice.volume = feedbackAudio.volume;
+                soulVoices[i] = voice;
+            }
         }
 
         // Use the authored clip when present; otherwise a tracked placeholder tone.

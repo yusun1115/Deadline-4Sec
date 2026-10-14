@@ -93,6 +93,9 @@ namespace Deadline4Sec
         {
             if (balance == null || gameTimer == null || !gameTimer.IsRunning)
                 return;
+            // Safety net for Classic: timer items do nothing without a Survival Timer.
+            if (gameTimer.IsUntimed && GameModeState.IsTimerPowerUp(type))
+                return;
             remaining[(int)type] = balance.Duration(type, GetLevel(type));
             if (type == PowerUpType.TimeHeart)
                 gameTimer.SetTemporaryMaximum(balance.TimeHeartMaximum(GetLevel(type)), true);
