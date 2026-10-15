@@ -194,6 +194,7 @@ namespace Deadline4Sec
             inventory?.BeginRun();
             gameTimer.SetUntimed(GameModeState.IsClassicRun);
             gameTimer.BeginRun();
+            PlayerStats.BeginRun(GameModeState.CurrentRunMode);
             if (playerController != null)
                 playerController.enabled = true;
             SetUI(true, true, false);
@@ -395,6 +396,7 @@ namespace Deadline4Sec
 
             gameOverHandled = true;
             State = GameState.Dying;
+            PlayerStats.RecordDeath();
             if (cameraFeedback != null)
             {
                 cameraFeedback.StopAllFeedback();
@@ -447,6 +449,7 @@ namespace Deadline4Sec
         {
             if (State != GameState.RevivePrompt || inventory == null || !inventory.TrySpendCoupon())
                 return;
+            PlayerStats.RecordCouponRevive();
             inventory.Revive();
             extrasUI?.HideRevive();
             playerController?.RestoreDeathPose();

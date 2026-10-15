@@ -83,7 +83,10 @@ namespace Deadline4Sec
             Changed?.Invoke();
         }
 
-        public bool OwnsSkin(int index) => index == 0 ||
+        public bool OwnsSkin(int index) => IsSkinOwned(catalog, index);
+
+        // Index 0 is the free default skin. Shared with achievements.
+        public static bool IsSkinOwned(GameExtrasCatalog catalog, int index) => index == 0 ||
             (catalog != null && index > 0 && index < catalog.Skins.Length &&
              PlayerPrefs.GetInt("SkinOwned_" + catalog.Skins[index].id, 0) != 0);
 
@@ -105,6 +108,7 @@ namespace Deadline4Sec
                     PlayerPrefs.SetInt("Currency_" + skin.currency,
                         CurrencyCount(skin.currency) - skin.currencyCost);
                 PlayerPrefs.SetInt("SkinOwned_" + skin.id, 1);
+                PlayerStats.RecordSkinPurchase();
             }
             PlayerPrefs.SetInt(EquippedSkinKey, index);
             PlayerPrefs.Save();
@@ -129,11 +133,13 @@ namespace Deadline4Sec
                 case ConsumableKind.Shield when ShieldCount > 0 && !shieldActive:
                     PlayerPrefs.SetInt(ShieldCountKey, ShieldCount - 1);
                     shieldActive = true;
+                    PlayerStats.RecordShieldUse();
                     Debug.Log("Shield active");
                     break;
                 case ConsumableKind.Dash when DashCount > 0 && Time.time >= dashUntil:
                     PlayerPrefs.SetInt(DashCountKey, DashCount - 1);
                     dashUntil = Time.time + dashDuration;
+                    PlayerStats.RecordDashUse();
                     Debug.Log("Dash consumable used");
                     break;
                 default:
@@ -167,6 +173,7 @@ namespace Deadline4Sec
             shieldBlockedCollider = source;
             shieldBlockedHazard = hazard;
             shieldContactGraceUntil = Time.time + shieldBreakGraceSeconds;
+            PlayerStats.RecordShieldBlock();
             Debug.Log("Shield break: fatal contact absorbed");
             Changed?.Invoke();
             return true;
@@ -217,6 +224,9 @@ namespace Deadline4Sec
                 PlayerPrefs.SetInt(PendingRewardCurrencyKey, (int)currency);
                 PlayerPrefs.SetInt(PendingRewardAppliedKey, 0);
                 PlayerPrefs.Save();
+                // Counted on the fresh roll only, so a re-applied pending reward
+                // (after a restart) is not a second opening.
+                PlayerStats.RecordGiftBoxOpened();
             }
             return ApplyPendingReward();
         }

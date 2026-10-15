@@ -26,6 +26,9 @@
 | Art/Apply Soul Pickup Model | (2026-10-11) Coin 프리팹의 외형을 `3DModel/Props/Soul.fbx`로 교체: 기존 원판 `Visual` 렌더러는 끄고 `FloatPivot/SoulModel`(높이 1.15m, 트리거 중앙 정렬, URP Unlit `Materials/PowerUps/Soul.mat`) 추가, 후광은 하늘색. 프리팹 이름·트리거·`CoinPickup`·패턴 배치·저장 키는 그대로. 화면 표기는 Coin → Soul(SOUL MAGNET, `SOUL +300`, 업그레이드 잔액, 스킨 가격, "Soul이 부족합니다!") |
 | Audio/Assign Soul Pickup Sound | Soul 획득음을 `Sound/SFX/driken5482-retro-coin-4-236671`로 지정(SoundLibrary `coin` 슬롯). 0.7초 안에 연속으로 먹으면 한 번마다 반음씩 올라가 최대 12단계(1옥타브)에서 유지, 끊기면 원래 음높이로 — `CameraFeedbackController`의 전용 보이스 3개라 다른 효과음 피치는 안 바뀜 |
 | Audio/Assign BGM | (2026-10-11) 타이틀 음악 = `Sound/BGM/BGM_MainScreen`, 인게임 음악 = `Sound/BGM/BGM_InGame` (SoundLibrary `titleMusic`/`runMusic`, 스트리밍). 전환·페이드·게임오버 덕킹은 기존 `MusicDirector` 그대로 |
+| UI/Apply Leaderboard | (2026-10-14) `Resources/GooglePlay/GooglePlaySettings.asset`(없을 때만 생성 — 리더보드 ID 2개 입력) + `TitlePanel/LeaderboardPanel`(비활성: 어두운 배경·BackButton → `Close`, DEADLINE MODE / CLASSIC MODE 버튼 → `OpenDeadline/OpenClassic`, 모드별 로컬 최고점, 상태 문구). 타이틀 `lankingButton` On Click → `LeaderboardPanel.Open`. 세 씬 적용 |
+| UI/Apply Achievements | (2026-10-14) 업적 시스템 씬/에셋 구성: `Resources/Achievements/AchievementCatalog.asset`(없을 때만 기본 28개로 생성, 이후 인스펙터 수정 유지), `Canvas/AchievementPopup`(상단 배너), `TitlePanel/AchievementPanel`(목록, 비활성). `achievementButton` On Click → `AchievementListUI.Open`, BackButton → `Close`. 세 씬 적용 |
+| Debug/Log Achievement Progress · Reset Achievement Save · Reset Player Stats | 개발용(게임 UI에는 없음). 진행도 전체 출력 / 해제 기록 삭제 / 통계 삭제 |
 
 ## 새 런타임 컴포넌트
 
@@ -73,6 +76,34 @@
   - 테스트: `ClassicModeAcceptanceTests` 2개(타이머 없음+점수·사망 유지+타이머 아이템 제외 / 모드별 기록 분리).
 - `ComboBadge` 게이지 — 콤보 타임아웃 남은 비율(`RunManager.ComboTimeLeft01`, 읽기 전용 추가).
 - `Dev/DevAutoPilot` — 에디터 전용 자동 플레이(시각 QA용). 빌드에 포함되지 않음.
+
+## 업적 / 플레이어 통계 (2026-10-14, Achievement.md 1단계)
+
+흐름: 게임플레이 → `PlayerStats`(기록만) → `AchievementManager`(판정·해제·저장·팝업 큐) → `AchievementPopup`. Google Play Games는 아직 연결하지 않음.
+
+- **스크립트(신규, `Assets/Script/Achievements/`)**: `PlayerStats`(정적, Lifetime + `RunStats`), `PlayerStatsRecorder`(기존 이벤트 → PlayerStats, GameFlowManager 오브젝트에 런타임 부착), `AchievementDefinition`(데이터 + enum), `AchievementCatalog`(ScriptableObject, 기본 목록), `AchievementManager`(정적), `AchievementPopup`, `AchievementListUI`, `AchievementRow`. 에디터: `AchievementSetup`. 테스트: `AchievementAcceptanceTests`.
+- **수정(한두 줄 훅만)**: `GameFlowManager`(런 시작 `BeginRun`, 사망, 쿠폰 부활), `PlayerController`(Ground Slam 처치 1마리마다), `RunInventory`(스킨 구매, 실드 사용/방어, 대시 사용, 선물상자 개봉 — 새로 뽑을 때만, 스킨 소유 판정 static 공유), `PowerUpManager`(업그레이드 성공, 레벨 static 공유), `PowerUpPickup`(파워업 획득).
+- **기존 이벤트 재사용**: `PlayerController.EnemyKilled`(Enemy.TryKill 뒤라 1킬 1회), `SlamResolved`, `RunManager.NearMissRecorded`(장애물당 1회), `GameTimer.TimerReset`(리셋 직전 남은 시간 전달 → `LowestTimerBeforeReset`), `CoinWallet` 런 획득량 증가분, `GiftBoxPickup.Collected`, `GameFlowManager.RunFinished`(런 종료).
+- **Run vs Lifetime**: 게임플레이 통계는 `BeginRun`~`EndRun` 사이에서만 집계(튜토리얼·타이틀 제외). 메타(업그레이드·스킨·선물상자 개봉)는 항상 집계. RunStats는 런 시작 시 0.
+- **Global / DeadlineOnly**: DeadlineOnly Counter/OneShot은 Deadline 전용 통계(`TotalDeadlineNearMisses`, `TotalDeadlineTimerResets`)만 읽고 Classic에서는 이 값이 오르지 않음(PlayerStats). DeadlineOnly RunCondition은 Deadline 런 중에만 검사(`AchievementManager.CanProgress`).
+- **Air Combo**: Homing Dash로 공중 적을 처치할 때마다 `Run.AirChain`+1, 플레이어가 땅·지붕에 닿으면(Recorder가 `IsGrounded` 확인) 0. 최고값 `BestAirChain`.
+- **Ground Slam**: 처치 1마리마다 `TotalEnemyKills`/`TotalGroundSlamKills`+1(지상/공중 구분), 착지 1회마다 `TotalGroundSlams`+1, 한 번에 잡은 최대 수 `Run.BestSlamKills`.
+- **진행도 소스**: Soul 업적은 누적 획득량(`TotalCoinsCollected`, 소비해도 안 줄어듦). 스킨·업그레이드 업적은 실제 저장 상태(소유 스킨 수, 아이템 레벨)를 읽어 기존 세이브도 인정. 해제 여부만 따로 저장.
+- **저장 키**: `Stats_<PlayerStat 이름>`(25개) + `Stats_LowestTimerBeforeReset`, `AchievementUnlocked_<ID>`. 통계는 메모리에 쌓고 런 종료·업그레이드·스킨 구매·상자 개봉·업적 해제·앱 일시정지/종료 때 저장.
+- **팝업**: `Canvas/AchievementPopup`(CanvasGroup, 터치 안 받음) → `Body`(Edge, Icon, Header "ACHIEVEMENT UNLOCKED", NameText, DescriptionText). 타이머·점수 알약 아래, 2.6초(카탈로그 `popupSeconds`). 큐는 `AchievementManager`에 있어 동시에 여러 개 해제돼도 하나씩, 씬 재시작에도 유지.
+- **목록**: `TitlePanel/AchievementPanel` — Backdrop, Frame, ListScrollView/Viewport/Content/RowTemplate(StateIcon, NameText, TagText "DEADLINE", DescriptionText, ProgressBar/Fill, ProgressText), HeadingText, CountIcon, CountText, BackButton. 숨김 업적은 해제 전 "???", Counter만 진행 바.
+- **디버그**: 카탈로그 `showAchievementDebugLogs` 켜면 통계 변화 / `Achievement Progress: ID n / m` / `Achievement Unlocked: ID` 로그. 메뉴 `Deadline 4 Sec/Debug/...`로 진행도 출력·초기화.
+- **Google Play 연결 위치**: `AchievementManager.UnlockAchievement` → `ReportToPlatform`(지금은 비어 있음), ID는 정의의 `googlePlayId`.
+- **Daily Quest 재사용**: `PlayerStats.Recorded(stat, amount, mode)` 이벤트와 `PlayerStats.Run` 값.
+- 이름 조정: `ACH_COIN_10000` "코인 사냥꾼" → "소울 사냥꾼", 설명은 Soul 표기(10-11 명칭 변경 반영). 숨김 업적 `ACH_NO_POWERUP_60` 포함.
+
+## 리더보드 / Google Play Games (2026-10-14, leaderboard.md)
+
+- **구조**: `GooglePlayService`(정적, 유일한 Google Play 창구: `Authenticate`, `IsAuthenticated`, `SubmitScore(mode, score)`, `ShowLeaderboard(mode)`, `ReportAchievement(id)`, 모드→ID 매핑 `GetLeaderboardId`). 업적의 `AchievementManager.ReportToPlatform`도 여기로 연결해 인증을 공유.
+- **플러그인**: Google Play Games Plugin 2.3.0 + EDM4U 1.2.182 설치(2026-10-14). Unity 6의 Import Package 창이 이 패키지에서 NullReferenceException(`PackageImportTreeView`, 상위 폴더 항목 누락)으로 멈춰서, 패키지 파일을 .meta(GUID 그대로)와 함께 직접 복사해 설치함(내장된 구버전 `current-build/…2.2.0.unitypackage`만 제외). `GooglePlayGamesDefine`(에디터)이 `Google.Play.Games` 어셈블리가 있으면 Android에 `DEADLINE_GPGS`를 자동 추가 → 실제 API(`PlayGamesPlatform`)는 Android 빌드에서만 컴파일, 에디터는 모의(Mock, 로그만), Windows 빌드는 플러그인 없이 그대로.
+- **ID**: `GooglePlaySettings` 에셋의 `deadlineLeaderboardId`, `classicLeaderboardId`(Play Console 값 또는 GPGSIds 상수 복사). 디버그: `showLeaderboardDebugLogs`, `useMockLeaderboardInEditor`, `simulateSignedOutInEditor`(로그인 실패 흉내).
+- **제출 시점**: `LeaderboardRunSubmitter`(GameFlowManager 오브젝트에 런타임 부착)가 `GameFlowManager.RunFinished`에서 제출 — 부활 제안을 거절/소진한 뒤 로컬 최고 기록 저장 직후 1회만 발생하므로 첫 사망·부활 중간 점수는 안 나감. `hasSubmittedLeaderboardScore`는 다음 런이 진행 중(Ready/Playing/Dying/RevivePrompt)일 때만 해제 → 런당 최대 1회, Retry 시 이전 점수 재제출 없음. 모드는 RunRecord(=CurrentRunMode).
+- **정책**: Google Play 리더보드는 플레이어별 최고점만 유지하므로 매 런 최종 점수를 그대로 제출(로컬 최고와 비교 안 함). 0점 이하는 제출 안 함. 로그인 안 됨/ID 없음/실패는 로그만 남기고 게임 진행에 영향 없음. 로컬 Best 저장과는 서로 독립.
 
 ## 코스 (2026-10-01 확장)
 

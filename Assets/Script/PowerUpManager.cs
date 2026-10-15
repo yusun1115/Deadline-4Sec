@@ -68,7 +68,10 @@ namespace Deadline4Sec
 
         public bool IsActive(PowerUpType type) => remaining[(int)type] > 0f;
         public float Remaining(PowerUpType type) => remaining[(int)type];
-        public int GetLevel(PowerUpType type) =>
+        public int GetLevel(PowerUpType type) => SavedLevel(type);
+
+        // Shared with achievements (Lv.1–7).
+        public static int SavedLevel(PowerUpType type) =>
             Mathf.Clamp(PlayerPrefs.GetInt(LevelKeyPrefix + type, 1), 1, 7);
 
         public bool TryUpgrade(PowerUpType type)
@@ -86,6 +89,7 @@ namespace Deadline4Sec
             }
             PlayerPrefs.SetInt(LevelKeyPrefix + type, level + 1);
             PlayerPrefs.Save();
+            PlayerStats.RecordItemUpgrade();
             return true;
         }
 

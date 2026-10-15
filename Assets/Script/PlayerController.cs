@@ -1182,6 +1182,7 @@ namespace Deadline4Sec
                 if (!enemy.TryKill("Ground Slam Attack"))
                     continue;
                 killedCount++;
+                PlayerStats.RecordGroundSlamKill(enemy.Type == Enemy.EnemyType.Air);
                 if (runManager != null)
                     runManager.RecordGroundSlamKill(enemy);
             }
