@@ -150,11 +150,35 @@ namespace Deadline4Sec.AcceptanceTests
             EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
         }
 
+        // Top of the nearest walkable floor below the runner (not enemies / obstacles).
+        private static float FloorUnder(Component player)
+        {
+            Bounds bounds = player.GetComponent<CharacterController>().bounds;
+            float best = 0f;
+            float bestDistance = float.PositiveInfinity;
+            foreach (RaycastHit hit in Physics.RaycastAll(bounds.center, Vector3.down, 60f, ~0, QueryTriggerInteraction.Ignore))
+            {
+                if (hit.collider.transform.IsChildOf(player.transform) ||
+                    hit.collider.GetComponentInParent(Find("Enemy")) != null ||
+                    hit.collider.GetComponentInParent(Find("Obstacle")) != null)
+                    continue;
+                if (hit.distance < bestDistance)
+                {
+                    bestDistance = hit.distance;
+                    best = hit.point.y;
+                }
+            }
+            return best;
+        }
+
         private static void Drive(Component player, float centerX, float time,
             Dictionary<int, float> actions, HashSet<int> bypassedEnemies, StringBuilder trace)
         {
             Component next = null;
             float nextDistance = float.PositiveInfinity;
+            // Two-level air routes (2026-10-16): only threats on the level the
+            // runner is over count — the floor under it (lower route or deck).
+            float floorY = FloorUnder(player);
             foreach (string type in new[] { "Enemy", "Obstacle" })
             foreach (Component candidate in UnityEngine.Object.FindObjectsByType(Find(type), FindObjectsSortMode.None))
             {
@@ -162,6 +186,13 @@ namespace Deadline4Sec.AcceptanceTests
                     continue;
                 if (bypassedEnemies.Contains(candidate.GetInstanceID()))
                     continue;
+                Collider body = candidate.GetComponent<Collider>();
+                if (body != null)
+                {
+                    bool airEnemy = type == "Enemy" && Read(candidate, "Type").ToString() == "Air";
+                    if (airEnemy ? body.bounds.center.y < floorY : Mathf.Abs(body.bounds.min.y - floorY) > 3f)
+                        continue;
+                }
                 float dz = candidate.transform.position.z - player.transform.position.z;
                 if (dz < -0.8f || dz >= nextDistance)
                     continue;

@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9130a2a41955d6e45afec2a8b8b4101c, type: 3}
+  m_Name: CurrencyShopCatalog
+  m_EditorClassIdentifier: Assembly-CSharp::Deadline4Sec.CurrencyShopCatalog
+  products:
+  - productId: soul_ad_100
+    productType: 0
+    soulAmount: 100
+    bonusSoul: 0
+    displayPrice: FREE
+    iapProductId: 
+    icon: {fileID: 21300000, guid: 4b72679f2e2b28a4f8a4df8f227b29fc, type: 3}
+  - productId: soul_pack_1000
+    productType: 1
+    soulAmount: 1000
+    bonusSoul: 0
+    displayPrice: "\u20A91,100"
+    iapProductId: soul_pack_1000
+    icon: {fileID: 21300000, guid: 4b72679f2e2b28a4f8a4df8f227b29fc, type: 3}
+  - productId: soul_pack_5500
+    productType: 1
+    soulAmount: 5000
+    bonusSoul: 500
+    displayPrice: "\u20A95,500"
+    iapProductId: soul_pack_5500
+    icon: {fileID: 21300000, guid: 2a6558f0fc1b6bf48bbdc3861e9fe60c, type: 3}
+  - productId: soul_pack_12000
+    productType: 1
+    soulAmount: 10000
+    bonusSoul: 2000
+    displayPrice: "\u20A911,000"
+    iapProductId: soul_pack_12000
+    icon: {fileID: 21300000, guid: 6da2845d575fefa4d80e6035d4643444, type: 3}
+  adDailyLimit: 3
+  simulateRewardedAdForTesting: 0
+  simulatedAdSucceeds: 1
+  debugPurchaseInEditor: 1
+  simulatedResponseSeconds: 0.4

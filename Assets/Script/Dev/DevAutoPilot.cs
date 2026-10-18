@@ -35,11 +35,13 @@ namespace Deadline4Sec.Dev
 
             Vector3 p = player.transform.position;
             int lane = player.LaneIndex;
+            // Air routes have two levels: judge everything against the floor below.
+            float floor = FloorUnder();
 
             // Air enemies: jump then home in.
             foreach (Enemy e in FindObjectsByType<Enemy>(FindObjectsSortMode.None))
             {
-                if (e.IsKilled || e.Type != Enemy.EnemyType.Air)
+                if (e.IsKilled || e.Type != Enemy.EnemyType.Air || e.transform.position.y < floor)
                     continue;
                 float dz = e.transform.position.z - p.z;
                 if (dz < 0f || dz > 9f)
@@ -59,7 +61,7 @@ namespace Deadline4Sec.Dev
             // Ground enemies: lane attack from the side; sidestep if dead ahead.
             foreach (Enemy e in FindObjectsByType<Enemy>(FindObjectsSortMode.None))
             {
-                if (e.IsKilled || e.Type != Enemy.EnemyType.Ground)
+                if (e.IsKilled || e.Type != Enemy.EnemyType.Ground || Mathf.Abs(e.transform.position.y - floor) > 3f)
                     continue;
                 float dz = e.transform.position.z - p.z;
                 if (dz < -0.5f || dz > 9f)
@@ -82,6 +84,9 @@ namespace Deadline4Sec.Dev
             foreach (Obstacle o in Obstacle.Active)
             {
                 Bounds b = o.GetComponent<Collider>().bounds;
+                if (Mathf.Abs(b.min.y - floor) > 3f)
+                    continue;
+                b.center -= Vector3.up * floor;
                 float dz = b.min.z - p.z;
                 if (dz < 0f || dz > 4.5f || Mathf.Abs(b.center.x - p.x) > b.extents.x + 0.5f)
                     continue;
@@ -101,6 +106,21 @@ namespace Deadline4Sec.Dev
                     Move(lane <= 0 ? 1 : -1);
                 return;
             }
+        }
+
+        private float FloorUnder()
+        {
+            Bounds bounds = player.GetComponent<CharacterController>().bounds;
+            float best = 0f, bestDistance = float.PositiveInfinity;
+            foreach (RaycastHit hit in Physics.RaycastAll(bounds.center, Vector3.down, 60f, ~0, QueryTriggerInteraction.Ignore))
+            {
+                if (hit.collider.transform.IsChildOf(player.transform) || hit.collider.GetComponentInParent<Enemy>() != null ||
+                    hit.collider.GetComponentInParent<Obstacle>() != null || hit.distance >= bestDistance)
+                    continue;
+                bestDistance = hit.distance;
+                best = hit.point.y;
+            }
+            return best;
         }
 
         private void Move(int direction)

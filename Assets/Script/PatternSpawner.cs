@@ -27,6 +27,17 @@ namespace Deadline4Sec
         [SerializeField] private int fixedSeed = 12345;
         [SerializeField] private bool showDebugLogs;
 
+        // Air Route (2026-10-16): a Ground → Upper entry pattern (air-enemy chain
+        // up to the deck, lower route kept below), 1–2 Upper → Upper runs, then an
+        // Upper → Ground return. It appears only after airRouteStartsAtSeconds and
+        // after a few ordinary patterns, never back to back.
+        [Header("Air Route")]
+        [SerializeField, Min(0f)] private float airRouteStartsAtSeconds = 25f;
+        [SerializeField, Min(1)] private int groundPatternsBetweenAirRoutesMin = 5;
+        [SerializeField, Min(1)] private int groundPatternsBetweenAirRoutesMax = 8;
+        [SerializeField, Min(0)] private int upperPatternsMin = 1;
+        [SerializeField, Min(0)] private int upperPatternsMax = 2;
+
         [Header("Pickup rarity (coins always appear)")]
         [SerializeField, Range(0f, 1f)] private float powerUpChance = 0.3f;
         [SerializeField, Range(0f, 1f)] private float giftBoxChance = 0.18f;
@@ -47,6 +58,12 @@ namespace Deadline4Sec
         private System.Random random;
         // Separate stream so pickup rolls never change which patterns a seed produces.
         private System.Random pickupRandom;
+        // Air route spacing has its own stream too: adding air routes must not
+        // change which ordinary patterns a seed produces before the first one.
+        private System.Random routeRandom;
+        private int patternsSinceAirRoute;
+        private int nextAirRouteGap;
+        private int upperPatternsInRoute;
         private CoursePattern previousPrefab;
         private CoursePattern.PatternCategory previousCategory;
         private int categoryStreak;
@@ -69,6 +86,8 @@ namespace Deadline4Sec
                 gameTimer = FindFirstObjectByType<GameTimer>();
             random = useFixedSeed ? new System.Random(fixedSeed) : new System.Random();
             pickupRandom = useFixedSeed ? new System.Random(fixedSeed + 7919) : new System.Random();
+            routeRandom = useFixedSeed ? new System.Random(fixedSeed + 104729) : new System.Random();
+            nextAirRouteGap = RollAirRouteGap();
             nextStartZ = transform.position.z;
             ApplyExistingFloorMaterials();
         }
@@ -164,9 +183,55 @@ namespace Deadline4Sec
             int maximumDifficulty = currentTime >= hardStartsAtSeconds ? 2 :
                 currentTime >= mediumStartsAtSeconds ? 1 : 0;
 
+            // On the deck: only upper runs or the return, whatever the tier.
+            if (previousPrefab != null && previousPrefab.ExitState == CoursePattern.TravelState.Upper)
+                return ChooseUpperPattern();
+
             CollectCandidates(minimumDifficulty, maximumDifficulty, true);
+            if (arrivalTime >= airRouteStartsAtSeconds && patternsSinceAirRoute >= nextAirRouteGap)
+            {
+                // Due: take an air-route entry when one fits here (else try again next pattern).
+                CoursePattern entry = PickWhere(p => p.IsAirRouteEntry);
+                if (entry != null)
+                    return entry;
+            }
+            candidates.RemoveAll(p => p.IsAirRouteEntry);
             return candidates.Count == 0 ? null : candidates[random.Next(candidates.Count)];
         }
+
+        private CoursePattern PickWhere(Predicate<CoursePattern> match)
+        {
+            List<CoursePattern> matching = candidates.FindAll(match);
+            return matching.Count == 0 ? null : matching[routeRandom.Next(matching.Count)];
+        }
+
+        // Upper runs until upperPatternsMin..Max is reached, then the return.
+        private CoursePattern ChooseUpperPattern()
+        {
+            bool mustReturn = upperPatternsInRoute >= upperPatternsMax;
+            bool mustStay = upperPatternsInRoute < upperPatternsMin;
+            for (int pass = 0; pass < 2; pass++)
+            {
+                candidates.Clear();
+                foreach (CoursePattern prefab in patternPrefabs)
+                {
+                    if (prefab == null || prefab == previousPrefab || prefab.PatternLength <= 0f ||
+                        prefab.EntryState != CoursePattern.TravelState.Upper)
+                        continue;
+                    if ((mustReturn && prefab.IsUpperRun) || (mustStay && prefab.IsUpperReturn))
+                        continue;
+                    if (pass == 0 && !OpportunityGapIsSafe(prefab))
+                        continue;
+                    candidates.Add(prefab);
+                }
+                if (candidates.Count > 0)
+                    return candidates[routeRandom.Next(candidates.Count)];
+            }
+            return null;
+        }
+
+        private int RollAirRouteGap() =>
+            routeRandom.Next(groundPatternsBetweenAirRoutesMin, Mathf.Max(groundPatternsBetweenAirRoutesMin, groundPatternsBetweenAirRoutesMax) + 1);
 
         private void CollectCandidates(int minimumDifficulty, int maximumDifficulty,
             bool avoidCategoryStreak)
@@ -178,6 +243,9 @@ namespace Deadline4Sec
             foreach (CoursePattern prefab in patternPrefabs)
             {
                 if (prefab == null || prefab == previousPrefab || prefab.PatternLength <= 0f)
+                    continue;
+                // Upper patterns only follow the deck (the first pattern included).
+                if (prefab.EntryState == CoursePattern.TravelState.Upper)
                     continue;
                 int difficulty = (int)prefab.Difficulty;
                 if (difficulty < minimumDifficulty || difficulty > maximumDifficulty)
@@ -221,6 +289,9 @@ namespace Deadline4Sec
         private static bool StatesConnect(CoursePattern.TravelState exitState,
             CoursePattern.TravelState entryState)
         {
+            // The deck has to continue: Upper never matches Any.
+            if (exitState == CoursePattern.TravelState.Upper || entryState == CoursePattern.TravelState.Upper)
+                return exitState == entryState;
             return exitState == CoursePattern.TravelState.Any ||
                 entryState == CoursePattern.TravelState.Any || exitState == entryState;
         }
@@ -244,6 +315,16 @@ namespace Deadline4Sec
                 categoryStreak = 1;
             previousCategory = prefab.Category;
             previousPrefab = prefab;
+            if (prefab.IsAirRouteEntry)
+            {
+                upperPatternsInRoute = 0;
+                patternsSinceAirRoute = 0;
+                nextAirRouteGap = RollAirRouteGap();
+            }
+            else if (prefab.IsUpperRun)
+                upperPatternsInRoute++;
+            else if (!prefab.IsUpperReturn)
+                patternsSinceAirRoute++;
 
             if (showDebugLogs)
                 Debug.Log("Spawn Pattern: " + prefab.name + " | " + prefab.Difficulty);
@@ -317,6 +398,8 @@ namespace Deadline4Sec
         private void OnValidate()
         {
             hardStartsAtSeconds = Mathf.Max(mediumStartsAtSeconds, hardStartsAtSeconds);
+            groundPatternsBetweenAirRoutesMax = Mathf.Max(groundPatternsBetweenAirRoutesMin, groundPatternsBetweenAirRoutesMax);
+            upperPatternsMax = Mathf.Max(upperPatternsMin, upperPatternsMax);
         }
 
         private void OnDrawGizmosSelected()

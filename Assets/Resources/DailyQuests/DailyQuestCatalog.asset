@@ -1,0 +1,149 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa59404cbf8ef89488b55a4b4da53292, type: 3}
+  m_Name: DailyQuestCatalog
+  m_EditorClassIdentifier: Assembly-CSharp::Deadline4Sec.DailyQuestCatalog
+  showDailyQuestDebugLogs: 0
+  pool:
+  - id: DQ_KILL_25
+    description: "\uC801 25\uB9C8\uB9AC \uCC98\uCE58\uD558\uAE30"
+    source: 0
+    targetValue: 25
+    rewardType: 0
+    rewardAmount: 350
+    modeRestriction: 0
+  - id: DQ_KILL_50
+    description: "\uC801 50\uB9C8\uB9AC \uCC98\uCE58\uD558\uAE30"
+    source: 0
+    targetValue: 50
+    rewardType: 0
+    rewardAmount: 600
+    modeRestriction: 0
+  - id: DQ_AIR_KILL_10
+    description: "\uACF5\uC911 \uC801 10\uB9C8\uB9AC \uCC98\uCE58\uD558\uAE30"
+    source: 1
+    targetValue: 10
+    rewardType: 0
+    rewardAmount: 400
+    modeRestriction: 0
+  - id: DQ_NEAR_MISS_5
+    description: "Near Miss 5\uD68C \uC131\uACF5\uD558\uAE30"
+    source: 2
+    targetValue: 5
+    rewardType: 0
+    rewardAmount: 300
+    modeRestriction: 0
+  - id: DQ_NEAR_MISS_10
+    description: "Near Miss 10\uD68C \uC131\uACF5\uD558\uAE30"
+    source: 2
+    targetValue: 10
+    rewardType: 0
+    rewardAmount: 500
+    modeRestriction: 0
+  - id: DQ_STOMP_3
+    description: "Stomp 3\uD68C \uC131\uACF5\uD558\uAE30"
+    source: 3
+    targetValue: 3
+    rewardType: 0
+    rewardAmount: 300
+    modeRestriction: 0
+  - id: DQ_STOMP_5
+    description: "Stomp 5\uD68C \uC131\uACF5\uD558\uAE30"
+    source: 3
+    targetValue: 5
+    rewardType: 0
+    rewardAmount: 450
+    modeRestriction: 0
+  - id: DQ_SLAM_3
+    description: "Ground Slam 3\uD68C \uC0AC\uC6A9\uD558\uAE30"
+    source: 4
+    targetValue: 3
+    rewardType: 0
+    rewardAmount: 350
+    modeRestriction: 0
+  - id: DQ_SOUL_100
+    description: "Soul 100\uAC1C \uD68D\uB4DD\uD558\uAE30"
+    source: 5
+    targetValue: 100
+    rewardType: 0
+    rewardAmount: 250
+    modeRestriction: 0
+  - id: DQ_SOUL_300
+    description: "Soul 300\uAC1C \uD68D\uB4DD\uD558\uAE30"
+    source: 5
+    targetValue: 300
+    rewardType: 0
+    rewardAmount: 500
+    modeRestriction: 0
+  - id: DQ_GIFT_1
+    description: "\uC120\uBB3C\uC0C1\uC790 1\uAC1C \uD68D\uB4DD\uD558\uAE30"
+    source: 6
+    targetValue: 1
+    rewardType: 0
+    rewardAmount: 300
+    modeRestriction: 0
+  - id: DQ_GIFT_2
+    description: "\uC120\uBB3C\uC0C1\uC790 2\uAC1C \uD68D\uB4DD\uD558\uAE30"
+    source: 6
+    targetValue: 2
+    rewardType: 0
+    rewardAmount: 500
+    modeRestriction: 0
+  - id: DQ_COMBO_15
+    description: "\uCF64\uBCF4 15 \uB2EC\uC131\uD558\uAE30"
+    source: 11
+    targetValue: 15
+    rewardType: 0
+    rewardAmount: 350
+    modeRestriction: 0
+  - id: DQ_COMBO_25
+    description: "\uCF64\uBCF4 25 \uB2EC\uC131\uD558\uAE30"
+    source: 11
+    targetValue: 25
+    rewardType: 0
+    rewardAmount: 550
+    modeRestriction: 0
+  - id: DQ_POWERUP_3
+    description: "\uD30C\uC6CC\uC5C5 3\uAC1C \uD68D\uB4DD\uD558\uAE30"
+    source: 7
+    targetValue: 3
+    rewardType: 0
+    rewardAmount: 300
+    modeRestriction: 0
+  - id: DQ_SHIELD_1
+    description: "Shield 1\uD68C \uC0AC\uC6A9\uD558\uAE30"
+    source: 8
+    targetValue: 1
+    rewardType: 0
+    rewardAmount: 250
+    modeRestriction: 0
+  - id: DQ_DASH_1
+    description: "Dash 1\uD68C \uC0AC\uC6A9\uD558\uAE30"
+    source: 9
+    targetValue: 1
+    rewardType: 0
+    rewardAmount: 250
+    modeRestriction: 0
+  - id: DQ_RUN_3
+    description: "3\uD310 \uD50C\uB808\uC774\uD558\uAE30"
+    source: 10
+    targetValue: 3
+    rewardType: 0
+    rewardAmount: 300
+    modeRestriction: 0
+  - id: DQ_DISTANCE_500
+    description: "\uD55C \uD310\uC5D0 500m \uB2EC\uB9AC\uAE30"
+    source: 12
+    targetValue: 500
+    rewardType: 0
+    rewardAmount: 400
+    modeRestriction: 0

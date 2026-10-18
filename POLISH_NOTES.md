@@ -26,6 +26,10 @@
 | Art/Apply Soul Pickup Model | (2026-10-11) Coin 프리팹의 외형을 `3DModel/Props/Soul.fbx`로 교체: 기존 원판 `Visual` 렌더러는 끄고 `FloatPivot/SoulModel`(높이 1.15m, 트리거 중앙 정렬, URP Unlit `Materials/PowerUps/Soul.mat`) 추가, 후광은 하늘색. 프리팹 이름·트리거·`CoinPickup`·패턴 배치·저장 키는 그대로. 화면 표기는 Coin → Soul(SOUL MAGNET, `SOUL +300`, 업그레이드 잔액, 스킨 가격, "Soul이 부족합니다!") |
 | Audio/Assign Soul Pickup Sound | Soul 획득음을 `Sound/SFX/driken5482-retro-coin-4-236671`로 지정(SoundLibrary `coin` 슬롯). 0.7초 안에 연속으로 먹으면 한 번마다 반음씩 올라가 최대 12단계(1옥타브)에서 유지, 끊기면 원래 음높이로 — `CameraFeedbackController`의 전용 보이스 3개라 다른 효과음 피치는 안 바뀜 |
 | Audio/Assign BGM | (2026-10-11) 타이틀 음악 = `Sound/BGM/BGM_MainScreen`, 인게임 음악 = `Sound/BGM/BGM_InGame` (SoundLibrary `titleMusic`/`runMusic`, 스트리밍). 전환·페이드·게임오버 덕킹은 기존 `MusicDirector` 그대로 |
+| UI/Apply Currency Shop | (2026-10-15) `Resources/Shop/CurrencyShopCatalog.asset`(상품 4개, 없을 때만 생성) + `Canvas/CurrencyShopPanel`(비활성: Background, BackButton → `Close`, SoulBox, Card_1~4[BuyButton → `CurrencyShopCard.Buy`], StatusText, EffectLayer). 타이틀 `CurrencyshopButton` → `OpenFromTitle`, SkinPanel / UpgradePanel의 Soul 수량 오른쪽에 `CurrencyPlusBtn` 생성(수량·아이콘을 왼쪽으로 46 이동) → `OpenFromSkinShop` / `OpenFromUpgradeShop`. 아트 `Art/2D/CurrencyShop`. 세 씬 적용 |
+| Debug/Soul Shop - Reset Today's Ad Views | 개발용. 오늘 광고 시청 횟수 초기화 |
+| UI/Apply Daily Quest | (2026-10-15) `Resources/DailyQuests/DailyQuestCatalog.asset`(퀘스트 풀, 없을 때만 생성) + `TitlePanel/DailyQuestPopup`(비활성: Backdrop, Popup_Dailyquest[ResetTimerText, box_Dailyquest_1~3, Xbutton_Dailyquest → `Close`], CurrencyBox, RewardAnimationLayer). 타이틀 `QuestButton` On Click → `DailyQuestPopup.Open` + `DailyQuestButton`(RedDot). 아트 `Art/2D/Dailyquest`. 세 씬 적용 |
+| Debug/Daily Quest - Log · Complete All · New Quests | 개발용. 오늘 퀘스트 출력 / 전부 완료(보상은 팝업에서) / 저장 삭제 후 새 퀘스트 |
 | UI/Apply Leaderboard | (2026-10-14) `Resources/GooglePlay/GooglePlaySettings.asset`(없을 때만 생성 — 리더보드 ID 2개 입력) + `TitlePanel/LeaderboardPanel`(비활성: 어두운 배경·BackButton → `Close`, DEADLINE MODE / CLASSIC MODE 버튼 → `OpenDeadline/OpenClassic`, 모드별 로컬 최고점, 상태 문구). 타이틀 `lankingButton` On Click → `LeaderboardPanel.Open`. 세 씬 적용 |
 | UI/Apply Achievements | (2026-10-14) 업적 시스템 씬/에셋 구성: `Resources/Achievements/AchievementCatalog.asset`(없을 때만 기본 28개로 생성, 이후 인스펙터 수정 유지), `Canvas/AchievementPopup`(상단 배너), `TitlePanel/AchievementPanel`(목록, 비활성). `achievementButton` On Click → `AchievementListUI.Open`, BackButton → `Close`. 세 씬 적용 |
 | Debug/Log Achievement Progress · Reset Achievement Save · Reset Player Stats | 개발용(게임 UI에는 없음). 진행도 전체 출력 / 해제 기록 삭제 / 통계 삭제 |
@@ -104,6 +108,27 @@
 - **ID**: `GooglePlaySettings` 에셋의 `deadlineLeaderboardId`, `classicLeaderboardId`(Play Console 값 또는 GPGSIds 상수 복사). 디버그: `showLeaderboardDebugLogs`, `useMockLeaderboardInEditor`, `simulateSignedOutInEditor`(로그인 실패 흉내).
 - **제출 시점**: `LeaderboardRunSubmitter`(GameFlowManager 오브젝트에 런타임 부착)가 `GameFlowManager.RunFinished`에서 제출 — 부활 제안을 거절/소진한 뒤 로컬 최고 기록 저장 직후 1회만 발생하므로 첫 사망·부활 중간 점수는 안 나감. `hasSubmittedLeaderboardScore`는 다음 런이 진행 중(Ready/Playing/Dying/RevivePrompt)일 때만 해제 → 런당 최대 1회, Retry 시 이전 점수 재제출 없음. 모드는 RunRecord(=CurrentRunMode).
 - **정책**: Google Play 리더보드는 플레이어별 최고점만 유지하므로 매 런 최종 점수를 그대로 제출(로컬 최고와 비교 안 함). 0점 이하는 제출 안 함. 로그인 안 됨/ID 없음/실패는 로그만 남기고 게임 진행에 영향 없음. 로컬 Best 저장과는 서로 독립.
+
+## 일일 퀘스트 (2026-10-15, DailyQuest.md)
+
+- **흐름**: 게임플레이 → `PlayerStats.Recorded`/런 값 → `DailyQuestManager`(진행·완료) → 타이틀 `QuestButton` RedDot → 팝업 열기 → 완료 퀘스트 자동 보상(연출) → Claimed 저장 → RedDot 갱신.
+- **스크립트(`Assets/Script/DailyQuest/`)**: `DailyQuestDefinition`(데이터+enum), `DailyQuestCatalog`(ScriptableObject 풀, 기본 19개), `DailyQuestManager`(정적: 생성·저장·자정 리셋·진행·`ClaimReward`), `DailyQuestBoxView`, `DailyQuestButton`(RedDot, 1초마다 날짜 확인), `DailyQuestPopup`(DOTween 연출). 에디터 `DailyQuestSetup`, 테스트 `DailyQuestAcceptanceTests`. 기존 스크립트 수정 없음.
+- **선택**: 풀을 섞어 서로 다른 ID 3개, 같은 종류(예: 처치 25/50)는 하루에 하나만(풀이 모자라면 허용).
+- **진행**: Counter/수집 퀘스트는 `PlayerStats.Recorded`의 증가분만 더함(생성 이후 행동만, 평생 누적값 미사용). 콤보/거리는 런 중 최고값. Deadline/Classic 모두 집계(`modeRestriction`으로 모드 전용 가능). 통계는 PlayerStats가 한 번만 기록하므로 업적·퀘스트 중복 카운트 없음.
+- **자정**: 기기 로컬 날짜. 앱 시작·버튼 표시·팝업 열기·통계 기록 때와 1초마다 저장 날짜와 비교 → 다르면 새 퀘스트(미수령 보상은 소멸). 날짜가 과거로 가면 경고 로그. 남은 시간 = 다음 00:00 - 현재.
+- **보상**: `ClaimReward`에서 재화 지급(`CoinWallet.CreditTotalCoins`)과 Claimed 저장을 함께 하고 즉시 `PlayerPrefs.Save` → 팝업에서 모든 미수령 보상을 먼저 지급한 뒤 연출(박스 Dim → Soul 박스 오른쪽에서 등장 → 아이콘 곡선 비행 → 펀치 + 카운트업, 퀘스트별 순차). 연출 중 X 버튼 비활성.
+- **저장 키**: `DailyQuest_CurrentDate`(yyyy-MM-dd), `DailyQuest{1~3}_ID/_Progress/_Completed/_Claimed`.
+
+## Soul 상점 (2026-10-15, Currencyshop.md)
+
+- **구조**: 상점은 Canvas 맨 위에 덮는 화면. Title/Skin/Upgrade 화면을 닫지 않고 위에 열기 때문에 Back(`Close`)은 덮개만 닫고 들어온 화면으로 그대로 복귀. 진입 경로는 `PreviousShopContext`(`ShopEntrySource.Title/SkinShop/UpgradeShop`)에 기록.
+- **스크립트(`Assets/Script/Shop/`)**: `SoulBank`(Soul 지급 공통 창구 `GrantSoul(amount, SoulSource)`, 기존 `CoinWallet`/`TotalCoins` 저장 그대로 사용), `CurrencyShopCatalog`(상품 데이터 + 개발용 스위치), `ShopServices`(`RewardedAdService.Show`, `SoulPurchaseService.Purchase` — SDK 연결 지점), `CurrencyShopManager`(광고 일일 제한·날짜 리셋·지급·중복 방지), `CurrencyShopCard`, `CurrencyShopPanel`. 에디터 `CurrencyShopSetup`, 테스트 `CurrencyShopAcceptanceTests`. 수정: `DailyQuestManager.ClaimReward`가 `SoulBank.GrantSoul` 사용.
+- **상품**: `CurrencyShopProduct`(productId, productType RewardedAd/IAP, soulAmount, bonusSoul, displayPrice, iapProductId, icon). 지급량 = soulAmount + bonusSoul, 카드 표시(X5,500 / +500)도 같은 값에서 계산.
+- **광고**: 하루 `adDailyLimit`(3)회, 광고 성공 콜백에서만 Soul 지급 + 횟수 +1 + 저장. 실패/취소는 변화 없음. 요청 중 `isProcessingRewardAd`로 재요청 차단, 콜백은 한 번만 처리. 날짜는 일일 퀘스트와 같은 시계(`DailyQuestManager.Now`)·같은 형식으로 `DailySoulAdDate`와 비교 → 다르면 `DailySoulAdCount` 0. 소진 시 카드 Dim + 버튼 비활성 + "FREE 0/3".
+- **SDK 없음**: 광고 SDK·IAP 미설치. `simulateRewardedAdForTesting`(기본 false)는 에디터/개발 빌드에서만 컴파일, `debugPurchaseInEditor`는 에디터에서만 → 릴리스 빌드는 광고 "불가", 구매 "실패"로 처리되어 무료 지급 불가.
+- **연출(DOTween)**: 카드 순차 등장(스케일 0.9→1 + 페이드), 보상 시 카드 아이콘이 상단 Soul 박스로 곡선 비행 → 아이콘 펀치 → 숫자 카운트업, "+100 SOUL" 문구 페이드.
+- **Red Dot**: 오늘 광고 보상이 남아 있으면 타이틀 `CurrencyshopButton/RedDot`(`CurrencyShopButton`, 1초마다 날짜 확인)과 광고 카드 `Card_1/RedDot` 표시, 3회 모두 쓰면 해제, 자정 후 다시 표시.
+- **저장 키**: `TotalCoins`(기존 Soul), `DailySoulAdDate`, `DailySoulAdCount`.
 
 ## 코스 (2026-10-01 확장)
 

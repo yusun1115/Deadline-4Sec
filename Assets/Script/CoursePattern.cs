@@ -8,11 +8,17 @@ using UnityEditor;
 namespace Deadline4Sec
 {
     // The root is the start marker; +Z at PatternLength is the end marker.
+    // Upper (2026-10-16, Air Route): the pattern carries an upper deck at
+    // UpperDeckHeight above its floor while the normal floor below stays the
+    // lower route. Upper connects only to Upper (never Any): an air-route entry
+    // is Ground → Upper, upper runs Upper → Upper, the return Upper → Ground.
     public sealed class CoursePattern : MonoBehaviour
     {
+        public const float UpperDeckHeight = 8f;
+
         public enum DifficultyLevel { Easy, Medium, Hard }
-        public enum PatternCategory { GroundCombat, AirCombat, Obstacle, Stomp, Mixed }
-        public enum TravelState { Ground, Air, Any }
+        public enum PatternCategory { GroundCombat, AirCombat, Obstacle, Stomp, Mixed, AirRoute }
+        public enum TravelState { Ground, Air, Any, Upper }
 
         [SerializeField, Min(1f)] private float patternLength = 20f;
         [SerializeField, Min(0.1f)] private float referenceForwardSpeed = 10.2f;
@@ -27,6 +33,9 @@ namespace Deadline4Sec
         public PatternCategory Category => category;
         public TravelState EntryState => entryState;
         public TravelState ExitState => exitState;
+        public bool IsAirRouteEntry => exitState == TravelState.Upper && entryState != TravelState.Upper;
+        public bool IsUpperRun => entryState == TravelState.Upper && exitState == TravelState.Upper;
+        public bool IsUpperReturn => entryState == TravelState.Upper && exitState != TravelState.Upper;
 
         public float PatternLength
         {
@@ -92,6 +101,18 @@ namespace Deadline4Sec
             Gizmos.DrawLine(end - laneSpan, end + laneSpan);
             Gizmos.DrawWireCube((start + end) * 0.5f,
                 new Vector3(laneWidth * 3f, 0.1f, patternLength));
+
+            // Upper route height at the ends that are on the deck.
+            if (entryState == TravelState.Upper || exitState == TravelState.Upper)
+            {
+                Gizmos.color = new Color(1f, 0.3f, 0.75f, 0.9f);
+                Vector3 up = transform.up * UpperDeckHeight;
+                if (entryState == TravelState.Upper)
+                    Gizmos.DrawLine(start - laneSpan + up, start + laneSpan + up);
+                if (exitState == TravelState.Upper)
+                    Gizmos.DrawLine(end - laneSpan + up, end + laneSpan + up);
+                Gizmos.DrawLine(start + up, end + up);
+            }
         }
 
 #if UNITY_EDITOR

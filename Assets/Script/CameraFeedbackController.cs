@@ -50,8 +50,25 @@ namespace Deadline4Sec
         [SerializeField, Min(0f)] private float homingFovBoost = 2f;
         [SerializeField, Min(0.01f)] private float homingFovDuration = 0.12f;
 
+        // Vertical follow (2026-10-16, Air Route). The camera rides on the
+        // player, so by itself it copies every jump. Instead it holds the height
+        // the player last stood on: a normal jump does not move it, rising more
+        // than verticalFollowThreshold above that (air combos, the air route)
+        // pulls it up with a lag, landing on a new level (the upper deck) settles
+        // it there, and dropping below it follows almost at once so the runner
+        // never leaves the bottom of the screen.
+        [Header("Vertical follow")]
+        [SerializeField] private bool enableVerticalFollow = true;
+        [SerializeField, Min(0f)] private float verticalFollowThreshold = 2.2f;
+        [SerializeField, Min(0.1f)] private float verticalFollowSpeed = 5f;
+        [SerializeField, Min(0f)] private float verticalFollowMaxDropLag = 0.8f;
+
         private Vector3 baseLocalPosition;
         private Quaternion baseLocalRotation;
+        private PlayerController followPlayer;
+        private float followY;
+        private float followAnchorY;
+        private bool followReady;
         private bool introActive;
         private float introElapsed;
         private float introDuration;
@@ -111,6 +128,7 @@ namespace Deadline4Sec
 
             baseLocalPosition = transform.localPosition;
             baseLocalRotation = transform.localRotation;
+            followPlayer = GetComponentInParent<PlayerController>();
             noiseSeedX = 17.31f;
             noiseSeedY = 93.77f;
             if (targetCamera != null)
@@ -168,9 +186,10 @@ namespace Deadline4Sec
                 transform.localRotation = Quaternion.Slerp(sideRotation, baseLocalRotation, blend);
                 return;
             }
+            Vector3 vertical = Vector3.up * VerticalFollowOffset();
             if (gameFlow == null || !gameFlow.IsPlaying || shakeTimeRemaining <= 0f)
             {
-                transform.localPosition = baseLocalPosition + NearMissImpulse();
+                transform.localPosition = baseLocalPosition + vertical + NearMissImpulse();
                 return;
             }
 
@@ -178,8 +197,33 @@ namespace Deadline4Sec
             float sampleTime = Time.unscaledTime * shakeFrequency;
             float x = Mathf.PerlinNoise(noiseSeedX, sampleTime) * 2f - 1f;
             float y = Mathf.PerlinNoise(noiseSeedY, sampleTime) * 2f - 1f;
-            transform.localPosition = baseLocalPosition + NearMissImpulse() +
+            transform.localPosition = baseLocalPosition + vertical + NearMissImpulse() +
                 new Vector3(x, y, 0f) * shakeIntensity * fade;
+        }
+
+        // Local offset that moves the camera from the player's height to the
+        // followed height (0 while the player stands where the camera rests).
+        private float VerticalFollowOffset()
+        {
+            if (!enableVerticalFollow || followPlayer == null)
+                return 0f;
+            float playerY = followPlayer.transform.position.y;
+            if (!followReady)
+            {
+                followY = followAnchorY = playerY;
+                followReady = true;
+            }
+            if (followPlayer.IsGrounded)
+                followAnchorY = playerY;
+            float target = followAnchorY;
+            if (playerY > followAnchorY + verticalFollowThreshold)
+                target = playerY - verticalFollowThreshold;
+            else if (playerY < followAnchorY)
+                target = playerY;
+            followY = Mathf.Lerp(followY, target, 1f - Mathf.Exp(-verticalFollowSpeed * Time.unscaledDeltaTime));
+            // Hard limits keep the runner on screen while the lag catches up.
+            followY = Mathf.Clamp(followY, playerY - verticalFollowThreshold, playerY + verticalFollowMaxDropLag);
+            return followY - playerY;
         }
 
         // Near miss: a very light out-and-back sway away from the obstacle.
@@ -204,6 +248,7 @@ namespace Deadline4Sec
         public void CompleteRunIntro()
         {
             introActive = false;
+            followReady = false; // start the follow at the runner's height
             transform.localPosition = baseLocalPosition;
             transform.localRotation = baseLocalRotation;
         }
