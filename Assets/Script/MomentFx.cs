@@ -25,6 +25,7 @@ namespace Deadline4Sec
         private static readonly Color NearColor = new Color(0.35f, 1f, 0.85f);
         private static readonly Color PressureRed = new Color(0.45f, 0f, 0.06f);
         private static readonly Color TimerRed = new Color(1f, 0.12f, 0.2f);
+        private static readonly Color WallHoldColor = new Color(0.72f, 0.62f, 1f);
 
         private const float PressureStart = 1.5f;
         private const int StreakCount = 8;
@@ -45,6 +46,11 @@ namespace Deadline4Sec
         private readonly Vector2[] streakVelocity = new Vector2[StreakCount];
         private Image pressureVignette;
         private Image timerGlow;
+        // Wall Run hold (2026-10-18): a lavender glow behind the timer and a
+        // "❚❚ PAUSE" tag under it while the countdown waits on a wall.
+        private Image wallGlow;
+        private CanvasGroup wallPauseTag;
+        private float wallHold;
         private Image deathFlash;
         private TMP_Text nearLabel;
         private bool nearLabelStyled;
@@ -58,6 +64,9 @@ namespace Deadline4Sec
 
         private bool dying;
         private bool deathByContact;
+        // Wall Run fall (2026-10-18): no flash, hit stop, timer punch or slow-down;
+        // the runner simply drops away (CameraFeedbackController plays the wind).
+        private bool deathByFall;
         private float deathStart = -10f;
         private bool managingTimeScale;
         private Vector3 shakeDirection;
@@ -128,6 +137,9 @@ namespace Deadline4Sec
             pressureVignette = Img(layer, "PressureVignette", FxSprites.Vignette, PressureRed);
             Stretch(pressureVignette.rectTransform);
             timerGlow = Img(layer, "TimerDangerGlow", FxSprites.Glow, TimerRed);
+            wallGlow = Img(layer, "TimerWallHoldGlow", FxSprites.Glow, WallHoldColor);
+            if (timerFrame != null)
+                BuildWallPauseTag();
             edgeFlash = Img(layer, "NearMissEdge", FxSprites.EdgeGlow, NearColor);
             edgeFlash.rectTransform.pivot = new Vector2(0f, 0.5f);
             for (int i = 0; i < StreakCount; i++)
@@ -137,6 +149,61 @@ namespace Deadline4Sec
             deathFlash = Img(canvas, "DeathFlash", null, Color.white);
             Stretch(deathFlash.rectTransform);
             deathFlash.transform.SetAsLastSibling();
+        }
+
+        private void BuildWallPauseTag()
+        {
+            var rect = (RectTransform)new GameObject("WallRunPause", typeof(RectTransform), typeof(CanvasGroup)).transform;
+            rect.SetParent(timerFrame, false);
+            rect.anchorMin = rect.anchorMax = new Vector2(0.5f, 0f);
+            rect.pivot = new Vector2(0.5f, 1f);
+            rect.anchoredPosition = new Vector2(0f, -2f);
+            rect.sizeDelta = new Vector2(160f, 32f);
+            wallPauseTag = rect.GetComponent<CanvasGroup>();
+            wallPauseTag.alpha = 0f;
+            wallPauseTag.blocksRaycasts = false;
+            foreach (float x in new[] { -66f, -54f })
+            {
+                Image bar = new GameObject("Bar", typeof(RectTransform), typeof(Image)).GetComponent<Image>();
+                bar.rectTransform.SetParent(rect, false);
+                bar.rectTransform.anchoredPosition = new Vector2(x, 0f);
+                bar.rectTransform.sizeDelta = new Vector2(7f, 22f);
+                bar.color = WallHoldColor;
+                bar.raycastTarget = false;
+            }
+            TextMeshProUGUI label = new GameObject("Label", typeof(RectTransform), typeof(TextMeshProUGUI)).GetComponent<TextMeshProUGUI>();
+            label.rectTransform.SetParent(rect, false);
+            label.rectTransform.anchoredPosition = new Vector2(20f, 0f);
+            label.rectTransform.sizeDelta = new Vector2(100f, 32f);
+            GameFont.Apply(label);
+            label.text = "PAUSE";
+            label.fontSize = 24f;
+            label.characterSpacing = 4f;
+            label.color = WallHoldColor;
+            label.alignment = TextAlignmentOptions.Left;
+            label.textWrappingMode = TextWrappingModes.NoWrap;
+            label.raycastTarget = false;
+            rect.gameObject.SetActive(false);
+        }
+
+        private void UpdateWallHold(float now, float dt)
+        {
+            bool held = flow != null && flow.IsPlaying && timer != null && timer.IsHeldByWallRun;
+            wallHold = Mathf.MoveTowards(wallHold, held ? 1f : 0f, dt * 6f);
+            float pulse = 0.85f + 0.15f * Mathf.Sin(now * 5f);
+            if (wallGlow != null && timerFrame != null)
+            {
+                RectTransform rect = wallGlow.rectTransform;
+                rect.position = timerFrame.TransformPoint(timerFrame.rect.center);
+                rect.sizeDelta = new Vector2(timerFrame.rect.width * 1.3f, timerFrame.rect.height * 2.2f);
+                Alpha(wallGlow, 0.5f * wallHold * pulse);
+            }
+            if (wallPauseTag != null)
+            {
+                wallPauseTag.alpha = wallHold * pulse;
+                if (wallPauseTag.gameObject.activeSelf != wallHold > 0.004f)
+                    wallPauseTag.gameObject.SetActive(wallHold > 0.004f);
+            }
         }
 
         // Global volume that drains colour after a death (weight animated).
@@ -303,7 +370,7 @@ namespace Deadline4Sec
         private void UpdatePressure(float now, float dt)
         {
             bool counting = flow != null && flow.IsPlaying && timer != null && timer.IsRunning &&
-                            (powerUps == null || !powerUps.TimerFrozen);
+                            (powerUps == null || !powerUps.TimerFrozen) && !timer.IsHeldByWallRun;
             float target = counting ? Mathf.Clamp01((PressureStart - timer.RemainingTime) / PressureStart) : 0f;
             pressure = Mathf.MoveTowards(pressure, target, dt * 6f);
 
@@ -335,7 +402,7 @@ namespace Deadline4Sec
                 rect.position = timerFrame.TransformPoint(timerFrame.rect.center);
                 rect.sizeDelta = new Vector2(timerFrame.rect.width * 1.25f, timerFrame.rect.height * 2.2f) *
                                  (1f + 0.15f * beat);
-                float expired = dying && !deathByContact ? Mathf.Clamp01(1f - (now - deathStart - 0.2f) / 0.3f) : 0f;
+                float expired = dying && !deathByContact && !deathByFall ? Mathf.Clamp01(1f - (now - deathStart - 0.2f) / 0.3f) : 0f;
                 Alpha(timerGlow, Mathf.Max((critical ? 0.55f : 0.2f) * pressure + 0.3f * beat * pressure, 0.9f * expired));
             }
             if (juice != null)
@@ -349,6 +416,9 @@ namespace Deadline4Sec
             dying = true;
             deathStart = now;
             deathByContact = timer != null && timer.LastDeathReason == GameTimer.DeathReason.Collision;
+            deathByFall = timer != null && timer.LastDeathReason == GameTimer.DeathReason.Fall;
+            if (deathByFall)
+                return;
             Vector2 random = Random.insideUnitCircle.normalized;
             shakeDirection = new Vector3(random.x, random.y * 0.6f, 0f);
             // Collision: a hard hit. Timer expiry: a low power-down thud.
@@ -360,7 +430,7 @@ namespace Deadline4Sec
 
         // Timer expiry: the frozen 0.00 punches twice while the HUD holds.
         private float TimerDeathPop(float now) =>
-            dying && !deathByContact ? 0.45f * Kick(now - deathStart) + 0.3f * Kick(now - deathStart - 0.22f) : 0f;
+            dying && !deathByContact && !deathByFall ? 0.45f * Kick(now - deathStart) + 0.3f * Kick(now - deathStart - 0.22f) : 0f;
 
         private void UpdateDeath(float now, float dt)
         {
@@ -388,7 +458,7 @@ namespace Deadline4Sec
 
             // Collision: hit stop, then slow motion easing back to normal speed.
             // Timer expiry: no freeze; the world winds down like it is powering off.
-            if (dying && t < 0.7f && flow.State == GameFlowManager.GameState.Dying)
+            if (dying && !deathByFall && t < 0.7f && flow.State == GameFlowManager.GameState.Dying)
             {
                 if (deathByContact)
                 {
@@ -426,6 +496,7 @@ namespace Deadline4Sec
             if (hud != null)
                 UpdateNearMiss(now);
             UpdatePressure(now, dt);
+            UpdateWallHold(now, dt);
             UpdateDeath(now, dt);
         }
     }

@@ -23,6 +23,18 @@ namespace Deadline4Sec
         public bool IsGroundSlamming => isGroundSlamming;
         public float VerticalSpeed => verticalSpeed;
         public float DeathPoseProgress { get; private set; }
+
+        // Wall Run (2026-10-18, Wall Run.md). WallRun is its own state, not an
+        // airborne one: gravity, jump, slide / fast fall / slam and homing are
+        // off, and left / right switch walls instead of lanes.
+        public enum MovementState { Normal, WallRun }
+        public MovementState Movement => movementState;
+        public bool IsWallRunning => movementState == MovementState.WallRun;
+        public WallRunSection.WallSide CurrentWall => currentWall;
+        public bool IsWallSwitching => isWallSwitching;
+        public float WallTilt => wallTilt;
+        // The wall the runner is on (None: back to normal running).
+        public event Action<WallRunSection.WallSide> WallRunChanged;
         [Header("Forward movement")]
         [SerializeField, Min(0f)] private float forwardSpeed = 11.2f;
         private float runForwardSpeed = -1f;
@@ -81,6 +93,26 @@ namespace Deadline4Sec
         [SerializeField, Min(1f)] private float groundDetectionMaxDistance = 60f;
         [SerializeField] private bool showGroundSlamDebug;
         [SerializeField] private Transform visualTransform;
+
+        [Header("Wall run")]
+        [SerializeField, Range(0.05f, 0.5f)] private float wallAttachDuration = 0.2f;
+        [SerializeField, Range(0.1f, 0.5f)] private float wallSwitchDuration = 0.28f;
+        [SerializeField, Min(0.1f)] private float wallRunSpeedMultiplier = 1f;
+        // Positive leans the character toward the wall it runs on.
+        [SerializeField, Range(-45f, 45f)] private float wallRunTiltAngle = 16f;
+        [SerializeField, Min(0.1f)] private float wallTiltSpeed = 14f;
+        [SerializeField, Min(0f)] private float fallDeathDropSpeed = 9f;
+
+        private MovementState movementState;
+        private WallRunSection.WallSide currentWall;
+        private WallRunSection wallSection;
+        private bool isWallSwitching;
+        private Vector3 wallMoveFrom;
+        private float wallMoveElapsed;
+        private float wallMoveDuration;
+        private float wallTilt;
+        private bool wallTiltApplied;
+        private Vector3 tiltPivot;
 
         private CharacterController characterController;
         private float centerX;
@@ -159,6 +191,10 @@ namespace Deadline4Sec
                 standingWeaponRotation = weaponVisualTransform.localRotation;
                 standingWeaponPosition = weaponVisualTransform.localPosition;
             }
+            // The wall-run lean turns the model about its own pivot (its feet);
+            // the weapon turns about the same point so it stays in hand.
+            PlayerCharacterAnimator model = GetComponentInChildren<PlayerCharacterAnimator>(true);
+            tiltPivot = model != null ? model.transform.localPosition : Vector3.zero;
             centerX = transform.position.x;
             if (gameTimer == null)
                 gameTimer = FindFirstObjectByType<GameTimer>();
@@ -195,6 +231,16 @@ namespace Deadline4Sec
         private void Update()
         {
             ReadKeyboardInput();
+            UpdateWallTilt();
+
+            // Wall Run owns its own movement (no gravity, fixed wall line).
+            if (movementState == MovementState.WallRun)
+            {
+                UpdateWallRun();
+                return;
+            }
+            if (!isHomingDash)
+                WallRunSection.FindEntry(characterController.bounds.center)?.ReportEntryReached();
 
             // Homing owns the only movement call for this frame. Normal forward,
             // lane movement, gravity and jump velocity resume after it ends.
@@ -389,6 +435,7 @@ namespace Deadline4Sec
             lastJumpActionFrame = lastLaneRequestFrame = lastSlideRequestFrame = -1;
             lastLaneInputTime = lastAirJumpTime = float.NegativeInfinity;
             preferredAirDashDirection = 0;
+            ClearWallRun();
             EndRunIntro();
         }
 
@@ -433,6 +480,17 @@ namespace Deadline4Sec
                 return;
 
             if (direction == 0)
+                return;
+
+            // Wall Run comes first so one swipe never does both: on a wall it
+            // switches walls; in an entry window the matching side attaches.
+            // A wrong side stays an ordinary lane move (the gap does the rest).
+            if (movementState == MovementState.WallRun)
+            {
+                RequestWallSwitch(direction);
+                return;
+            }
+            if (TryAttachWall(direction))
                 return;
 
             preferredAirDashDirection = direction > 0 ? 1 : -1;
@@ -1037,7 +1095,7 @@ namespace Deadline4Sec
         {
             if (!CanReceiveInput)
                 return;
-            if (isHomingDash)
+            if (isHomingDash || movementState == MovementState.WallRun)
                 return;
             if (lastJumpActionFrame == Time.frameCount)
                 return;
@@ -1064,7 +1122,7 @@ namespace Deadline4Sec
 
         public void Slide()
         {
-            if (!CanReceiveInput)
+            if (!CanReceiveInput || movementState == MovementState.WallRun)
                 return;
 
             if (isGrounded)
@@ -1262,8 +1320,185 @@ namespace Deadline4Sec
             }
         }
 
+        // ---------------- Wall Run ----------------
+
+        private bool TryAttachWall(int direction)
+        {
+            if (isHomingDash)
+                return false;
+            WallRunSection section = WallRunSection.FindEntry(characterController.bounds.center);
+            WallRunSection.WallSide side = direction < 0 ? WallRunSection.WallSide.Left : WallRunSection.WallSide.Right;
+            if (section == null || !section.Allows(side))
+                return false;
+
+            EndSlide();
+            isFastFalling = false;
+            pendingGroundSlide = false;
+            isGroundSlamming = false;
+            hasGroundSlamImpacted = false;
+            airComboReady = false;
+            attackTimeRemaining = 0f;
+            jumpAttackTimeRemaining = 0f;
+            wallSection = section;
+            movementState = MovementState.WallRun;
+            BeginWallMove(side, wallAttachDuration);
+            Debug.Log("Wall Attach: " + side);
+            if (cameraFeedback != null)
+                cameraFeedback.PlayWallAttach(direction);
+            WallRunChanged?.Invoke(side);
+            return true;
+        }
+
+        private void RequestWallSwitch(int direction)
+        {
+            WallRunSection.WallSide side = direction < 0 ? WallRunSection.WallSide.Left : WallRunSection.WallSide.Right;
+            // Same wall: nothing further out. Mid-move (attach or switch): ignored.
+            if (isWallSwitching || side == currentWall || wallSection == null ||
+                wallSection.AnchorFor(side) == null)
+                return;
+            BeginWallMove(side, wallSwitchDuration);
+            Debug.Log("Wall Switch: " + side);
+            if (cameraFeedback != null)
+                cameraFeedback.PlayWallSwitch(direction);
+            WallRunChanged?.Invoke(side);
+        }
+
+        private void BeginWallMove(WallRunSection.WallSide side, float duration)
+        {
+            currentWall = side;
+            isWallSwitching = true;
+            wallMoveFrom = transform.position;
+            wallMoveElapsed = 0f;
+            wallMoveDuration = Mathf.Max(0.01f, duration);
+        }
+
+        // Forward at the run speed (+Z, like every other movement here) while
+        // easing sideways / up onto the anchor's line; obstacles on the wall are
+        // ordinary fatal Obstacle contacts (Shield rules unchanged).
+        private void UpdateWallRun()
+        {
+            Transform anchor = wallSection != null ? wallSection.AnchorFor(currentWall) : null;
+            if (anchor == null)
+            {
+                ExitWallRun();
+                return;
+            }
+
+            // The anchor marks the feet line; the pivot sits above the feet.
+            float pivotAboveFeet = transform.position.y - characterController.bounds.min.y;
+            float x = anchor.position.x;
+            float y = anchor.position.y + pivotAboveFeet;
+            if (isWallSwitching)
+            {
+                wallMoveElapsed += Time.deltaTime;
+                float t = Mathf.Clamp01(wallMoveElapsed / wallMoveDuration);
+                float eased = Mathf.SmoothStep(0f, 1f, t);
+                x = Mathf.Lerp(wallMoveFrom.x, x, eased);
+                y = Mathf.Lerp(wallMoveFrom.y, y, eased);
+                if (t >= 1f)
+                    isWallSwitching = false;
+            }
+            float forward = (runForwardSpeed >= 0f ? runForwardSpeed : forwardSpeed) * wallRunSpeedMultiplier;
+            Vector3 movement = new Vector3(x - transform.position.x, y - transform.position.y, forward * Time.deltaTime);
+            Bounds before = characterController.bounds;
+            MoveWithObstacleCheck(movement, out _);
+            if (gameTimer != null && gameTimer.IsGameOver)
+                return;
+            CheckEnemyContact(before, movement, false, false, false);
+            if (gameTimer != null && gameTimer.IsGameOver)
+                return;
+            isGrounded = false;
+            verticalSpeed = 0f;
+            if (transform.position.z >= wallSection.ExitZ)
+                ExitWallRun();
+        }
+
+        // Back to normal running: gravity takes the runner down onto the floor
+        // after the gap, in the lane nearest the wall it left.
+        private void ExitWallRun()
+        {
+            if (movementState != MovementState.WallRun)
+                return;
+            laneIndex = Mathf.Clamp(Mathf.RoundToInt((transform.position.x - centerX) / laneWidth), -1, 1);
+            ClearWallRun();
+            isGrounded = false;
+            verticalSpeed = 0f;
+            Debug.Log("Wall Run Exit");
+            WallRunChanged?.Invoke(WallRunSection.WallSide.None);
+        }
+
+        private void ClearWallRun()
+        {
+            movementState = MovementState.Normal;
+            currentWall = WallRunSection.WallSide.None;
+            wallSection = null;
+            isWallSwitching = false;
+            airComboReady = false;
+            lastAirJumpTime = float.NegativeInfinity;
+        }
+
+        // Lean toward the wall; through a switch it passes upright (Left →
+        // Neutral → Right). Applied to the model by PlayerCharacterAnimator and
+        // to the weapon here, about the model's pivot.
+        private void UpdateWallTilt()
+        {
+            float target = 0f;
+            if (movementState == MovementState.WallRun &&
+                (!isWallSwitching || wallMoveElapsed >= wallMoveDuration * 0.5f))
+                target = currentWall == WallRunSection.WallSide.Left ? wallRunTiltAngle : -wallRunTiltAngle;
+            wallTilt = Mathf.Lerp(wallTilt, target, 1f - Mathf.Exp(-wallTiltSpeed * Time.deltaTime));
+            if (Mathf.Abs(wallTilt) < 0.05f && target == 0f)
+                wallTilt = 0f;
+            if (weaponVisualTransform == null || DeathPoseProgress > 0f || (wallTilt == 0f && !wallTiltApplied))
+                return;
+            Quaternion lean = Quaternion.Euler(0f, 0f, wallTilt);
+            weaponVisualTransform.localPosition = tiltPivot + lean * (standingWeaponPosition - tiltPivot);
+            weaponVisualTransform.localRotation = lean * standingWeaponRotation;
+            wallTiltApplied = wallTilt != 0f;
+        }
+
+        // Revive: a death inside a wall-run section (fall or wall obstacle)
+        // restarts on the safe ground before its entry, never over the gap.
+        public bool ReturnToWallRunCheckpoint()
+        {
+            WallRunSection section = wallSection != null ? wallSection : WallRunSection.FindForRevive(transform.position);
+            if (section == null)
+                return false;
+            ClearWallRun();
+            wallTilt = 0f;
+            UpdateWallTilt();
+            EndSlide();
+            StopAirDash();
+            isFastFalling = false;
+            pendingGroundSlide = false;
+            isGroundSlamming = false;
+            hasGroundSlamImpacted = false;
+            attackTimeRemaining = 0f;
+            jumpAttackTimeRemaining = 0f;
+            float pivotAboveFeet = transform.position.y - characterController.bounds.min.y;
+            Vector3 checkpoint = section.CheckpointPosition;
+            laneIndex = 0;
+            characterController.enabled = false;
+            transform.position = new Vector3(centerX, checkpoint.y + pivotAboveFeet + 0.02f, checkpoint.z);
+            characterController.enabled = true;
+            verticalSpeed = -2f;
+            isGrounded = false;
+            if (cameraFeedback != null)
+                cameraFeedback.SnapVerticalFollow();
+            Debug.Log("Revive at wall run checkpoint");
+            return true;
+        }
+
         public void SetDeathPose(float progress)
         {
+            // A fall keeps falling in the Fall pose (no collapse); the camera
+            // stays a little above and lets the runner drop away.
+            if (gameTimer != null && gameTimer.LastDeathReason == GameTimer.DeathReason.Fall)
+            {
+                if (progress > 0f && characterController != null && characterController.enabled)
+                    characterController.Move(Vector3.down * fallDeathDropSpeed * Time.unscaledDeltaTime);
+                return;
+            }
             progress = Mathf.Clamp01(progress);
             DeathPoseProgress = progress;
             if (visualTransform != null)

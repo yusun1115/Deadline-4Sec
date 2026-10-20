@@ -134,6 +134,10 @@ namespace Deadline4Sec
                 return IdleState;
             if (player.IsHoming)
                 return HomingState;
+            // Wall Run: the run clip plus a lean (no dedicated clip yet; a
+            // WallRun_Left / WallRun_Right state can replace this later).
+            if (player.IsWallRunning)
+                return RunState;
             if (player.IsSliding && player.IsGrounded)
                 return SlideState;
             if (!player.IsGrounded)
@@ -169,7 +173,7 @@ namespace Deadline4Sec
                     weaponPivot.localRotation = weaponBaseRotation * Quaternion.Euler(homingSpin, 0f, 0f);
                 return;
             }
-            transform.localRotation = baseRotation;
+            transform.localRotation = Quaternion.Euler(0f, 0f, player != null ? player.WallTilt : 0f) * baseRotation;
             if (weaponPivot != null)
                 weaponPivot.localRotation = weaponBaseRotation;
         }

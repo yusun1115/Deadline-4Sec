@@ -35,6 +35,33 @@ namespace Deadline4Sec.Dev
 
             Vector3 p = player.transform.position;
             int lane = player.LaneIndex;
+
+            // Wall Run: swipe toward the open wall in the entry window, then
+            // switch away from an obstacle ahead on the current wall.
+            if (player.IsWallRunning)
+            {
+                if (player.IsWallSwitching)
+                    return;
+                int wall = player.CurrentWall == WallRunSection.WallSide.Left ? -1 : 1;
+                foreach (Obstacle o in Obstacle.Active)
+                {
+                    Bounds b = o.GetComponent<Collider>().bounds;
+                    float dz = b.min.z - p.z;
+                    float side = b.center.x - centerX;
+                    if (dz > 0f && dz < 8f && Mathf.Abs(side) > 2f && Mathf.Sign(side) == wall)
+                    {
+                        Move(-wall);
+                        return;
+                    }
+                }
+                return;
+            }
+            WallRunSection entry = WallRunSection.FindEntry(player.GetComponent<CharacterController>().bounds.center);
+            if (entry != null)
+            {
+                Move(entry.Available == WallRunSection.AvailableWall.Right ? 1 : -1);
+                return;
+            }
             // Air routes have two levels: judge everything against the floor below.
             float floor = FloorUnder();
 

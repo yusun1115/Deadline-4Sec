@@ -255,7 +255,7 @@ namespace Deadline4Sec.AcceptanceTests
 
         // Lambda state lives in statics: locals captured by a lambda would be
         // created before EnterPlayMode and lost in the domain reload.
-        private static float routeEnd, routeStart, trackedMaxY;
+        private static float routeEnd, routeStart, trackedMaxY, waitUntil;
 
         private static Component PlayerC => Get("PlayerController");
         private static Vector3 PlayerPos => PlayerC.transform.position;
@@ -523,7 +523,10 @@ namespace Deadline4Sec.AcceptanceTests
             yield return Until(() => (Grounded && PlayerPos.y < 2f) || Dead, 3f);
             Assert.IsFalse(Dead, "Landed safely.");
             Assert.Less(PlayerPos.y, 2f, "Back on the ground route.");
-            yield return Wait(1f);
+            // Keep playing while the camera settles (U4's lower enemy at 31m).
+            waitUntil = Time.time + 1f;
+            yield return RunLowerRoute(() => Time.time >= waitUntil, 4f);
+            Assert.IsFalse(Dead);
             Transform cam = Camera.main.transform;
             Assert.AreEqual(cam.parent.position.y + 4.31f, cam.position.y, 0.3f, "Camera back at ground framing.");
             yield return RunLowerRoute(() => PlayerPos.z > routeStart + 34f, 3f);

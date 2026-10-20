@@ -130,9 +130,26 @@ namespace Deadline4Sec.Editor
             Stretch(backdrop.rectTransform);
             backdrop.raycastTarget = true;
 
-            Image frame = Img(root, "Frame", Load(Generated + "ui_panel_gothic.png"), Color.white);
-            frame.type = Image.Type.Sliced;
-            StretchInset(frame.rectTransform, new Vector2(0f, -85f), new Vector2(-44f, -290f));
+            // Temporary frame (2026-10-18): the gothic panel art's thick side
+            // ornaments squeezed the list, so a plain dark panel with a pink
+            // outline and accent bars stands in until final art arrives.
+            Image frame = Img(root, "Frame", null, new Color(0.11f, 0.05f, 0.15f, 0.94f));
+            frame.type = Image.Type.Simple;
+            StretchInset(frame.rectTransform, new Vector2(0f, -110f), new Vector2(-40f, -300f));
+            Outline outline = frame.TryGetComponent(out Outline o) ? o : frame.gameObject.AddComponent<Outline>();
+            outline.effectColor = new Color(1f, 0.32f, 0.62f, 0.75f);
+            outline.effectDistance = new Vector2(3f, -3f);
+            foreach (bool top in new[] { true, false })
+            {
+                Image bar = Img(frame.rectTransform, top ? "TopAccent" : "BottomAccent", null, Pink);
+                RectTransform br = bar.rectTransform;
+                br.anchorMin = new Vector2(0.5f, top ? 1f : 0f);
+                br.anchorMax = new Vector2(0.5f, top ? 1f : 0f);
+                br.pivot = new Vector2(0.5f, 0.5f);
+                br.anchoredPosition = Vector2.zero;
+                br.sizeDelta = new Vector2(220f, 6f);
+                br.localScale = Vector3.one;
+            }
 
             Text(root, "HeadingText", "ACHIEVEMENTS", Vector2.zero, new Vector2(640f, 70f), 50f, Color.white, TextAlignmentOptions.Center);
             TopAnchor((RectTransform)root.Find("HeadingText"), new Vector2(0.5f, 1f), new Vector2(0f, -190f));
@@ -159,10 +176,9 @@ namespace Deadline4Sec.Editor
             Place(backIcon.rectTransform, Vector2.zero, new Vector2(73f, 73f));
             OnClick(back.gameObject, back, ui.Close);
 
-            // Scroll list inside the frame's inner area (its ornaments are thick:
-            // about ±240 wide, from +316 to -450 on a 9:16 screen).
+            // Scroll list filling the frame (18 px inside its sides, under the heading).
             RectTransform scroll = Child(root, "ListScrollView");
-            StretchInset(scroll, new Vector2(0f, -67f), new Vector2(-320f, -656f));
+            StretchInset(scroll, new Vector2(0f, -110f), new Vector2(-76f, -336f));
             ScrollRect scrollRect = scroll.TryGetComponent(out ScrollRect sr) ? sr : scroll.gameObject.AddComponent<ScrollRect>();
             RectTransform viewport = Child(scroll, "Viewport");
             Stretch(viewport);
@@ -180,7 +196,7 @@ namespace Deadline4Sec.Editor
             content.sizeDelta = Vector2.zero;
             VerticalLayoutGroup layout = content.TryGetComponent(out VerticalLayoutGroup l) ? l : content.gameObject.AddComponent<VerticalLayoutGroup>();
             layout.spacing = 4f;
-            layout.padding = new RectOffset(10, 10, 8, 8);
+            layout.padding = new RectOffset(8, 8, 8, 8);
             layout.childControlWidth = true;
             layout.childControlHeight = false;
             layout.childForceExpandWidth = true;
@@ -217,10 +233,10 @@ namespace Deadline4Sec.Editor
             RectTransform row = Child(content, "RowTemplate");
             row.anchorMin = new Vector2(0f, 1f);
             row.anchorMax = new Vector2(0f, 1f);
-            row.sizeDelta = new Vector2(460f, 120f);
+            row.sizeDelta = new Vector2(700f, 128f);
             LayoutElement element = row.TryGetComponent(out LayoutElement le) ? le : row.gameObject.AddComponent<LayoutElement>();
-            element.preferredHeight = 120f;
-            element.minHeight = 120f;
+            element.preferredHeight = 128f;
+            element.minHeight = 128f;
             AchievementRow component = row.TryGetComponent(out AchievementRow r) ? r : row.gameObject.AddComponent<AchievementRow>();
 
             Image divider = Img(row, "Divider", null, new Color(1f, 0.3f, 0.6f, 0.35f));
@@ -231,31 +247,36 @@ namespace Deadline4Sec.Editor
             dr.anchoredPosition = Vector2.zero;
             dr.sizeDelta = new Vector2(-20f, 3f);
 
+            // Anchored to the row's edges so the row uses the full list width.
             Image icon = Img(row, "StateIcon", Load(UiIconFactory.Folder + "icon_achievement.png"), Color.white);
             icon.preserveAspect = true;
-            Place(icon.rectTransform, new Vector2(-194f, 4f), new Vector2(72f, 72f));
+            EdgePlace(icon.rectTransform, 0f, 0f, new Vector2(0f, 0.5f), new Vector2(18f, 4f), new Vector2(82f, 82f));
 
-            TMP_Text name = Text(row, "NameText", "첫 수확", new Vector2(20f, 32f), new Vector2(280f, 38f), 28f, Color.white,
+            TMP_Text name = Text(row, "NameText", "첫 수확", Vector2.zero, Vector2.zero, 30f, Color.white,
                 TextAlignmentOptions.Left);
-            TMP_Text tag = Text(row, "TagText", "DEADLINE", new Vector2(172f, 36f), new Vector2(110f, 24f), 17f, Pink,
+            Span(name.rectTransform, 120f, 190f, 34f, 40f);
+            TMP_Text tag = Text(row, "TagText", "DEADLINE", Vector2.zero, Vector2.zero, 18f, Pink,
                 TextAlignmentOptions.Right);
+            EdgePlace(tag.rectTransform, 1f, 1f, new Vector2(1f, 0.5f), new Vector2(-20f, 36f), new Vector2(160f, 26f));
             tag.characterSpacing = 3f;
-            TMP_Text description = Text(row, "DescriptionText", "적을 처음으로 처치했습니다.", new Vector2(50f, -6f),
-                new Vector2(340f, 46f), 20f, new Color(0.9f, 0.85f, 0.95f), TextAlignmentOptions.TopLeft);
+            TMP_Text description = Text(row, "DescriptionText", "적을 처음으로 처치했습니다.", Vector2.zero,
+                Vector2.zero, 22f, new Color(0.9f, 0.85f, 0.95f), TextAlignmentOptions.TopLeft);
+            Span(description.rectTransform, 120f, 20f, -4f, 46f);
             description.textWrappingMode = TextWrappingModes.Normal;
             description.enableAutoSizing = true;
-            description.fontSizeMin = 16f;
+            description.fontSizeMin = 17f;
 
             Image barBack = Img(row, "ProgressBar", null, new Color(1f, 1f, 1f, 0.14f));
-            Place(barBack.rectTransform, new Vector2(-20f, -42f), new Vector2(200f, 12f));
+            Span(barBack.rectTransform, 120f, 180f, -44f, 12f);
             Image fill = Img(barBack.rectTransform, "Fill", null, Pink);
             Stretch(fill.rectTransform);
             fill.sprite = Load(UiIconFactory.Folder + "ui_hud_pill.png");
             fill.type = Image.Type.Filled;
             fill.fillMethod = Image.FillMethod.Horizontal;
             fill.fillAmount = 0.35f;
-            TMP_Text progress = Text(row, "ProgressText", "35 / 100", new Vector2(160f, -42f), new Vector2(130f, 28f), 21f,
+            TMP_Text progress = Text(row, "ProgressText", "35 / 100", Vector2.zero, Vector2.zero, 22f,
                 Color.white, TextAlignmentOptions.Right);
+            EdgePlace(progress.rectTransform, 1f, 1f, new Vector2(1f, 0.5f), new Vector2(-20f, -44f), new Vector2(150f, 28f));
 
             var so = new SerializedObject(component);
             so.FindProperty("stateIcon").objectReferenceValue = icon;
@@ -353,6 +374,29 @@ namespace Deadline4Sec.Editor
             rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0.5f, 0.5f);
             rect.anchoredPosition = position;
             rect.sizeDelta = size;
+            rect.localScale = Vector3.one;
+        }
+
+        // Fixed-size element anchored at a row edge (x anchor 0 = left, 1 = right).
+        private static void EdgePlace(RectTransform rect, float anchorMinX, float anchorMaxX, Vector2 pivot,
+            Vector2 position, Vector2 size)
+        {
+            rect.anchorMin = new Vector2(anchorMinX, 0.5f);
+            rect.anchorMax = new Vector2(anchorMaxX, 0.5f);
+            rect.pivot = pivot;
+            rect.anchoredPosition = position;
+            rect.sizeDelta = size;
+            rect.localScale = Vector3.one;
+        }
+
+        // Stretches across the row between a left and a right margin.
+        private static void Span(RectTransform rect, float left, float right, float y, float height)
+        {
+            rect.anchorMin = new Vector2(0f, 0.5f);
+            rect.anchorMax = new Vector2(1f, 0.5f);
+            rect.pivot = new Vector2(0.5f, 0.5f);
+            rect.anchoredPosition = new Vector2((left - right) * 0.5f, y);
+            rect.sizeDelta = new Vector2(-(left + right), height);
             rect.localScale = Vector3.one;
         }
 

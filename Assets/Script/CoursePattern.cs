@@ -17,7 +17,7 @@ namespace Deadline4Sec
         public const float UpperDeckHeight = 8f;
 
         public enum DifficultyLevel { Easy, Medium, Hard }
-        public enum PatternCategory { GroundCombat, AirCombat, Obstacle, Stomp, Mixed, AirRoute }
+        public enum PatternCategory { GroundCombat, AirCombat, Obstacle, Stomp, Mixed, AirRoute, WallRun }
         public enum TravelState { Ground, Air, Any, Upper }
 
         [SerializeField, Min(1f)] private float patternLength = 20f;
@@ -36,6 +36,8 @@ namespace Deadline4Sec
         public bool IsAirRouteEntry => exitState == TravelState.Upper && entryState != TravelState.Upper;
         public bool IsUpperRun => entryState == TravelState.Upper && exitState == TravelState.Upper;
         public bool IsUpperReturn => entryState == TravelState.Upper && exitState != TravelState.Upper;
+        // Wall Run (2026-10-18): a special Ground -> Ground section with a floor gap.
+        public bool IsWallRun => category == PatternCategory.WallRun;
 
         public float PatternLength
         {

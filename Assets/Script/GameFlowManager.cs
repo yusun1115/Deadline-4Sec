@@ -453,6 +453,8 @@ namespace Deadline4Sec
             inventory.Revive();
             extrasUI?.HideRevive();
             playerController?.RestoreDeathPose();
+            // Wall Run: a fall or wall hit restarts before the section's entry.
+            playerController?.ReturnToWallRunCheckpoint();
             gameTimer.ReviveRun();
             if (playerController != null)
                 playerController.enabled = true;

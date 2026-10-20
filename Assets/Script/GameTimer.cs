@@ -17,6 +17,8 @@ namespace Deadline4Sec
         [SerializeField] private Color criticalTimeColor = new Color(1f, 0.16f, 0.31f);
         [SerializeField, Min(0f)] private float warningAtSeconds = 2.5f;
         [SerializeField, Min(0f)] private float criticalAtSeconds = 1f;
+        // Held on a wall (Wall Run): the number turns this colour while it waits.
+        [SerializeField] private Color wallPausedTimeColor = new Color(0.72f, 0.62f, 1f);
 
         public const float BaseDuration = 4f;
         private float remainingTime;
@@ -32,8 +34,10 @@ namespace Deadline4Sec
         public float MaximumTime => maximumTime;
         public bool IsGameOver => isGameOver;
         public bool IsRunning => isRunning && !isGameOver;
+        // Deadline countdown held because the runner is on a wall (Wall Run).
+        public bool IsHeldByWallRun => IsRunning && !untimed && playerController != null && playerController.IsWallRunning;
         public event Action<float> TimerReset;
-        public enum DeathReason { TimerExpired, Collision }
+        public enum DeathReason { TimerExpired, Collision, Fall }
 
         // Presentation only: why the last run ended (collision vs. reaching 0 s).
         public DeathReason LastDeathReason { get; private set; }
@@ -100,8 +104,10 @@ namespace Deadline4Sec
             if (!IsRunning || untimed || Time.frameCount == runStartedFrame)
                 return;
 
+            // The countdown holds while Freeze Clock runs and while the runner is
+            // on a wall (Wall Run, 2026-10-18); it resumes after the exit.
             PowerUpManager powerUps = GetComponent<PowerUpManager>();
-            if (powerUps == null || !powerUps.TimerFrozen)
+            if ((powerUps == null || !powerUps.TimerFrozen) && !IsHeldByWallRun)
                 remainingTime = Mathf.Max(0f, remainingTime - deltaTime);
             UpdateTimeText();
 
@@ -200,6 +206,16 @@ namespace Deadline4Sec
             TriggerGameOver();
         }
 
+        // Wall Run (2026-10-18): falling into a floor gap. Not a contact, so the
+        // Shield (which only blocks enemy / obstacle contact) does not stop it.
+        public void TriggerFallDeath()
+        {
+            if (!IsRunning)
+                return;
+            LastDeathReason = DeathReason.Fall;
+            TriggerGameOver();
+        }
+
         public void TriggerGameOver()
         {
             if (isGameOver || !isRunning)
@@ -226,7 +242,7 @@ namespace Deadline4Sec
             if (timeText != null)
             {
                 timeText.text = remainingTime.ToString("F2", CultureInfo.InvariantCulture);
-                timeText.color = remainingTime <= criticalAtSeconds
+                timeText.color = IsHeldByWallRun ? wallPausedTimeColor : remainingTime <= criticalAtSeconds
                     ? criticalTimeColor
                     : remainingTime <= warningAtSeconds
                         ? warningTimeColor

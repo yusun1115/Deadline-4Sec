@@ -27,7 +27,6 @@ namespace Deadline4Sec.Editor
         };
 
         private const string SettingsPath = "Assets/Resources/GooglePlay/GooglePlaySettings.asset";
-        private const string Generated = "Assets/Art/2D/Generated/";
         private static readonly Color Pink = new Color(1f, 0.32f, 0.62f);
         private static readonly Color Gold = new Color(1f, 0.86f, 0.42f);
 
@@ -81,21 +80,28 @@ namespace Deadline4Sec.Editor
             Stretch(backdrop.rectTransform);
             OnClick(backdrop.gameObject, backdrop, panel.Close, Selectable.Transition.None);
 
-            Image dialog = Img(root, "Dialog", Load(Generated + "ui_panel_gothic.png"), Color.white);
-            dialog.type = Image.Type.Sliced;
+            // Temporary dialog (2026-10-18): the gothic panel art's thick
+            // ornaments squeezed the buttons, so a plain dark panel with a pink
+            // outline and accent bars (same as the achievement list) stands in.
+            Image dialog = Img(root, "Dialog", null, new Color(0.11f, 0.05f, 0.15f, 0.96f));
+            dialog.type = Image.Type.Simple;
             dialog.raycastTarget = true; // taps on the dialog do not close it
-            // The frame's ornaments take ~150 units at the top and bottom, so the
-            // content sits inside ±280 and the heading goes above the frame.
-            Place(dialog.rectTransform, new Vector2(0f, -20f), new Vector2(700f, 860f));
+            Place(dialog.rectTransform, new Vector2(0f, -10f), new Vector2(720f, 660f));
             RectTransform box = dialog.rectTransform;
+            Border(dialog, new Color(1f, 0.32f, 0.62f, 0.75f));
+            foreach (bool top in new[] { true, false })
+            {
+                Image bar = Img(box, top ? "TopAccent" : "BottomAccent", null, Pink);
+                Place(bar.rectTransform, new Vector2(0f, top ? 330f : -330f), new Vector2(220f, 6f));
+            }
 
-            Text(box, "HeadingText", "LEADERBOARD", new Vector2(0f, 476f), new Vector2(560f, 70f), 54f, Color.white).characterSpacing = 4f;
+            Text(box, "HeadingText", "LEADERBOARD", new Vector2(0f, 258f), new Vector2(600f, 70f), 54f, Color.white).characterSpacing = 4f;
 
-            TMP_Text deadlineBest = ModeButton(box, "DeadlineButton", "DEADLINE MODE", new Vector2(0f, 150f), Pink, panel.OpenDeadline);
-            TMP_Text classicBest = ModeButton(box, "ClassicButton", "CLASSIC MODE", new Vector2(0f, -36f), new Color(1f, 0.7f, 0.85f),
+            TMP_Text deadlineBest = ModeButton(box, "DeadlineButton", "DEADLINE MODE", new Vector2(0f, 92f), Pink, panel.OpenDeadline);
+            TMP_Text classicBest = ModeButton(box, "ClassicButton", "CLASSIC MODE", new Vector2(0f, -96f), new Color(1f, 0.7f, 0.85f),
                 panel.OpenClassic);
 
-            TMP_Text status = Text(box, "StatusText", "", new Vector2(0f, -200f), new Vector2(480f, 80f), 26f, Color.white);
+            TMP_Text status = Text(box, "StatusText", "", new Vector2(0f, -248f), new Vector2(620f, 80f), 26f, Color.white);
             status.textWrappingMode = TextWrappingModes.Normal;
 
             Image back = Img(root, "BackButton", Load(UiIconFactory.Folder + "ui_round_button.png"), Color.white);
@@ -127,16 +133,33 @@ namespace Deadline4Sec.Editor
                 OnClick(opener.gameObject, opener.GetComponent<Graphic>(), panel.Open, Selectable.Transition.ColorTint);
         }
 
-        // Gothic button with the mode name and, under it, the local best.
+        // Temporary mode button (plain panel, accent outline and side stripe)
+        // with the mode name and, under it, the local best.
         private static TMP_Text ModeButton(RectTransform parent, string name, string label, Vector2 position, Color accent,
             UnityAction action)
         {
-            Image button = Img(parent, name, Load(Generated + "ui_button_gothic.png"), Color.white);
-            button.preserveAspect = true;
-            Place(button.rectTransform, position, new Vector2(520f, 150f));
+            Image button = Img(parent, name, null, new Color(0.2f, 0.08f, 0.24f, 1f));
+            button.preserveAspect = false;
+            Place(button.rectTransform, position, new Vector2(620f, 172f));
+            Border(button, new Color(accent.r, accent.g, accent.b, 0.85f));
             OnClick(button.gameObject, button, action, Selectable.Transition.ColorTint);
-            Text(button.rectTransform, "Label", label, new Vector2(0f, 12f), new Vector2(380f, 56f), 42f, accent);
-            return Text(button.rectTransform, "BestText", "MY BEST  0", new Vector2(0f, -30f), new Vector2(360f, 32f), 24f, Gold);
+            Image stripe = Img(button.rectTransform, "Stripe", null, accent);
+            RectTransform sr = stripe.rectTransform;
+            sr.anchorMin = new Vector2(0f, 0f);
+            sr.anchorMax = new Vector2(0f, 1f);
+            sr.pivot = new Vector2(0f, 0.5f);
+            sr.anchoredPosition = Vector2.zero;
+            sr.sizeDelta = new Vector2(10f, 0f);
+            sr.localScale = Vector3.one;
+            Text(button.rectTransform, "Label", label, new Vector2(0f, 22f), new Vector2(560f, 64f), 48f, accent);
+            return Text(button.rectTransform, "BestText", "MY BEST  0", new Vector2(0f, -38f), new Vector2(520f, 40f), 30f, Gold);
+        }
+
+        private static void Border(Graphic graphic, Color color)
+        {
+            Outline outline = graphic.TryGetComponent(out Outline o) ? o : graphic.gameObject.AddComponent<Outline>();
+            outline.effectColor = color;
+            outline.effectDistance = new Vector2(3f, -3f);
         }
 
         private static Sprite Load(string path) => AssetDatabase.LoadAssetAtPath<Sprite>(path);

@@ -15,6 +15,13 @@ namespace Deadline4Sec
         public AudioClip slide;
         public AudioClip fastFall;
 
+        // Wall Run (2026-10-18). Empty: attach / switch reuse laneMove, the fall
+        // uses a synthesized wind placeholder.
+        [Header("Wall run")]
+        public AudioClip wallAttach;
+        public AudioClip wallSwitch;
+        public AudioClip fallWind;
+
         [Header("Combat")]
         public AudioClip homing;
         public AudioClip kill;

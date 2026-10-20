@@ -18,6 +18,8 @@
 | Course/Build Extended Pattern Library | 신규 패턴 12종 + 세트피스(시계탑 게이트, 고딕 아치, 화물칸 1·2량)를 생성하고 세 씬의 PatternSpawner에 등록. 다시 실행하면 같은 이름의 패턴을 덮어씀 |
 | UI/Apply Mode Select | (2026-10-11 개편) 타이틀의 예전 `< DEADLINE >` 선택기를 지우고 전체화면 팝업 `TitlePanel/ModeSelectPopup`(비활성) 생성: 왼쪽 클래식·오른쪽 데드라인 아트(`Art/2D/ModeSelect_*.png`) + 데코 라인, 하단 패널(모드 이름 흰색 / 태그라인 핑크 / 설명) + SELECT 버튼. On Click: `ModeSelect_Btn` → `ModeSelectUI.Open`, 각 아트 → `ChooseClassic/ChooseDeadline`, SELECT → `Confirm`(모드 적용 후 타이틀로). 선택 안 된 쪽은 `UIGrayscale` 셰이더로 흑백+어둡게. 데드라인 아트의 터치 영역은 `ModeSplitHitArea`(대각선 경계 topX/bottomX)로 잘라 왼쪽 터치는 클래식으로 감. 문구는 ModeSelectUI 인스펙터에서 편집. 세 씬 적용(`ModeSelect_Btn`은 EndlessRun에만 있음) |
 | Course/Build Train Patterns | 서브웨이 서퍼 스타일 전철: `Train`(멈춰있는 전철, 2.2×2.8×14m, 정면·측면 충돌 즉사, 지붕 착지 안전, 점프로 못 올라감) / `Train Ramp`(앞에 경사로 — 경사로는 Obstacle 밖 형제 오브젝트라 닿아도 안전, 지붕보다 0.15m 높게 끝나 지붕으로 내려섬) + 패턴 R(Easy 전철 사이 통로)·S(Medium 가운데 경사로 전철 + 양옆 전철)·T(Hard 전철 피하고 다른 레인 경사로 전철 오르기) 생성·세 씬 등록. 활성 씬이 저장된 상태에서 실행 |
+| Course/Build Air Route Patterns | (2026-10-16, Upper Platform.md) 공중 경로 패턴 5종 U1(진입)·U5(진입 Weave, Hard)·U2/U3(상층 달리기)·U4(복귀) 생성·세 씬 등록. 상층 덱은 `Upper Deck`(높이 8m, 폭 8.6m, FloorColor + `OneWayPlatform`) + 핑크 가장자리·거더(콜라이더 없음). 활성 씬이 저장된 상태에서 실행 |
+| Course/Build Wall Run Patterns | (2026-10-18, Wall Run.md) Wall Run 패턴 2종 W1(왼쪽 진입)·W2(오른쪽 진입) 생성·세 씬 등록. 바닥 구멍(26~53m) 양옆에 벽 패널(시각용, 콜라이더 없음)·핑크 러닝 라인·바닥 끝 발광 립·구덩이 바닥, `SetPiece Wall Run` 안에 `WallRunSection`(WallRunEntry 트리거, WallRunExit, Left/RightWallAnchor, GroundExitAnchor, ReviveCheckpoint) + `FallDeathTrigger`. 활성 씬이 저장된 상태에서 실행 |
 | UI/Apply Result Screen Layout | 결과창 정보 계층(큰 SCORE → 거리/콤보/시간 3열 → NEW BEST → PERSONAL BEST → RUN REWARD → MAIN MENU \| RETRY 가로 버튼) + 뒤 어두운 오버레이 + `ResultPresenter` 연결. 기존 오브젝트 이름·참조·On Click 유지, ConfirmButton은 비활성(2026-10-09 OPEN REWARDS 제거 요청 — 상자는 두 버튼 모두 기존 상자 오픈 흐름을 먼저 거침). 세 씬 적용 |
 | UI/Build Loading Scene | `Assets/Scenes/Loading.unity` 생성(키아트 + LOADING... + bg/fill/frame 게이지 + 랜덤 팁) 후 Build Settings 0번에 배치. 다시 실행해도 인스펙터에 적은 팁 목록은 유지 |
 | UI/Apply Number Font To HUD | CallifontSharpie-Bold TMP 에셋 생성(`Resources/Fonts/CallifontSharpie-Bold SDF`) + HUD 숫자 라벨(타이머·점수·거리·코인·선물상자 수)에 `NumericLabel` 부착·크기 보정 |
@@ -137,8 +139,34 @@
 - 세트피스(시계탑 게이트, 고딕 아치)는 콜라이더 없는 장식이다.
 - 패턴 안 아이템/상자는 후보일 뿐이다: `PatternSpawner`의 `powerUpChance`(0.3)·`giftBoxChance`(0.18)·`maxPowerUpsPerPattern`(1)로 생성 시 남길지 결정한다. 코인은 항상 나온다. 별도 시드 스트림이라 고정 시드의 코스 순서는 그대로다.
 - 전철(2026-10-10): `Obstacle.ObstacleType.RampTrain` 추가(경사로 전철 라벨). 전철의 Near Miss 좌우 여유는 0.35m — 옆 레인을 달리는 것만으로는 Near Miss가 아니고, 정면 직전에 레인을 바꿔 스칠 때만 인정. 리플레이 봇 규칙상 단독 전철은 왼쪽(-1) 레인 또는 좌우 쌍으로, 지붕 위엔 공중 적만, 지붕에서 떨어진 뒤 지상 적은 착지 지점(최고 속도 ~18m) 이후에 배치. Reaper Rush는 지붕도 통과하므로 지붕 위에 두지 않음.
-- 기존 코스 특성 메모: Air로 끝나는 패턴(C·D·J·L·M·O·P) 뒤엔 Air/Any 입장 패턴만 올 수 있어, 한 번 공중 패턴 흐름에 들어가면 지상 패턴(전철 포함)으로 돌아오지 않음. 지상 복귀용 Air→Ground 패턴이 있으면 해결됨(미적용).
+- 기존 코스 특성 메모: Air로 끝나는 패턴(C·D·J·L·M·O·P) 뒤엔 Air/Any 입장 패턴만 올 수 있어, 한 번 공중 패턴 흐름에 들어가면 지상 패턴(전철 포함)으로 돌아오지 않았음. 2026-10-16부터 공중 경로 진입(U1·U5)이 Any 입장이라 이 흐름에서도 나오고, 복귀(U4)가 Ground로 끝나 고리가 끊김.
 - 배치 규칙(리플레이 봇 기준): 연속 점프 금지(점프 체공 ~8m), 지상 적은 인접 레인으로 ≥5m 간격, 높은 공중 콤보 직후에는 Ground 입장 패턴만.
+
+## Air Route + Upper Platform (2026-10-16, Upper Platform.md)
+
+- **흐름**: 공중 적 호밍 연쇄로 상승 → 상층 덱 착지 → 상층 달리기 1~2개 → 덱 끝에서 낙하해 지상 복귀. 연쇄를 놓치면 그대로 아래 경로(지상)로 진행 — 아래 경로에도 Soul·적·장애물이 있어 손해만 있고 죽지 않음.
+- **두 층 패턴**: 패턴 하나에 지상(기존 바닥)과 덱(`CoursePattern.UpperDeckHeight` = 8m)이 함께 있음. 덱 높이가 항상 같아서 패턴 사이 Y 연결 계산이 필요 없음. `TravelState.Upper` 추가: Upper는 Upper하고만 연결(Any도 안 됨). 진입 = Any→Upper, 상층 = Upper→Upper, 복귀 = Upper→Ground. `PatternCategory.AirRoute` 추가.
+- **연쇄 배치**: 공중 적은 레인을 번갈아 5m 간격으로 상승, 마지막 적은 덱보다 1m 위·덱 1.5m 앞 → 그 킬의 바운스로 덱에 착지. 놓쳤을 때는 마지막으로 잡은 적의 레인(다음 적 아래가 아님)으로 떨어지고, 덱 앞면(7.5m) 아래로 지나갈 수 있는 높이.
+- **스포너(`PatternSpawner`, 인스펙터 Air Route)**: `airRouteStartsAtSeconds`(25) 이후, 일반 패턴 `groundPatternsBetweenAirRoutesMin~Max`(5~8)개마다 진입 패턴, 상층 `upperPatternsMin~Max`(1~2)개 후 복귀. 연속 공중 경로 없음. 상층 중에는 난이도·카테고리 연속 규칙을 보지 않음. 공중 경로는 별도 난수(`fixedSeed + 104729`)를 써서 첫 공중 경로 전까지 기존 시드의 코스 순서가 그대로.
+- **`OneWayPlatform`**: 덱은 위에서만 단단함. 발이 덱 윗면보다 아래면 플레이어와 충돌 무시 → 아래 경로에서 점프·스톰프·Ground Slam 바운스가 덱 밑면/앞면에 걸리지 않고, 위에서 내려오면 착지. 레이캐스트(Ground Slam 높이 계산 등)는 덱을 그대로 봄.
+- **카메라(`CameraFeedbackController`, Vertical follow)**: 착지한 바닥 높이를 기준으로, 플레이어가 기준+`verticalFollowThreshold`(2.2m) 위로 올라가면 따라 올라가고, 기준보다 아래로 내려가면 바로 따라 내려감(`verticalFollowMaxDropLag` 0.8m 이내). 일반 점프(1.6m)는 데드존 안이라 카메라가 안 움직임. `verticalFollowSpeed`(5)로 부드럽게.
+- **모드**: 호밍 킬마다 기존 규칙대로 Deadline 타이머 리셋. Classic도 같은 경로. 플레이어 컨트롤·입력·호밍 코드는 변경 없음.
+- **테스트 봇**: 리플레이 봇(`CourseReplayAcceptanceTests.Drive`)과 `DevAutoPilot`은 발밑 바닥 높이(`FloorUnder`)를 기준으로 같은 층의 위협만 봄(덱 위 적·장애물은 아래 경로에서 무시, 그 반대도). `AirRouteAcceptanceTests` 7종: 패턴 구조, 스포너 규칙, Deadline/Classic 상승·덱 플레이, 연쇄 실패·빠른 낙하 후 아래 경로, 복귀 낙하·카메라.
+
+## Wall Run (2026-10-18, Wall Run.md)
+
+- **흐름**: 지상 → 바닥이 끊기는 구간 → 진입 창(WallRunEntry) 안에서 벽 방향으로 좌/우 입력 → 벽 부착 → 좌/우 입력으로 반대 벽 전환하며 벽 장애물 회피 → WallRunExit에서 일반 상태로 → 벽 쪽 레인에 착지. 자동 부착 없음. 입력이 없거나 반대 방향이거나 창이 끝난 뒤면 그대로 떨어져 `FallDeathTrigger` → `GameTimer.DeathReason.Fall`.
+- **상태**: `PlayerController.MovementState { Normal, WallRun }` 추가(새 컨트롤러/입력 없음). WallRun 중엔 중력·점프·슬라이드/빠른 낙하/슬램·호밍 OFF, 좌/우 = 벽 전환(같은 방향·전환 중 입력 무시). 좌/우 입력 우선순위: WallRun 전환 > 진입 창의 부착 > 일반 레인 이동 → 한 번의 스와이프가 레인 이동과 부착을 동시에 하지 않음. 키보드(A/D/←/→)·스와이프 모두 `RequestMoveLeft/Right` 경유라 같은 분기.
+- **이동**: 부착 0.2초(`wallAttachDuration`)·전환 0.28초(`wallSwitchDuration`) 동안 SmoothStep으로 앵커 라인(X, 발 높이 0.8m)까지 이동하면서 앞으로는 계속 달림(`wallRunSpeedMultiplier` 1 × 현재 달리기 속도, +Z). 벽 장애물은 기존 `Obstacle`(Lane Blocker) → 충돌 즉사·Shield 1회 방어·Near Miss(늦게 피하면 타이머 리셋) 그대로.
+- **기울기**: `wallRunTiltAngle`(16°, 벽 쪽으로) — 모델은 `PlayerCharacterAnimator`, 무기는 PlayerController가 같은 피벗으로 회전. 전환 중 중간에 똑바로 섰다가 반대로 기욺. 전용 애니메이션 없음(Run 상태 사용, 나중에 WallRun_Left/Right로 교체 가능).
+- **카메라**: Wall Run 중 FOV +4(`wallRunFovBoost`), 부착 시 FOV 펀치, 전환 시 옆으로 살짝 밀림. 카메라 롤 없음. 낙사 때는 카메라가 최대 3.5m(`fallDeathCameraLag`) 위에 남고 캐릭터가 떨어져 내려감.
+- **낙사 연출**: 히트 스톱·플래시·타이머 펀치·슬로모션 없음(`MomentFx`), 충돌음 대신 바람 소리 플레이스홀더(`SoundLibrary.fallWind` 슬롯, 비면 합성 노이즈), 사망 포즈 대신 계속 낙하. Shield는 낙사를 막지 않음(접촉 사망만 방어하는 기존 정책).
+- **부활**: 구간(체크포인트~착지 지점) 안에서 죽으면 `ReviveCheckpoint`(진입 창 직전 지상, 가운데 레인)에서 부활. 낙사·벽 장애물 사망 모두.
+- **Deadline**: 벽 위에 있는 동안(부착~출구) 타이머 멈춤(2026-10-18 요청, `GameTimer.Tick`), 출구 후 다시 감소. 멈춘 동안 숫자가 보라색(`GameTimer.wallPausedTimeColor`)이 되고 타이머 뒤 은은한 보라 빛 + 아래 "❚❚ PAUSE" 표시(`MomentFx`), 마지막 1.5초 압박 연출(틱·심장박동·붉은 비네트)은 멈춤. 부착·전환은 타이머를 리셋하지 않음. 진입 창 직전 적(12m)·착지 후 적(59.5m)이 앞뒤 리셋 기회. Classic은 같은 패턴.
+- **스포너(인스펙터 Wall Run)**: `wallRunStartsAtSeconds`(45) 이후, `patternsBetweenWallRunsMin~Max`(6~10)개마다, 특수 구간(공중 경로·Wall Run) 뒤 일반 패턴 `normalPatternsAfterSpecial`(3)개 보장. 공중 경로와 동시에 차례가 되면 더 오래 기다린 쪽 먼저. Wall Run은 Ground 입장이라 공중 패턴 흐름(Air 종료) 뒤엔 못 오므로, 차례가 된 뒤엔 일반 패턴을 지상 종료 패턴 위주로 골라 지상을 유지. 별도 난수(`fixedSeed + 15485863`)라 첫 Wall Run 전까지 기존 시드 코스 그대로. 바닥은 구멍 앞/뒤 두 조각으로 생성.
+- **튜토리얼 훅**: `WallRunSection.EntryReached`(정적 이벤트, 구간마다 1회) — 나중에 "← SWIPE" 표시 연결용.
+- **테스트 봇**: 리플레이 봇·`DevAutoPilot`이 진입 창에서 벽 방향 입력, 벽 위에선 앞 장애물 반대쪽으로 전환. `WallRunAcceptanceTests` 16종.
+- **실기기 확인 필요**: Android 스와이프 판정·부착·전환·낙사·카메라(명세 §75)는 기기에서 직접 확인해야 함.
 
 ## Tripo 사용 기록
 

@@ -63,10 +63,26 @@ namespace Deadline4Sec
         [SerializeField, Min(0.1f)] private float verticalFollowSpeed = 5f;
         [SerializeField, Min(0f)] private float verticalFollowMaxDropLag = 0.8f;
 
+        // Wall Run (2026-10-18): a slightly wider view on the wall, a small FOV
+        // punch on attach and a light sideways nudge on a switch. No camera
+        // roll (a tilted screen would confuse swipe directions). A fall death
+        // lets the runner drop away below the camera.
+        [Header("Wall run")]
+        [SerializeField, Range(0f, 10f)] private float wallRunFovBoost = 4f;
+        [SerializeField, Range(0f, 10f)] private float wallAttachFovPunch = 3f;
+        [SerializeField, Min(0.01f)] private float wallAttachFovDuration = 0.25f;
+        [SerializeField, Range(0f, 0.3f)] private float wallSwitchImpulse = 0.12f;
+        [SerializeField, Min(0f)] private float fallDeathCameraLag = 3.5f;
+
         private Vector3 baseLocalPosition;
         private Quaternion baseLocalRotation;
         private PlayerController followPlayer;
         private float followY;
+        private GameTimer fallTimer;
+        private float impulseSize = NearMissImpulseSize;
+        private AudioClip wallAttachClip;
+        private AudioClip wallSwitchClip;
+        private AudioClip fallWindClip;
         private float followAnchorY;
         private bool followReady;
         private bool introActive;
@@ -129,6 +145,7 @@ namespace Deadline4Sec
             baseLocalPosition = transform.localPosition;
             baseLocalRotation = transform.localRotation;
             followPlayer = GetComponentInParent<PlayerController>();
+            fallTimer = FindFirstObjectByType<GameTimer>();
             noiseSeedX = 17.31f;
             noiseSeedY = 93.77f;
             if (targetCamera != null)
@@ -221,8 +238,12 @@ namespace Deadline4Sec
             else if (playerY < followAnchorY)
                 target = playerY;
             followY = Mathf.Lerp(followY, target, 1f - Mathf.Exp(-verticalFollowSpeed * Time.unscaledDeltaTime));
-            // Hard limits keep the runner on screen while the lag catches up.
-            followY = Mathf.Clamp(followY, playerY - verticalFollowThreshold, playerY + verticalFollowMaxDropLag);
+            // Hard limits keep the runner on screen while the lag catches up
+            // (a fall death may leave the camera further above).
+            bool fallDeath = gameFlow != null && !gameFlow.IsPlaying && fallTimer != null &&
+                             fallTimer.LastDeathReason == GameTimer.DeathReason.Fall;
+            followY = Mathf.Clamp(followY, playerY - verticalFollowThreshold,
+                playerY + (fallDeath ? fallDeathCameraLag : verticalFollowMaxDropLag));
             return followY - playerY;
         }
 
@@ -232,7 +253,7 @@ namespace Deadline4Sec
             float t = (Time.unscaledTime - impulseStart) / 0.18f;
             if (t < 0f || t >= 1f || gameFlow == null || !gameFlow.IsPlaying)
                 return Vector3.zero;
-            return impulseDirection * (NearMissImpulseSize *Mathf.Sin(t * Mathf.PI) * (1f - t * 0.5f));
+            return impulseDirection * (impulseSize * Mathf.Sin(t * Mathf.PI) * (1f - t * 0.5f));
         }
 
         public void BeginRunIntro(float duration)
@@ -327,6 +348,7 @@ namespace Deadline4Sec
                 {
                     impulseDirection = Vector3.right * -Mathf.Sign(side);
                     impulseStart = Time.unscaledTime;
+                    impulseSize = NearMissImpulseSize;
                 }
                 else
                 {
@@ -353,6 +375,39 @@ namespace Deadline4Sec
                 case PlayerController.PlayerAction.SlamStart: PlaySound(fastFallClip); break;
                 default: PlaySound(movementClip); break;
             }
+        }
+
+        // Restart the vertical follow at the runner's height (revive teleport).
+        public void SnapVerticalFollow() => followReady = false;
+
+        public void PlayWallAttach(int direction)
+        {
+            if (!CanPlayFeedback())
+                return;
+            PlaySound(wallAttachClip);
+            PlayFovPulse(wallAttachFovPunch, wallAttachFovDuration);
+            if (particles != null)
+                particles.PlayWallRun(direction);
+            Vibrate(18, 60);
+        }
+
+        public void PlayWallSwitch(int direction)
+        {
+            if (!CanPlayFeedback())
+                return;
+            PlaySound(wallSwitchClip);
+            impulseDirection = Vector3.right * Mathf.Sign(direction);
+            impulseStart = Time.unscaledTime;
+            impulseSize = wallSwitchImpulse;
+            if (particles != null)
+                particles.PlayWallRun(direction);
+        }
+
+        // Fall death: wind instead of an impact (GameTimer.DeathReason.Fall).
+        public void PlayFallDeath()
+        {
+            PlaySound(fallWindClip);
+            Vibrate(60, 90);
         }
 
         public void PlayPickup(bool powerUp)
@@ -389,6 +444,11 @@ namespace Deadline4Sec
 
         public void PlayGameOver()
         {
+            if (fallTimer != null && fallTimer.LastDeathReason == GameTimer.DeathReason.Fall)
+            {
+                PlayFallDeath();
+                return;
+            }
             PlaySound(gameOverClip);
             Vibrate(110, 200);
         }
@@ -428,6 +488,11 @@ namespace Deadline4Sec
             gameOverClip = Pick(l != null ? l.gameOver : null, "Game Over", 135f, 0.34f);
             uiClip = Pick(l != null ? l.uiClick : null, "UI Click", 560f, 0.045f);
             coinClip = Pick(l != null ? l.coin : null, "Soul", 1320f, 0.06f);
+            wallAttachClip = l != null && l.wallAttach != null ? l.wallAttach : movementClip;
+            wallSwitchClip = l != null && l.wallSwitch != null ? l.wallSwitch : movementClip;
+            fallWindClip = l != null && l.fallWind != null ? l.fallWind : CreateWind();
+            if (l == null || l.fallWind == null)
+                generatedClips.Add(fallWindClip);
             for (int i = 0; i < soulVoices.Length; i++)
             {
                 AudioSource voice = gameObject.AddComponent<AudioSource>();
@@ -462,6 +527,26 @@ namespace Deadline4Sec
                 samples[i] = Mathf.Sin(phase) * envelope * 0.3f;
             }
             AudioClip clip = AudioClip.Create(name, count, 1, sampleRate, false);
+            clip.SetData(samples, 0);
+            return clip;
+        }
+
+        // Placeholder fall wind: soft low-passed noise that swells and fades.
+        private static AudioClip CreateWind()
+        {
+            const int sampleRate = 22050;
+            int count = Mathf.CeilToInt(sampleRate * 0.9f);
+            float[] samples = new float[count];
+            System.Random noise = new System.Random(7);
+            float smooth = 0f;
+            for (int i = 0; i < count; i++)
+            {
+                float progress = i / (float)count;
+                smooth = Mathf.Lerp(smooth, (float)noise.NextDouble() * 2f - 1f, 0.06f + 0.1f * progress);
+                float envelope = Mathf.Sin(progress * Mathf.PI) * 0.8f;
+                samples[i] = smooth * envelope;
+            }
+            AudioClip clip = AudioClip.Create("Fall Wind", count, 1, sampleRate, false);
             clip.SetData(samples, 0);
             return clip;
         }
@@ -602,7 +687,8 @@ namespace Deadline4Sec
                     runManager.BaseForwardSpeed) / range);
             }
             float speedFov = Mathf.Lerp(baseSpeedFov, maxSpeedFov, speedT);
-            float targetFov = speedFov + temporaryFov + FovBias;
+            float wallFov = followPlayer != null && followPlayer.IsWallRunning ? wallRunFovBoost : 0f;
+            float targetFov = speedFov + temporaryFov + FovBias + wallFov;
             targetCamera.fieldOfView = Mathf.Lerp(targetCamera.fieldOfView,
                 targetFov, 1f - Mathf.Exp(-fovSmoothSpeed * unscaledDelta));
         }

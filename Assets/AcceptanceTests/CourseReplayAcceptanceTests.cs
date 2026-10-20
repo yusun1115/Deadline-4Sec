@@ -171,9 +171,49 @@ namespace Deadline4Sec.AcceptanceTests
             return best;
         }
 
+        private static void WallInput(Component player, Component target, string command, float time,
+            Dictionary<int, float> actions, StringBuilder trace)
+        {
+            int key = target.GetInstanceID() * 31 + command.GetHashCode();
+            if (actions.TryGetValue(key, out float last) && time - last < 0.12f)
+                return;
+            actions[key] = time;
+            trace.AppendLine($"WALL t={time:F2} z={player.transform.position.z:F2} {command} -> {target.name}");
+            Input(player, command);
+        }
+
         private static void Drive(Component player, float centerX, float time,
             Dictionary<int, float> actions, HashSet<int> bypassedEnemies, StringBuilder trace)
         {
+            // Wall Run (2026-10-18): swipe toward the open wall in the entry
+            // window, then switch away from an obstacle ahead on the current wall.
+            if ((bool)Read(player, "IsWallRunning"))
+            {
+                if ((bool)Read(player, "IsWallSwitching"))
+                    return;
+                int wall = Read(player, "CurrentWall").ToString() == "Left" ? -1 : 1;
+                foreach (Component obstacle in UnityEngine.Object.FindObjectsByType(Find("Obstacle"), FindObjectsSortMode.None))
+                {
+                    Bounds b = obstacle.GetComponent<Collider>().bounds;
+                    float ahead = b.min.z - player.transform.position.z;
+                    float side = b.center.x - centerX;
+                    if (ahead > 0f && ahead < 8f && Mathf.Abs(side) > 2f && Mathf.Sign(side) == wall)
+                    {
+                        WallInput(player, obstacle, wall < 0 ? "RequestMoveRight" : "RequestMoveLeft", time, actions, trace);
+                        return;
+                    }
+                }
+                return;
+            }
+            Component wallEntry = (Component)Find("WallRunSection").GetMethod("FindEntry")
+                .Invoke(null, new object[] { player.GetComponent<CharacterController>().bounds.center });
+            if (wallEntry != null)
+            {
+                WallInput(player, wallEntry, Read(wallEntry, "Available").ToString() == "Right" ? "RequestMoveRight" : "RequestMoveLeft",
+                    time, actions, trace);
+                return;
+            }
+
             Component next = null;
             float nextDistance = float.PositiveInfinity;
             // Two-level air routes (2026-10-16): only threats on the level the

@@ -178,6 +178,28 @@ namespace Deadline4Sec
             trailUntil = Time.unscaledTime + 0.25f;
         }
 
+        // Wall Run attach / switch: a short streak off the feet toward the wall
+        // and a brief scythe trail.
+        public void PlayWallRun(int direction)
+        {
+            if (player == null)
+                return;
+            Vector3 feet = player.transform.position + new Vector3(Mathf.Sign(direction) * 0.4f, -0.7f, 0f);
+            for (int i = 0; i < 12; i++)
+            {
+                var p = new ParticleSystem.EmitParams
+                {
+                    position = feet + new Vector3(Random.Range(-0.2f, 0.2f), Random.Range(0f, 1.4f), Random.Range(-0.4f, 0.4f)),
+                    velocity = new Vector3(Mathf.Sign(direction) * Random.Range(1f, 3f), 0f, -Random.Range(14f, 22f)),
+                    startSize = Random.Range(0.05f, 0.1f),
+                    startLifetime = Random.Range(0.16f, 0.26f),
+                    startColor = Color.Lerp(Violet, HotWhite, Random.value * 0.6f),
+                };
+                sparks.Emit(p, 1);
+            }
+            trailUntil = Time.unscaledTime + 0.3f;
+        }
+
         // ---------------- power-up hooks (PowerUpFx) ----------------
 
         // 0..1 while Reaper Rush runs: denser, brighter speed lines and a
