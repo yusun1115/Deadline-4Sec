@@ -14,41 +14,59 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Deadline4Sec.GameExtrasCatalog
   skins:
   - id: DefaultScythe
-    displayName: DEFAULT SCYTHE
+    displayName: NEON REAPER
     coinCost: 0
     currency: 0
     currencyCost: 0
     weaponMaterial: {fileID: 2100000, guid: 7b1e903e5cc8b884395469156a6649ef, type: 2}
+    weaponPrefab: {fileID: 0}
+    accentColor: {r: 1, g: 0.22, b: 0.55, a: 1}
+    icon: {fileID: 21300000, guid: 311278920a2b19547804e73fcfe65a0d, type: 3}
   - id: NeonReaper
-    displayName: NEON REAPER
+    displayName: STARLIGHT
     coinCost: 8000
     currency: 0
     currencyCost: 0
     weaponMaterial: {fileID: 2100000, guid: 014253d35b37a4345a90703cc0bb63a1, type: 2}
+    weaponPrefab: {fileID: 3221109424169006097, guid: 425ad11613f4aeb42b4f5200e27c5c39, type: 3}
+    accentColor: {r: 1, g: 0.82, b: 0.3, a: 1}
+    icon: {fileID: 21300000, guid: 978c6c4abc9cf5e4a9f1b10897d81bf2, type: 3}
   - id: FrostMoon
-    displayName: FROST MOON
+    displayName: FROST BITE
     coinCost: 0
     currency: 1
     currencyCost: 30
     weaponMaterial: {fileID: 2100000, guid: bfa5a7c7b1ad8e64dad570871d9a38e8, type: 2}
+    weaponPrefab: {fileID: 6966046127725743489, guid: 1c680f36bcda79640b1dc001451b24e2, type: 3}
+    accentColor: {r: 0.45, g: 0.85, b: 1, a: 1}
+    icon: {fileID: 21300000, guid: 602e55cf2e6e1424297c7998a6aacab7, type: 3}
   - id: BloodMoon
     displayName: BLOOD MOON
     coinCost: 0
     currency: 2
     currencyCost: 30
     weaponMaterial: {fileID: 2100000, guid: 65b6aedab9770d64fb8c5a4ac97e1ef6, type: 2}
+    weaponPrefab: {fileID: 6181723079349194160, guid: 830cc41f6fc1672468718f8290a04180, type: 3}
+    accentColor: {r: 1, g: 0.1, b: 0.18, a: 1}
+    icon: {fileID: 21300000, guid: 0f5df82bafba225418284c3f342a7c2e, type: 3}
   - id: CyberDeath
     displayName: CYBER DEATH
     coinCost: 0
     currency: 3
     currencyCost: 40
     weaponMaterial: {fileID: 2100000, guid: 90de5b4600ed4fb44b7e5e6ef01f9b04, type: 2}
+    weaponPrefab: {fileID: 440986010529471326, guid: 494df015e70ed8946b3aa9cc704ee7b8, type: 3}
+    accentColor: {r: 0.3, g: 1, b: 0.35, a: 1}
+    icon: {fileID: 21300000, guid: 06f05b7b0bc61c94882f228c5f14798d, type: 3}
   - id: Eclipse
     displayName: ECLIPSE
     coinCost: 15000
     currency: 4
     currencyCost: 25
     weaponMaterial: {fileID: 2100000, guid: cdcfc51afddaea448838c4ebf908c392, type: 2}
+    weaponPrefab: {fileID: 2335274906990273726, guid: cec044c14e597e34e8444c67932e5c80, type: 3}
+    accentColor: {r: 0.66, g: 0.3, b: 1, a: 1}
+    icon: {fileID: 21300000, guid: 08c24963fe27b3c4ead860a40ae717b1, type: 3}
   rewards:
   - kind: 0
     amount: 300

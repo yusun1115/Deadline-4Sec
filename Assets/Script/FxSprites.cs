@@ -18,7 +18,7 @@ namespace Deadline4Sec
         public static readonly Func<Sprite>[] All =
         {
             () => Vignette, () => Frost, () => Glow, () => Ring, () => Shard, () => Crack,
-            () => ChainLink, () => Padlock, () => EdgeGlow, () => Streak,
+            () => ChainLink, () => Padlock, () => EdgeGlow, () => Streak, () => EdgeGlowBox, () => RoundedBox,
         };
 
         public static Sprite Vignette => Get("fx_vignette", 256, 256, VignetteAlpha);
@@ -31,6 +31,29 @@ namespace Deadline4Sec
         public static Sprite Padlock => Get("fx_padlock", 96, 112, PadlockAlpha);
         public static Sprite EdgeGlow => Get("fx_edge_glow", 128, 32, EdgeGlowAlpha);
         public static Sprite Streak => Get("fx_streak", 128, 16, StreakAlpha);
+        // 9-sliced soft glow around a box (skin shop card states, 2026-10-30).
+        public static Sprite EdgeGlowBox => Get("fx_glow_box", 96, 96, GlowBoxAlpha, null, new Vector4(40f, 40f, 40f, 40f));
+
+        // Solid rounded rectangle, 9-sliced (filled buttons that take their colour fully).
+        public static Sprite RoundedBox => Get("fx_rounded_box", 64, 64, RoundedBoxAlpha, null, new Vector4(24f, 24f, 24f, 24f));
+
+        private static float RoundedBoxAlpha(float u, float v)
+        {
+            const float Radius = 20f;
+            float dx = Mathf.Max(0f, Mathf.Abs(u - 0.5f) * 64f - (32f - Radius));
+            float dy = Mathf.Max(0f, Mathf.Abs(v - 0.5f) * 64f - (32f - Radius));
+            return Mathf.Clamp01(Radius + 0.5f - Mathf.Sqrt(dx * dx + dy * dy));
+        }
+
+        // Opaque inside the centre square, fading over the 40 px border.
+        private static float GlowBoxAlpha(float u, float v)
+        {
+            float dx = Mathf.Max(0f, Mathf.Abs(u - 0.5f) * 96f - 8f);
+            float dy = Mathf.Max(0f, Mathf.Abs(v - 0.5f) * 96f - 8f);
+            float d = Mathf.Sqrt(dx * dx + dy * dy) / 40f;
+            float a = Mathf.Clamp01(1f - d);
+            return a * a;
+        }
 
         // Bright at the left edge (u = 0) fading inward; rotate for other edges.
         private static float EdgeGlowAlpha(float u, float v)
@@ -47,7 +70,7 @@ namespace Deadline4Sec
         }
 
         private static Sprite Get(string name, int w, int h, Func<float, float, float> alpha,
-            Func<int, int, float[]> pixels = null)
+            Func<int, int, float[]> pixels = null, Vector4 border = default)
         {
             if (Cache.TryGetValue(name, out Sprite sprite) && sprite != null)
                 return sprite;
@@ -68,7 +91,8 @@ namespace Deadline4Sec
                 };
                 texture.SetPixels32(colors);
                 texture.Apply(false, true);
-                sprite = Sprite.Create(texture, new Rect(0, 0, w, h), new Vector2(0.5f, 0.5f), 100f);
+                sprite = Sprite.Create(texture, new Rect(0, 0, w, h), new Vector2(0.5f, 0.5f), 100f, 0,
+                    SpriteMeshType.FullRect, border);
                 sprite.name = name;
             }
             Cache[name] = sprite;

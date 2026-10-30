@@ -20,6 +20,9 @@
 | Course/Build Train Patterns | 서브웨이 서퍼 스타일 전철: `Train`(멈춰있는 전철, 2.2×2.8×14m, 정면·측면 충돌 즉사, 지붕 착지 안전, 점프로 못 올라감) / `Train Ramp`(앞에 경사로 — 경사로는 Obstacle 밖 형제 오브젝트라 닿아도 안전, 지붕보다 0.15m 높게 끝나 지붕으로 내려섬) + 패턴 R(Easy 전철 사이 통로)·S(Medium 가운데 경사로 전철 + 양옆 전철)·T(Hard 전철 피하고 다른 레인 경사로 전철 오르기) 생성·세 씬 등록. 활성 씬이 저장된 상태에서 실행 |
 | Course/Build Air Route Patterns | (2026-10-16, Upper Platform.md) 공중 경로 패턴 5종 U1(진입)·U5(진입 Weave, Hard)·U2/U3(상층 달리기)·U4(복귀) 생성·세 씬 등록. 상층 덱은 `Upper Deck`(높이 8m, 폭 8.6m, FloorColor + `OneWayPlatform`) + 핑크 가장자리·거더(콜라이더 없음). 활성 씬이 저장된 상태에서 실행 |
 | Course/Build Wall Run Patterns | (2026-10-18, Wall Run.md) Wall Run 패턴 2종 W1(왼쪽 진입)·W2(오른쪽 진입) 생성·세 씬 등록. 바닥 구멍(26~53m) 양옆에 벽 패널(시각용, 콜라이더 없음)·핑크 러닝 라인·바닥 끝 발광 립·구덩이 바닥, `SetPiece Wall Run` 안에 `WallRunSection`(WallRunEntry 트리거, WallRunExit, Left/RightWallAnchor, GroundExitAnchor, ReviveCheckpoint) + `FallDeathTrigger`. 활성 씬이 저장된 상태에서 실행 |
+| Skins/Apply Weapon Skins | (2026-10-30) `Art/3DModel/Weapon`의 무기 모델 6종으로 스킨 적용: URP 머티리얼(`Art/Materials/WeaponSkins/Weapon_<이름>.mat`), 스킨 프리팹(`Prefab/WeaponSkins/WeaponSkin_<이름>.prefab`, 루트=손잡이 위치 + `WeaponSkinFx`), 상점 아이콘(`Art/2D/WeaponSkins/icon_weapon_<이름>.png`, 모델 렌더링), 카탈로그 이름·프리팹·색·아이콘 갱신. 씬은 건드리지 않음 |
+| UI/Apply Skin Shop | (2026-10-30) 무기 스킨 상점: 상단 Soul 아이콘(`TextLeadingIcon`), 카드 290 높이로 재배치(무기 아이콘·이름·아이콘+숫자 가격·버튼·미리보기 테두리, 카드 본체=미리보기 버튼), "스킨 미리보기 입니다." 태그, 구매 확인 창(`PurchaseDialog`, 예/아니오). `SkinShopUI`를 SkinPanel에 붙임. 열린 씬이 이미 수정 중이면 저장하지 않음 |
+| Character/Apply Reaper Rig Fixes | (2026-10-30) 머리에 묶인 후드 메시(`Art/3DModel/Generated/Hood_HeadBound.asset`) 생성 + 세 씬의 ReaperModel에 `ReaperRig` 추가(발 높이·후드·망토 물리·낫 잡기·왼손 IK). 열린 씬이 이미 수정 중이면 저장하지 않음 |
 | UI/Apply Result Screen Layout | 결과창 정보 계층(큰 SCORE → 거리/콤보/시간 3열 → NEW BEST → PERSONAL BEST → RUN REWARD → MAIN MENU \| RETRY 가로 버튼) + 뒤 어두운 오버레이 + `ResultPresenter` 연결. 기존 오브젝트 이름·참조·On Click 유지, ConfirmButton은 비활성(2026-10-09 OPEN REWARDS 제거 요청 — 상자는 두 버튼 모두 기존 상자 오픈 흐름을 먼저 거침). 세 씬 적용 |
 | UI/Build Loading Scene | `Assets/Scenes/Loading.unity` 생성(키아트 + LOADING... + bg/fill/frame 게이지 + 랜덤 팁) 후 Build Settings 0번에 배치. 다시 실행해도 인스펙터에 적은 팁 목록은 유지 |
 | UI/Apply Number Font To HUD | CallifontSharpie-Bold TMP 에셋 생성(`Resources/Fonts/CallifontSharpie-Bold SDF`) + HUD 숫자 라벨(타이머·점수·거리·코인·선물상자 수)에 `NumericLabel` 부착·크기 보정 |
@@ -167,6 +170,38 @@
 - **튜토리얼 훅**: `WallRunSection.EntryReached`(정적 이벤트, 구간마다 1회) — 나중에 "← SWIPE" 표시 연결용.
 - **테스트 봇**: 리플레이 봇·`DevAutoPilot`이 진입 창에서 벽 방향 입력, 벽 위에선 앞 장애물 반대쪽으로 전환. `WallRunAcceptanceTests` 16종.
 - **실기기 확인 필요**: Android 스와이프 판정·부착·전환·낙사·카메라(명세 §75)는 기기에서 직접 확인해야 함.
+
+## 무기 스킨 (2026-10-30)
+
+- **이름 변경**: DEFAULT SCYTHE → NEON REAPER(기본), NEON REAPER → STARLIGHT, FROST MOON → FROST BITE. BLOOD MOON·CYBER DEATH·ECLIPSE 그대로. 스킨 id(`DefaultScythe`, `NeonReaper`, `FrostMoon`…)는 그대로라 보유·장착 저장 데이터 유지.
+- **모델 교체**: `WeaponSkinVisual.Apply(Skin)` — 손에 붙은 기본 낫 노드(`tripo_node_29219f7e`, 애니메이션이 직접 움직이는 노드) 밑에 스킨 프리팹을 붙이고 기본 낫 렌더러만 숨김(스윙 잔상 등 붙어 있는 것은 그대로 따라감). 프리팹 원점 = 손잡이(낫: 자루의 아래 1/3 지점, BLOOD MOON 검: 손잡이 13% 지점), 기본 낫과 같은 축이라 같은 손 위치. 기본 스킨(NEON REAPER)은 같은 모델이라 기본 낫 그대로, 이펙트 없음.
+- **이펙트(`WeaponSkinFx`)**: 런타임 절차 생성 파티클(공용 `FxAdditive` 셰이더), 모든 스킨에 스킨 색 빛무리 + 두 겹: STARLIGHT 금빛 반짝임·별빛 팝 / FROST BITE 가라앉는 냉기 안개·얼음 반짝임 / BLOOD MOON 떨어지는 핏방울·올라가는 붉은 불씨 / CYBER DEATH 깜빡이는 데이터 조각·옆으로 튀는 글리치 / ECLIPSE 보랏빛 오라·금빛 코로나 불꽃. 러너 기준 공간이라 달려도 화면 뒤로 흘러가지 않고 스윙 때만 뒤로 남음.
+- **색**: 카탈로그 `accentColor` → 스윙 잔상 색(`CombatParticles`, `WeaponSkinVisual.AccentChanged`), 기본 스킨이 아니면 처치 불꽃에 스킨 색 추가.
+- **상점**: 카드 아이콘이 각 무기 렌더링 아이콘으로 바뀜(미보유는 흐리게). 왼쪽 미리보기 캐릭터는 장착한 무기·이펙트를 그대로 보여줌.
+- **모델 원본 머티리얼**: FBX에 연결된 `weapon_mat/tripo_mat_*.mat`은 Built-in 파티클 셰이더라 URP에서 안 그려져 사용하지 않음(별도 URP 머티리얼 생성).
+- **테스트**: `WeaponSkinAcceptanceTests` 2종(카탈로그 이름·모델·이펙트·아이콘 / 장착 시 손 위치·크기·이펙트 재생·잔상 색·기본 복귀).
+
+## 무기 스킨 상점 (2026-10-30)
+
+- **상단 재화**: Soul 숫자 왼쪽에 Soul 아이콘(`icon_coin_gold`), 자릿수가 바뀌어도 숫자 바로 왼쪽에 붙음(`TextLeadingIcon`).
+- **가격**: 글자 대신 아이콘 + 숫자. Soul은 `[아이콘] 8,000`(부족하면 빨강), 스킨 재화는 `[재화 아이콘] 18 / 30`(보유 수가 부족하면 빨강, 충분하면 초록). 둘 다 필요한 카드(ECLIPSE)는 두 줄. 위치는 런타임 `SkinShopRow.PlacePrice`로 아이콘+숫자를 가운데 정렬.
+- **카드 상태(`SkinShopRow.CardState`)**: 장착(Equipped) 핑크 테두리 + 맥동 글로우, "EQUIPPED"(비활성) / 보유(Owned) 흰·보라 테두리, 보라 "EQUIP" / 구매 가능(Buyable) 밝은 핑크 "BUY"(살짝 맥동) / Soul 부족(SoulShort) 어두운 "BUY"(누르면 재화 상점 안내) / 잠김(Locked, 스킨 재화 부족) 회색 "BUY"(비활성). 버튼은 꽉 찬 둥근 사각형(`FxSprites.RoundedBox`).
+- **카드 테마(`SkinCardTheme`, 런타임)**: 테두리 안쪽 선 + 아이콘 뒤 빛 + 작은 움직임만 — STARLIGHT 금빛 글로우·반짝임 / FROST BITE 서리 테두리·눈송이 / BLOOD MOON 붉은 균열·불씨 / CYBER DEATH 초록 스캔라인·모서리 브래킷·깜빡이는 픽셀 / ECLIPSE 보라 이중 테두리·금빛 링·모서리 다이아몬드. 기본(NEON REAPER) 카드는 깔끔하게 둠.
+- **보유 카드 탭**: 이미 가진 스킨 카드를 누르면 미리보기 없이 바로 장착(2026-10-31).
+- **미리보기**: 아직 없는 스킨 카드를 누르면 캐릭터가 그 무기를 들고(이펙트 포함) 상단에 "스킨 미리보기 입니다." 표시, 미리보는 카드엔 흰 테두리. 다시 누르거나 장착 중인 카드를 누르면 해제. 화면을 나가면 장착 스킨으로 복귀(`RunInventory.PreviewSkin / ShowEquippedSkin`).
+- **구매**: BUY → 그 무기를 미리보기로 보여주며 "구매하시겠습니까?" 예/아니오 → 예: 구매 + 장착. Soul 부족 → "Soul이 부족합니다. 재화 상점으로 이동할까요?" 예/아니오 → 예: 재화 상점(`CurrencyShopPanel.OpenFromSkinShop`, Back으로 스킨 상점 복귀). Soul이 바뀌면 카드 상태 자동 갱신.
+- **상점 무대(`SkinShopStage`, 런타임)**: 스킨 화면 동안 캐릭터 뒤에 어두운 보라 그라데이션 벽, 회전하는 핑크/보라 링 조명, 발밑 원형 플랫폼(핑크 테두리) + 어두운 바닥. 나가면 숨김.
+- **헤더**: 카드 목록 위 "SCYTHE" 제목은 비움(2026-10-30).
+- **테스트**: `WeaponSkinAcceptanceTests.SkinShopPreviewsConfirmsAndSendsShortSoulToTheCurrencyShop`.
+
+## 캐릭터 보정 (2026-10-30, `ReaperRig`)
+
+- **발 높이**: 모든 애니메이션에서 신발 바닥이 지면보다 ~0.17~0.2m 떠 있었음 → 모델을 0.2m 내림(`groundOffset`, 대기 시 지면 ±3cm, 달리기 최저점 살짝 닿음).
+- **후드**: 후드+망토 메시가 망토 뼈(Cape_Root, 가슴에 고정)에만 묶여 있어 머리를 돌리면 얼굴이 후드에서 빠져나옴 → 목 위 정점을 머리뼈에 묶은 메시 복사본으로 교체(2282개 중 959개, 목 근처는 망토 뼈와 섞어 자연스럽게 이어짐). 원본 FBX는 그대로.
+- **망토 물리**: 망토 뼈 3줄(L/C/R × 4마디, 애니메이션 키 없음)에 스프링 시뮬레이션 — 중력, 달리기 관성 일부(`runInertia` 0.3), 약한 펄럭임, 최대 흔들림 각도(70°), 엉덩이·몸통·다리 구체 충돌. 텔레포트(부활 등) 땐 초기화. 인스펙터에서 `stiffness`, `damping`, `gravity`, `runInertia`, `maxSwingAngle`, `flutter` 조절.
+- **낫 잡기**: 낫 자루가 주먹 옆으로 지나가 손에서 어긋나 보였음(자루 축과 손가락 관절선이 51° 차이) → 자루를 손가락 관절선 방향으로, 주먹 안쪽(관절과 굽힌 손끝 사이)을 지나도록 무기 노드 위치·각도 보정(대기 애니메이션 첫 프레임 주먹으로 에디터에서 측정해 저장, 애니메이터가 매 프레임 스켈레톤을 다시 쓰므로 매 프레임 적용). 스킨 무기도 같은 노드에 붙어 함께 적용.
+- **왼손**: 애니메이션에서 왼손이 자루 가까이(26cm 이내) 오면 자루를 쥐도록 2본 IK(거리에 따라 부드럽게 섞임, 오른손과 15cm 간격).
+- **테스트**: `ReaperRigAcceptanceTests`(발 지면 접촉, 후드 머리 바인딩, 자루-주먹 정렬, 망토 움직임).
 
 ## Tripo 사용 기록
 

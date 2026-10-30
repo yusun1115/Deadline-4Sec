@@ -19,6 +19,12 @@ namespace Deadline4Sec
             public SkinCurrency currency;
             public int currencyCost;
             public Material weaponMaterial;
+            // Weapon models (2026-10-30): the skin's own weapon (null keeps the
+            // character's built-in scythe), its colour for the swing trail and
+            // kill sparks, and its shop-card icon.
+            public GameObject weaponPrefab;
+            public Color accentColor = new Color(1f, 0.22f, 0.55f);
+            public Sprite icon;
         }
 
         [Serializable]

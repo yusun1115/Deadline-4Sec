@@ -102,10 +102,24 @@ namespace Deadline4Sec
                 player.ActionPerformed += OnPlayerAction;
                 AttachScytheTrail();
             }
+            WeaponSkinVisual.AccentChanged += OnSkinAccent;
+        }
+
+        // Weapon skins (2026-10-30): the swing trail takes the equipped skin's colour.
+        private void OnSkinAccent(Color accent)
+        {
+            if (scytheTrail == null)
+                return;
+            Gradient g = new Gradient();
+            g.SetKeys(new[] { new GradientColorKey(HotWhite, 0f), new GradientColorKey(accent, 0.35f),
+                    new GradientColorKey(Color.Lerp(accent, Violet, accent == Pink ? 1f : 0.45f), 1f) },
+                new[] { new GradientAlphaKey(1f, 0f), new GradientAlphaKey(0f, 1f) });
+            scytheTrail.colorGradient = g;
         }
 
         private void OnDestroy()
         {
+            WeaponSkinVisual.AccentChanged -= OnSkinAccent;
             if (player != null)
                 player.ActionPerformed -= OnPlayerAction;
             if (root != null)
@@ -127,6 +141,10 @@ namespace Deadline4Sec
             Burst(sparks, point, stomp ? 26 : 20, stomp ? 11f : 9f, new Vector2(0.06f, 0.16f), new Vector2(0.18f, 0.34f), main, HotWhite, 0.4f);
             Burst(wisps, point, 7, 1.6f, new Vector2(0.25f, 0.5f), new Vector2(0.5f, 0.85f), Pink, Violet, -0.6f);
             Burst(wisps, point, 1, 0f, new Vector2(1.6f, 1.6f), new Vector2(0.12f, 0.12f), HotWhite, HotWhite, 0f);
+            // A skin's own colour joins the kill spray (the default skin is already pink).
+            Color skin = WeaponSkinVisual.CurrentAccent;
+            if (!stomp && !homing && (Mathf.Abs(skin.r - Pink.r) + Mathf.Abs(skin.g - Pink.g) + Mathf.Abs(skin.b - Pink.b)) > 0.1f)
+                Burst(sparks, point, 12, 8f, new Vector2(0.05f, 0.13f), new Vector2(0.2f, 0.32f), skin, HotWhite, 0.3f);
             float roll = Random.Range(-35f, 35f);
             Quaternion facing = Quaternion.LookRotation(view.transform.forward, Vector3.up);
             PlaySlash(point, facing * Quaternion.Euler(0f, 0f, roll + 30f), 1.1f, main, 0.16f);
@@ -455,6 +473,7 @@ namespace Deadline4Sec
             g.SetKeys(new[] { new GradientColorKey(HotWhite, 0f), new GradientColorKey(Pink, 0.35f), new GradientColorKey(Violet, 1f) },
                 new[] { new GradientAlphaKey(1f, 0f), new GradientAlphaKey(0f, 1f) });
             scytheTrail.colorGradient = g;
+            OnSkinAccent(WeaponSkinVisual.CurrentAccent);
             scytheTrail.shadowCastingMode = ShadowCastingMode.Off;
             scytheTrail.receiveShadows = false;
             scytheTrail.emitting = false;

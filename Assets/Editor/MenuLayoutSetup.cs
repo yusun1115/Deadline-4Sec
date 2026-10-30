@@ -567,7 +567,7 @@ namespace Deadline4Sec.Editor
 
             TMP_Text heading = Child<TextMeshProUGUI>(panel, "HeadingText");
             GameFont.Apply(heading);
-            heading.text = "SCYTHE";
+            heading.text = ""; // header left empty (2026-10-30)
             heading.fontSize = 34f;
             heading.alignment = TextAlignmentOptions.Center;
             heading.color = new Color(1f, 0.45f, 0.7f);

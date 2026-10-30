@@ -84,6 +84,28 @@ namespace Deadline4Sec
         }
 
         public bool OwnsSkin(int index) => IsSkinOwned(catalog, index);
+        public CoinWallet Wallet => wallet;
+
+        // Skin shop (2026-10-30): what a skin still needs (Soul / its currency).
+        public void SkinShortfall(int index, out bool soulShort, out bool currencyShort)
+        {
+            soulShort = currencyShort = false;
+            if (catalog == null || index < 0 || index >= catalog.Skins.Length || OwnsSkin(index))
+                return;
+            GameExtrasCatalog.Skin skin = catalog.Skins[index];
+            soulShort = wallet == null || wallet.TotalCoins < skin.coinCost;
+            currencyShort = CurrencyCount(skin.currency) < skin.currencyCost;
+        }
+
+        // Skin shop preview: the skin in the hand without equipping it; the
+        // equipped one comes back with ShowEquippedSkin.
+        public void PreviewSkin(int index)
+        {
+            if (weaponVisual != null && catalog != null && index >= 0 && index < catalog.Skins.Length)
+                weaponVisual.Apply(catalog.Skins[index]);
+        }
+
+        public void ShowEquippedSkin() => ApplySkinVisual();
 
         // Index 0 is the free default skin. Shared with achievements.
         public static bool IsSkinOwned(GameExtrasCatalog catalog, int index) => index == 0 ||
@@ -285,7 +307,7 @@ namespace Deadline4Sec
         private void ApplySkinVisual()
         {
             if (weaponVisual != null && catalog != null && catalog.Skins.Length > 0)
-                weaponVisual.Apply(catalog.Skins[EquippedSkinIndex].weaponMaterial);
+                weaponVisual.Apply(catalog.Skins[EquippedSkinIndex]);
         }
 
         private bool IsStillTouching(Collider source)
