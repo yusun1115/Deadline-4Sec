@@ -136,32 +136,49 @@ namespace Deadline4Sec.AcceptanceTests
             scoreObject.transform.SetParent(canvas.transform, false);
             run.GetType().GetField("scoreText", BindingFlags.NonPublic |
                 BindingFlags.Instance).SetValue(run, scoreObject.GetComponent<Text>());
-            // Heading straight into the block, the runner dodges at the last moment.
-            Component player = CreatePlayer(Vector3.zero);
-            CreateObstacle(new Vector3(0f, 0.5f, 4f));
-            yield return null;
-            Invoke(timer, "BeginRun");
-            int frames = 0;
-            while (player.transform.position.z < 1.4f && frames++ < 600)
+            // Heading straight into the block, the runner dodges at the last
+            // moment. Fixed 60 FPS steps: a long frame would move the dodge.
+            float oldDelta = Time.captureDeltaTime;
+            Time.captureDeltaTime = 1f / 60f;
+            try
+            {
+                Component player = CreatePlayer(Vector3.zero);
+                Component obstacle = CreateObstacle(new Vector3(0f, 0.5f, 4f));
                 yield return null;
-            Invoke(player, "RequestMoveRight");
-            yield return AdvanceSeconds(0.05f);
-            Assert.AreEqual(0, (int)run.GetType().GetProperty("CurrentScore").GetValue(run),
-                "Entering the Near Miss zone is only a candidate.");
-            yield return AdvanceSeconds(0.6f);
-            Assert.IsFalse(IsGameOver(timer));
-            Assert.Greater(player.transform.position.z, 5f);
-            Assert.AreEqual(150, (int)run.GetType().GetProperty("CurrentScore").GetValue(run));
-            Assert.AreEqual(1, (int)run.GetType().GetProperty("CurrentCombo").GetValue(run));
-            Transform feedback = canvas.transform.Find("NearMissFeedback");
-            Assert.IsNotNull(feedback);
-            Assert.IsTrue(feedback.gameObject.activeSelf);
-            Type tmpType = Type.GetType("TMPro.TMP_Text, Unity.TextMeshPro");
-            Component feedbackText = feedback.GetComponent(tmpType);
-            Assert.That((string)tmpType.GetProperty("text").GetValue(feedbackText),
-                Does.Contain("NEAR MISS"));
-            yield return AdvanceSeconds(0.8f);
-            Assert.IsFalse(feedback.gameObject.activeSelf);
+                Invoke(timer, "BeginRun");
+                int frames = 0;
+                while (player.transform.position.z < 1.4f && frames++ < 600)
+                    yield return null;
+                string dodge = "dodge at " + player.transform.position;
+                Invoke(player, "RequestMoveRight");
+                yield return AdvanceSeconds(0.05f);
+                Assert.AreEqual(0, (int)run.GetType().GetProperty("CurrentScore").GetValue(run),
+                    "Entering the Near Miss zone is only a candidate.");
+                yield return AdvanceSeconds(0.6f);
+                Assert.IsFalse(IsGameOver(timer));
+                Assert.Greater(player.transform.position.z, 5f);
+                BindingFlags hidden = BindingFlags.NonPublic | BindingFlags.Instance;
+                Assert.AreEqual(150, (int)run.GetType().GetProperty("CurrentScore").GetValue(run),
+                    dodge + " heading=" + obstacle.GetType().GetField("wasHeadingInto", hidden).GetValue(obstacle) +
+                    " near=" + obstacle.GetType().GetField("wasNearWhilePassing", hidden).GetValue(obstacle) +
+                    " touched=" + obstacle.GetType().GetField("physicallyTouched", hidden).GetValue(obstacle) +
+                    " end=" + player.transform.position);
+                Assert.AreEqual(1, (int)run.GetType().GetProperty("CurrentCombo").GetValue(run));
+                Transform feedback = canvas.transform.Find("NearMissFeedback");
+                Assert.IsNotNull(feedback);
+                Assert.IsTrue(feedback.gameObject.activeSelf);
+                Type tmpType = Type.GetType("TMPro.TMP_Text, Unity.TextMeshPro");
+                Component feedbackText = feedback.GetComponent(tmpType);
+                Assert.That((string)tmpType.GetProperty("text").GetValue(feedbackText),
+                    Does.Contain("NEAR MISS"));
+                Time.captureDeltaTime = oldDelta; // the label times itself in real time
+                yield return AdvanceSeconds(0.8f);
+                Assert.IsFalse(feedback.gameObject.activeSelf);
+            }
+            finally
+            {
+                Time.captureDeltaTime = oldDelta;
+            }
             yield return new ExitPlayMode();
         }
 
@@ -773,6 +790,9 @@ namespace Deadline4Sec.AcceptanceTests
             GameObject obstacle = GameObject.CreatePrimitive(PrimitiveType.Cube);
             obstacle.name = "Obstacle";
             obstacle.transform.position = position;
+            // Otherwise the collider can still be at the origin (inside a runner
+            // created there) for the first move, which counts as touching it.
+            Physics.SyncTransforms();
             return obstacle.AddComponent(Find("Obstacle"));
         }
 
