@@ -136,14 +136,19 @@ namespace Deadline4Sec.AcceptanceTests
             scoreObject.transform.SetParent(canvas.transform, false);
             run.GetType().GetField("scoreText", BindingFlags.NonPublic |
                 BindingFlags.Instance).SetValue(run, scoreObject.GetComponent<Text>());
-            Component player = CreatePlayer(new Vector3(1.4f, 0f, 0f));
+            // Heading straight into the block, the runner dodges at the last moment.
+            Component player = CreatePlayer(Vector3.zero);
             CreateObstacle(new Vector3(0f, 0.5f, 4f));
             yield return null;
             Invoke(timer, "BeginRun");
-            yield return AdvanceSeconds(0.25f);
+            int frames = 0;
+            while (player.transform.position.z < 1.4f && frames++ < 600)
+                yield return null;
+            Invoke(player, "RequestMoveRight");
+            yield return AdvanceSeconds(0.05f);
             Assert.AreEqual(0, (int)run.GetType().GetProperty("CurrentScore").GetValue(run),
                 "Entering the Near Miss zone is only a candidate.");
-            yield return AdvanceSeconds(0.4f);
+            yield return AdvanceSeconds(0.6f);
             Assert.IsFalse(IsGameOver(timer));
             Assert.Greater(player.transform.position.z, 5f);
             Assert.AreEqual(150, (int)run.GetType().GetProperty("CurrentScore").GetValue(run));
@@ -157,6 +162,29 @@ namespace Deadline4Sec.AcceptanceTests
                 Does.Contain("NEAR MISS"));
             yield return AdvanceSeconds(0.8f);
             Assert.IsFalse(feedback.gameObject.activeSelf);
+            yield return new ExitPlayMode();
+        }
+
+        // 2026-11-01: just running past close by (never lined up to hit it) is
+        // not a Near Miss — only a last-moment escape is.
+        [UnityTest]
+        public IEnumerator StraightClosePassIsNotANearMiss()
+        {
+            yield return new EnterPlayMode();
+            CreateFloor();
+            Component timer = new GameObject("Timer").AddComponent(Find("GameTimer"));
+            Component run = new GameObject("Run").AddComponent(Find("RunManager"));
+            Component player = CreatePlayer(new Vector3(1.4f, 0f, 0f));
+            Component obstacle = CreateObstacle(new Vector3(0f, 0.5f, 4f));
+            yield return null;
+            Invoke(timer, "BeginRun");
+            yield return AdvanceSeconds(0.65f);
+            Assert.IsFalse(IsGameOver(timer));
+            Assert.Greater(player.transform.position.z, 5f);
+            Assert.IsTrue((bool)obstacle.GetType().GetField("wasNearWhilePassing",
+                BindingFlags.NonPublic | BindingFlags.Instance).GetValue(obstacle), "The pass was inside the near zone.");
+            Assert.AreEqual(0, (int)run.GetType().GetProperty("CurrentScore").GetValue(run));
+            Assert.AreEqual(0, (int)run.GetType().GetProperty("CurrentCombo").GetValue(run));
             yield return new ExitPlayMode();
         }
 

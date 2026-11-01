@@ -86,6 +86,11 @@ namespace Deadline4Sec
             (State == GameState.Tutorial && !skipConfirmationOpen && tutorial != null && tutorial.CanReceiveInput);
         public bool IsSkipConfirmationOpen => skipConfirmationOpen;
 
+        // A tutorial lesson holding for one swipe lets only that swipe through.
+        public bool TryTutorialInput(TutorialController.LessonInput input) =>
+            State != GameState.Tutorial || tutorial == null ||
+            (!skipConfirmationOpen && tutorial.TryConsumeInput(input));
+
         private void Awake()
         {
             if (playerController == null)

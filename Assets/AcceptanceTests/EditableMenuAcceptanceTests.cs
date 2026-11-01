@@ -145,6 +145,13 @@ namespace Deadline4Sec.AcceptanceTests
             Assert.IsNotNull(skip);
             Component tutorial = (Component)UnityEngine.Object.FindFirstObjectByType(
                 Type.GetType("Deadline4Sec.TutorialController, Assembly-CSharp"));
+            // The rules briefing goes on with a tap anywhere.
+            for (int taps = 0; taps < 200 &&
+                tutorial.GetType().GetProperty("State").GetValue(tutorial).ToString() == "Briefing"; taps++)
+            {
+                Click("Canvas/TutorialHUD/TapToContinue");
+                yield return null;
+            }
             float deadline = Time.realtimeSinceStartup + 2f;
             while (tutorial.GetType().GetProperty("State").GetValue(tutorial).ToString() != "Active" &&
                    Time.realtimeSinceStartup < deadline)
@@ -155,6 +162,8 @@ namespace Deadline4Sec.AcceptanceTests
             Assert.AreEqual("Active", tutorial.GetType().GetProperty("State").GetValue(tutorial).ToString());
             Component timer = (Component)UnityEngine.Object.FindFirstObjectByType(
                 Type.GetType("Deadline4Sec.GameTimer, Assembly-CSharp"));
+            // A lesson may be holding the game (timeScale 0) for its swipe.
+            float timeScaleBeforeSkip = Time.timeScale;
             Click("Canvas/TutorialSkipUI/SkipButton");
             Assert.IsTrue((bool)flow.GetType().GetProperty("IsSkipConfirmationOpen").GetValue(flow));
             Assert.IsNotNull(GameObject.Find("Canvas/TutorialSkipConfirmation"));
@@ -172,7 +181,7 @@ namespace Deadline4Sec.AcceptanceTests
             Click("Canvas/TutorialSkipConfirmation/Dialog/NoButton");
             Assert.AreEqual("Tutorial", State(flow));
             Assert.AreEqual(0, PlayerPrefs.GetInt(TutorialKey, 0));
-            Assert.AreEqual(1f, Time.timeScale);
+            Assert.AreEqual(timeScaleBeforeSkip, Time.timeScale);
             Assert.IsTrue((bool)flow.GetType().GetProperty("CanReceiveInput").GetValue(flow));
             Click("Canvas/TutorialSkipUI/SkipButton");
             Click("Canvas/TutorialSkipConfirmation/Dialog/YesButton");

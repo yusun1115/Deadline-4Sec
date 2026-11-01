@@ -14,6 +14,12 @@ namespace Deadline4Sec
         [SerializeField] private ObstacleType obstacleType;
         [Header("Near miss zone (extra space outside the solid collider)")]
         [SerializeField] private Vector3 nearMissMargin = new Vector3(0.95f, 0.65f, 1.25f);
+        // A Near Miss is a last-moment escape (2026-11-01): the runner must have
+        // been heading straight into the solid box (overlapping it sideways and
+        // in height) within this distance of its front, then got clear of it.
+        // Just running past in another lane, or dodging early, never counts.
+        [Tooltip("How close (m, runner front to obstacle front) the runner must still be on a collision course.")]
+        [SerializeField, Min(0f)] private float lastMomentDistance = 2.6f;
 
         private BoxCollider hazard;
         private CharacterController playerCollider;
@@ -23,6 +29,7 @@ namespace Deadline4Sec
         private Bounds previousPlayerBounds;
         private bool hasPreviousBounds;
         private bool wasNearWhilePassing;
+        private bool wasHeadingInto;
         private bool physicallyTouched;
         private bool resolved;
 
@@ -63,12 +70,14 @@ namespace Deadline4Sec
             Bounds obstacleBounds = hazard.bounds;
             if (!physicallyTouched && CrossedNearZone(previousPlayerBounds, current, obstacleBounds))
                 wasNearWhilePassing = true;
+            if (!wasHeadingInto && HeadingInto(current, obstacleBounds))
+                wasHeadingInto = true;
 
             // Forward movement is +Z. The whole player must clear the obstacle.
             if (current.min.z > obstacleBounds.max.z)
             {
                 resolved = true;
-                if (wasNearWhilePassing && !physicallyTouched)
+                if (wasNearWhilePassing && wasHeadingInto && !physicallyTouched)
                 {
                     Debug.Log("NEAR MISS! [" + name + "]");
                     gameTimer.ResetTimer();
@@ -106,6 +115,15 @@ namespace Deadline4Sec
                 previousPlayerBounds = playerCollider.bounds;
                 hasPreviousBounds = true;
             }
+        }
+
+        // Still in front of the box, close to it, and lined up to hit it.
+        private bool HeadingInto(Bounds player, Bounds obstacleBounds)
+        {
+            float gap = obstacleBounds.min.z - player.max.z;
+            return gap <= lastMomentDistance && player.min.z <= obstacleBounds.min.z &&
+                player.min.x < obstacleBounds.max.x && player.max.x > obstacleBounds.min.x &&
+                player.min.y < obstacleBounds.max.y && player.max.y > obstacleBounds.min.y;
         }
 
         private bool CrossedNearZone(Bounds before, Bounds after, Bounds obstacleBounds)

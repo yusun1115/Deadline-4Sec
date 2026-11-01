@@ -23,6 +23,7 @@
 | Skins/Apply Weapon Skins | (2026-10-30) `Art/3DModel/Weapon`의 무기 모델 6종으로 스킨 적용: URP 머티리얼(`Art/Materials/WeaponSkins/Weapon_<이름>.mat`), 스킨 프리팹(`Prefab/WeaponSkins/WeaponSkin_<이름>.prefab`, 루트=손잡이 위치 + `WeaponSkinFx`), 상점 아이콘(`Art/2D/WeaponSkins/icon_weapon_<이름>.png`, 모델 렌더링), 카탈로그 이름·프리팹·색·아이콘 갱신. 씬은 건드리지 않음 |
 | UI/Apply Skin Shop | (2026-10-30) 무기 스킨 상점: 상단 Soul 아이콘(`TextLeadingIcon`), 카드 290 높이로 재배치(무기 아이콘·이름·아이콘+숫자 가격·버튼·미리보기 테두리, 카드 본체=미리보기 버튼), "스킨 미리보기 입니다." 태그, 구매 확인 창(`PurchaseDialog`, 예/아니오). `SkinShopUI`를 SkinPanel에 붙임. 열린 씬이 이미 수정 중이면 저장하지 않음 |
 | Character/Apply Reaper Rig Fixes | (2026-10-30) 머리에 묶인 후드 메시(`Art/3DModel/Generated/Hood_HeadBound.asset`) 생성 + 세 씬의 ReaperModel에 `ReaperRig` 추가(발 높이·후드·망토 물리·낫 잡기·왼손 IK). 열린 씬이 이미 수정 중이면 저장하지 않음 |
+| Prepare Tutorial Course | 튜토리얼 코스 에셋(`Resources/Tutorial/TutorialCourse.asset`)에 실제 적·장애물 프리팹·바닥 머티리얼 연결. (2026-11-01) 화자·말풍선·스와이프 화살표·손 스프라이트(`Art/Tutorial`)도 연결, 단계 목록이 비어 있을 때만 기본 12단계로 채움(인스펙터에서 고친 문구 유지). 씬은 건드리지 않음 |
 | UI/Apply Result Screen Layout | 결과창 정보 계층(큰 SCORE → 거리/콤보/시간 3열 → NEW BEST → PERSONAL BEST → RUN REWARD → MAIN MENU \| RETRY 가로 버튼) + 뒤 어두운 오버레이 + `ResultPresenter` 연결. 기존 오브젝트 이름·참조·On Click 유지, ConfirmButton은 비활성(2026-10-09 OPEN REWARDS 제거 요청 — 상자는 두 버튼 모두 기존 상자 오픈 흐름을 먼저 거침). 세 씬 적용 |
 | UI/Build Loading Scene | `Assets/Scenes/Loading.unity` 생성(키아트 + LOADING... + bg/fill/frame 게이지 + 랜덤 팁) 후 Build Settings 0번에 배치. 다시 실행해도 인스펙터에 적은 팁 목록은 유지 |
 | UI/Apply Number Font To HUD | CallifontSharpie-Bold TMP 에셋 생성(`Resources/Fonts/CallifontSharpie-Bold SDF`) + HUD 숫자 라벨(타이머·점수·거리·코인·선물상자 수)에 `NumericLabel` 부착·크기 보정 |
@@ -202,6 +203,28 @@
 - **낫 잡기**: 낫 자루가 주먹 옆으로 지나가 손에서 어긋나 보였음(자루 축과 손가락 관절선이 51° 차이) → 자루를 손가락 관절선 방향으로, 주먹 안쪽(관절과 굽힌 손끝 사이)을 지나도록 무기 노드 위치·각도 보정(대기 애니메이션 첫 프레임 주먹으로 에디터에서 측정해 저장, 애니메이터가 매 프레임 스켈레톤을 다시 쓰므로 매 프레임 적용). 스킨 무기도 같은 노드에 붙어 함께 적용.
 - **왼손**: 애니메이션에서 왼손이 자루 가까이(26cm 이내) 오면 자루를 쥐도록 2본 IK(거리에 따라 부드럽게 섞임, 오른손과 15cm 간격).
 - **테스트**: `ReaperRigAcceptanceTests`(발 지면 접촉, 후드 머리 바인딩, 자루-주먹 정렬, 망토 움직임).
+
+## 튜토리얼 온보딩 (2026-11-01, Tutorial.md)
+
+- **구조**: 기존 `TutorialController`(10개 실전 레슨, 실제 입력·처치 이벤트로 완료)는 그대로 두고, 앞에 브리핑(InfoOnly) 2단계를 붙임. 연출은 새 `TutorialUIController`(TutorialHUD에 런타임 생성), 단계 데이터는 `TutorialStep`(stepId, kind, title, dialogueText, followUpText, highlightTarget, dimBackground, requiredInputType, showSwipeGuide, autoAdvance, nextDelay, completeCondition).
+- **편집**: `TutorialCourse.asset`의 `steps`(문구·강조·가이드·딜레이)와 `presentation`(크기·위치·타이핑 속도·dim·펄스·손 이동 거리·성공 문구). 레슨 10개는 코스 배치 순서대로 `completeCondition`이 맞아야 하며, 순서가 어긋나면 경고 후 기본 단계를 씀.
+- **화자**: 왼쪽 위 `tutorial_ex`가 왼쪽에서 OutBack으로 등장(0.26초) → 0.1초 뒤 `tutorial_ex_bubble`이 왼쪽 기준 ScaleX로 펼쳐짐 → 대사가 타이핑(초당 40자, 0이면 페이드). 단계가 바뀌면 말풍선이 살짝 튀고 새 대사를 타이핑.
+- **브리핑**: 실제 타이머(4.00 정지)가 펄스 + 핑크 외곽 발광, 나머지 화면은 dim(GameplayUI 맨 앞에 깔려 타이머만 그 위로 그려짐). 아무 곳이나 탭 → 타이핑 완료 → 다음, 또는 대사가 끝나고 `nextDelay`초 뒤 자동 진행.
+- **스와이프 가이드**: 하단 중앙. 레슨이 그 순간 요구하는 입력(`PromptInput`)을 따라 위쪽 화살표 스프라이트를 회전(좌 90°, 우 -90°, 하 180°)하고 방향으로 살짝 흔들림, 손이 화살표 옆에서 같은 방향으로 스와이프(페이드인 → 이동 → 페이드아웃 루프). 에디터/PC에서는 위에 키 안내(A / LEFT 등).
+- **배치(2026-11-01 수정)**: 말풍선이 캐릭터 위·오른쪽에 있고 꼬리(왼쪽 아래)가 캐릭터를 가리킴(`portraitPosition` / `bubblePosition`).
+- **입력 대기 정지(`pauseForInput`)**: 스와이프할 타이밍(`PromptInput`)이 오면 게임을 멈추고(`timeScale` 0, 가이드 표시) 그 방향 스와이프만 받아 다시 진행. 다른 방향은 무시(`PlayerController.Request*` → `GameFlowManager.TryTutorialInput` → `TutorialController.TryConsumeInput`). 점프·슬라이드 안내는 장애물과 같은 레인일 때, 레인 공격은 적이 바로 오른쪽 레인일 때만. 시간이 멈춘 프레임에는 플레이어 이동 갱신을 건너뜀(0 이동이 '공중'으로 판정돼 점프가 씹히던 문제).
+- **실패 → 자동 재시도**: TRY AGAIN 버튼 없이 화면(말풍선 제외)이 살짝 어두워졌다가(`failFadeAlpha` 0.8, 0.25초 + 0.55초) 같은 단계를 자동 재시작. 잘못된 조작으로 장애물/목표 적을 지나쳐 버리면(옆으로 피함, 너무 이른 처치 등) 4초를 기다리지 않고 0.25초 뒤 바로 실패 처리.
+- **성공/완료**: 성공 시 화면 중앙 NICE! / GOOD! / GREAT! 팝(니어 미스 단계 "NEAR MISS!", 타이머 단계 "4.00 RESET!" — 단계별 `successText`) 후 `nextDelay`(0.6초) 뒤 다음 단계. 완료 대사도 말풍선으로.
+- **HUD**: 튜토리얼 동안 `hiddenHud` 목록(점수·콤보·Soul·선물상자·파워업 표시)만 CanvasGroup으로 숨김 — NEAR MISS 문구·점수 팝업·콤보 배지 같은 피드백은 보임. 하단 버튼은 SKIP(오른쪽 아래)만(MENU 제거). 종료/SKIP 시 `Cleanup`으로 전부 원복(씬도 다시 로드됨).
+- **니어 미스 단계(11-01 수정)**: 장애물을 러너와 같은 레인 정중앙(x 2.5)에 두고, 장애물 앞까지 0.75m(연습 속도 6m/s에서 니어 미스가 되는 0.45~1.0m 사이)일 때만 정지·왼쪽 안내. 미리 피하면 니어 미스가 아니라 실패 → 자동 재시도.
+- **공중 적 연결(11-01 수정)**: 공중 처치 직후(`PlayerController.IsAirComboReady`) 다음 적이 옆 레인이면 그쪽 방향 스와이프(오른쪽/왼쪽)로 안내·정지(실제 연결 조작), 같은 줄 위쪽이면 위. AIR HOMING은 위 → 오른쪽, STOMP는 위 → 왼쪽 → 아래. 점프 직후의 호밍 위 스와이프도 정지 대기.
+- **줄바꿈**: TMP Settings의 Modern Hangul Line Breaking을 켬(한국어가 단어 중간에서 끊기지 않음, 게임 전체 적용).
+- **테스트**: `TutorialAcceptanceTests.SpeakerBriefsTimerThenSwipeGuideFollowsPromptAndSkipRestoresHud`, `HeldLessonTakesOnlyItsSwipeAndAWrongMoveRetriesByItself` + 레슨 10개 재생 테스트(브리핑은 탭, 모든 레슨이 정지 대기를 거침).
+
+## Near Miss 판정 / Ground Slam 착지 (2026-11-01)
+
+- **Near Miss = 마지막 순간 회피**: 기존 조건(장애물 주변 near 구역을 몸 전체가 지나가고 닿지 않음)에 더해, 장애물 앞 `lastMomentDistance`(기본 2.6m) 안에서 장애물과 정면으로 겹치는(좌우·높이) 충돌 코스에 있었어야 함(`Obstacle.HeadingInto`). 옆 레인으로 그냥 지나가거나(예: 전철 옆 레인 통과) 미리 피하면 Near Miss가 아님. 테스트 `ClosePassAwardsOneNearMiss`(막판 회피 = 인정), `StraightClosePassIsNotANearMiss`(옆 통과 = 불인정).
+- **Ground Slam 반동 제거**: 충격파 판정 후 튀어 오르지 않고 바로 착지해 계속 달림(`groundSlamBouncePower` 삭제, 씬에 남은 값은 무시됨). 공중 콤보 상태도 해제.
 
 ## Tripo 사용 기록
 

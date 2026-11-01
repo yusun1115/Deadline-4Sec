@@ -16,6 +16,8 @@ namespace Deadline4Sec
         public event Action<Enemy, string> EnemyKilled;
         public event Action<int> SlamResolved;
         public int LaneIndex => laneIndex;
+        // After an airborne kill a sideways swipe chains to the next Air Enemy on that side.
+        public bool IsAirComboReady => airComboReady && !isGrounded && !isHomingDash;
         public bool IsGrounded => isGrounded;
         public bool IsSliding => isSliding;
         public bool IsHoming => isHomingDash;
@@ -87,7 +89,6 @@ namespace Deadline4Sec
         [SerializeField, Min(0.1f)] private float groundSlamFallSpeed = 34f;
         [SerializeField, Min(0.1f)] private float groundSlamRadius = 4f;
         [SerializeField, Min(0f)] private float groundSlamAttackHeight = 2.2f;
-        [SerializeField, Min(0.1f)] private float groundSlamBouncePower = 19f;
         [SerializeField] private LayerMask groundSlamEnemyMask = ~0;
         [SerializeField] private LayerMask groundDetectionMask = ~0;
         [SerializeField, Min(1f)] private float groundDetectionMaxDistance = 60f;
@@ -231,6 +232,10 @@ namespace Deadline4Sec
         private void Update()
         {
             ReadKeyboardInput();
+            // Stopped time (tutorial hold, skip dialog, hit-stop): moving by
+            // zero would only report "not grounded" and lose the next jump.
+            if (Time.deltaTime <= 0f)
+                return;
             UpdateWallTilt();
 
             // Wall Run owns its own movement (no gravity, fixed wall line).
@@ -443,23 +448,33 @@ namespace Deadline4Sec
             (gameTimer == null || !gameTimer.IsGameOver) &&
             (gameFlow == null || gameFlow.CanReceiveInput);
 
+        // Tutorial hold (2026-11-01): while a lesson waits for one swipe, the
+        // other swipes are ignored and the right one resumes the game.
+        private bool TutorialAllows(TutorialController.LessonInput input) =>
+            gameFlow == null || gameFlow.TryTutorialInput(input);
+
         public void RequestMoveLeft()
         {
-            RequestLaneChange(-1);
+            if (TutorialAllows(TutorialController.LessonInput.Left))
+                RequestLaneChange(-1);
         }
 
         public void RequestMoveRight()
         {
-            RequestLaneChange(1);
+            if (TutorialAllows(TutorialController.LessonInput.Right))
+                RequestLaneChange(1);
         }
 
         public void RequestJump()
         {
-            Jump();
+            if (TutorialAllows(TutorialController.LessonInput.Up))
+                Jump();
         }
 
         public void RequestSlide()
         {
+            if (!TutorialAllows(TutorialController.LessonInput.Down))
+                return;
             if (lastSlideRequestFrame == Time.frameCount)
                 return;
             lastSlideRequestFrame = Time.frameCount;
@@ -1255,18 +1270,18 @@ namespace Deadline4Sec
             if (cameraFeedback != null)
                 cameraFeedback.PlayGroundSlamImpact(lastGroundSlamImpactPoint, groundSlamRadius);
 
+            // No rebound (2026-11-01): the runner lands and keeps running
+            // (the old bounce of 19 m/s threw the player back into the air).
             isGroundSlamming = false;
             isFastFalling = false;
             pendingGroundSlide = false;
-            isGrounded = false;
-            airComboReady = true;
+            isGrounded = true;
+            airComboReady = false;
             jumpAttackTimeRemaining = 0f;
-            verticalSpeed = groundSlamBouncePower;
+            verticalSpeed = -2f;
             lastAirJumpTime = float.NegativeInfinity;
             ActionPerformed?.Invoke(PlayerAction.SlamImpact);
             SlamResolved?.Invoke(killedCount);
-            if (showGroundSlamDebug)
-                Debug.Log("Ground Slam Bounce");
         }
 
         private void StartGroundSlide()

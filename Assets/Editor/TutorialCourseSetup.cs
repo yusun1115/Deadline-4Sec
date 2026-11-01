@@ -26,6 +26,15 @@ namespace Deadline4Sec.Editor
             assets.floorMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/Material/FloorColor.mat");
             if (!assets.IsValid)
                 throw new System.InvalidOperationException("Tutorial requires the production enemy, obstacle and floor assets.");
+            // Speaker and swipe guide art (2026-11-01); steps keep any edits.
+            assets.portrait = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Tutorial/tutorial_ex.png");
+            assets.bubble = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Tutorial/tutorial_ex_bubble.png");
+            assets.swipeArrow = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Tutorial/tutorial_swipe_arrow.png");
+            assets.swipeHand = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Tutorial/tutorial_swipe_hand.png");
+            if (assets.presentation == null)
+                assets.presentation = new TutorialPresentation();
+            if (assets.steps == null || assets.steps.Length == 0)
+                assets.steps = TutorialStep.CreateDefaults();
             EditorUtility.SetDirty(assets);
             AssetDatabase.SaveAssets();
             Debug.Log("Tutorial course uses the production enemy/obstacle prefabs.");
