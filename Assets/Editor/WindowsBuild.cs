@@ -24,6 +24,15 @@ namespace Deadline4Sec.Editor
             string output = Path.Combine(root, "Builds", "Windows", "Deadline4Sec.exe");
             Directory.CreateDirectory(Path.GetDirectoryName(output));
 
+            // URP keeps the list of pipeline assets a build uses (CoreBuildData)
+            // until a build ends. A stale copy from a mobile build made the
+            // Windows player strip the PC renderer's post-processing / SSAO
+            // resources and draw only black (2026-11-03): start from fresh data
+            // for the Windows target.
+            if (EditorUserBuildSettings.activeBuildTarget != BuildTarget.StandaloneWindows64)
+                EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.Standalone, BuildTarget.StandaloneWindows64);
+            UnityEditor.Rendering.CoreBuildData.instance.Dispose();
+
             PlayerSettings.fullScreenMode = FullScreenMode.Windowed;
             PlayerSettings.defaultScreenWidth = 540;
             PlayerSettings.defaultScreenHeight = 960;
