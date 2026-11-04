@@ -102,29 +102,26 @@ namespace Deadline4Sec.AcceptanceTests
                 Assert.AreEqual(1, PlayerPrefs.GetInt("Deadline4Sec.TutorialCompleted"));
                 SceneFlowAcceptanceTests.AssertAllTextUsesGameFont();
                 SceneFlowAcceptanceTests.CaptureIntroFrame(Camera.main, "tutorial-complete");
+                // 2026-11-05: no START RUN / SKIP at the end; after the last line
+                // the screen fades out to the title and fades back in.
+                Assert.IsNull(GameObject.Find("START RUNButton"));
+                Assert.IsNull(GameObject.Find("SkipButton"));
                 Time.captureDeltaTime = 0f;
-                Call(tutorial, "ContinueToRun");
-                yield return null;
-                yield return null;
-                flow = Get("GameFlowManager");
-                Assert.AreEqual("Ready", Read(flow, "State").ToString());
-                Assert.IsNull(Get("TutorialController"));
-                Assert.IsNull(GameObject.Find("TutorialHUD"));
-                Assert.IsNull(GameObject.Find("Tutorial Floor"));
                 frames = 0;
-                while (Read(flow, "State").ToString() == "Ready" && frames++ < 10000)
+                while ((Get("GameFlowManager") == null || Read(Get("GameFlowManager"), "State").ToString() != "Title" ||
+                        GameObject.Find("ScreenFade") != null) && frames++ < 20000)
                 {
                     System.Threading.Thread.Sleep(1);
                     yield return null;
                 }
-                Assert.Less(frames, 10000);
-                Assert.AreEqual("Playing", Read(flow, "State").ToString());
-                Assert.AreEqual(0, Read(Get("RunManager"), "CurrentScore"));
-                Assert.Less((float)Read(Get("RunManager"), "Distance"), 1f);
-                Assert.Greater((float)Read(Get("GameTimer"), "RemainingTime"), 3.8f);
-                Assert.IsTrue(((Behaviour)Get("PatternSpawner")).enabled);
+                Assert.Less(frames, 20000, "The tutorial returns to the title by itself.");
+                Assert.IsNull(Get("TutorialController"));
+                Assert.IsNull(GameObject.Find("TutorialHUD"));
+                Assert.IsNull(GameObject.Find("Tutorial Floor"));
+                Assert.IsFalse((bool)Read(Get("GameTimer"), "IsRunning"));
+                Assert.AreEqual(1f, Time.timeScale);
                 AssertRecordsUnchanged();
-                trace.AppendLine("PASS: 10 actual lessons, no failure, records preserved, normal Ready/Go run.");
+                trace.AppendLine("PASS: 10 actual lessons, no failure, records preserved, back to the title.");
             }
             finally
             {

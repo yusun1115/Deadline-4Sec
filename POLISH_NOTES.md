@@ -25,6 +25,7 @@
 | Character/Apply Reaper Rig Fixes | (2026-10-30) 머리에 묶인 후드 메시(`Art/3DModel/Generated/Hood_HeadBound.asset`) 생성 + 세 씬의 ReaperModel에 `ReaperRig` 추가(발 높이·후드·망토 물리·낫 잡기·왼손 IK). 열린 씬이 이미 수정 중이면 저장하지 않음 |
 | Prepare Tutorial Course | 튜토리얼 코스 에셋(`Resources/Tutorial/TutorialCourse.asset`)에 실제 적·장애물 프리팹·바닥 머티리얼 연결. (2026-11-01) 화자·말풍선·스와이프 화살표·손 스프라이트(`Art/Tutorial`)도 연결, 단계 목록이 비어 있을 때만 기본 12단계로 채움(인스펙터에서 고친 문구 유지). 씬은 건드리지 않음 |
 | UI/Apply Ranking Style To Windows | (2026-11-01) `ui_panel_gothic` / `ui_button_gothic`가 남은 창(설정·결과·부활·선물상자·업그레이드·업그레이드 팝업·튜토리얼 스킵 확인·SKIP·모드 선택 SELECT)을 랭킹/업적 스타일로 통일: 패널 = 어두운 자주색 + 핑크 외곽선 + 위/아래 핑크 포인트 바, 버튼 = 자주색 + 포인트색 외곽선·왼쪽 띠·글자(뒤로/아니오/포기/메인은 연핑크), 크기는 고딕 아트의 투명 여백만큼 축소(가로 92%, 세로 80%). 인게임 타이머 프레임은 그대로. 업그레이드 창은 업적 창 배치(넓은 프레임 + 화면 전체 스크롤 목록)로, 소모 아이템 칸은 목록 맨 아래 항목(스크롤해서 봄). 고딕 아트를 쓰는 예전 메뉴(UI Skin / Title·Upgrade 배치 / Mode Select)를 다시 실행했다면 이 메뉴도 다시 실행. 열린 씬이 이미 수정 중이면 저장하지 않음 |
+| UI/Apply Settings Icon Buttons | (2026-11-04) 설정 화면: SOUND / VIBRATION을 나란히 놓인 정사각형 아이콘 버튼(190×190)으로 바꾸고 TUTORIAL·BACK은 아래 넓은 버튼. 아이콘은 `UI/icon_sound_on·off`, `icon_vibration_on·off`(없으면 `Art/Draw Setting Toggle Icons`로 먼저 그림 — 같은 이름의 PNG로 교체 가능), 버튼의 `SettingToggleIcon`이 저장된 설정에 따라 ON/OFF 아이콘으로 바꾸고 OFF는 흐리게. On Click(ToggleSound / ToggleVibration)과 버튼 이름은 그대로, 글자 라벨은 숨김. 세 씬 적용, 열린 씬이 이미 수정 중이면 저장하지 않음 |
 | UI/Apply Result Screen Layout | 결과창 정보 계층(큰 SCORE → 거리/콤보/시간 3열 → NEW BEST → PERSONAL BEST → RUN REWARD → MAIN MENU \| RETRY 가로 버튼) + 뒤 어두운 오버레이 + `ResultPresenter` 연결. 기존 오브젝트 이름·참조·On Click 유지, ConfirmButton은 비활성(2026-10-09 OPEN REWARDS 제거 요청 — 상자는 두 버튼 모두 기존 상자 오픈 흐름을 먼저 거침). 세 씬 적용 |
 | UI/Build Loading Scene | `Assets/Scenes/Loading.unity` 생성(키아트 + LOADING... + bg/fill/frame 게이지 + 랜덤 팁) 후 Build Settings 0번에 배치. 다시 실행해도 인스펙터에 적은 팁 목록은 유지 |
 | UI/Apply Number Font To HUD | CallifontSharpie-Bold TMP 에셋 생성(`Resources/Fonts/CallifontSharpie-Bold SDF`) + HUD 숫자 라벨(타이머·점수·거리·코인·선물상자 수)에 `NumericLabel` 부착·크기 보정 |
@@ -219,6 +220,8 @@
 - **HUD**: 튜토리얼 동안 `hiddenHud` 목록(점수·콤보·Soul·선물상자·파워업 표시)만 CanvasGroup으로 숨김 — NEAR MISS 문구·점수 팝업·콤보 배지 같은 피드백은 보임. 하단 버튼은 SKIP(오른쪽 아래)만(MENU 제거). 종료/SKIP 시 `Cleanup`으로 전부 원복(씬도 다시 로드됨).
 - **니어 미스 단계(11-01 수정)**: 장애물을 러너와 같은 레인 정중앙(x 2.5)에 두고, 장애물 앞까지 0.75m(연습 속도 6m/s에서 니어 미스가 되는 0.45~1.0m 사이)일 때만 정지·왼쪽 안내. 미리 피하면 니어 미스가 아니라 실패 → 자동 재시도.
 - **공중 적 연결(11-01 수정)**: 공중 처치 직후(`PlayerController.IsAirComboReady`) 다음 적이 옆 레인이면 그쪽 방향 스와이프(오른쪽/왼쪽)로 안내·정지(실제 연결 조작), 같은 줄 위쪽이면 위. AIR HOMING은 위 → 오른쪽, STOMP는 위 → 왼쪽 → 아래. 점프 직후의 호밍 위 스와이프도 정지 대기.
+- **공중 적 한 번에(11-05)**: 땅에서 공중 적을 향해 위로 스와이프하면 점프 후 호밍 공격이 저절로 이어짐(두 번째 위 스와이프·정지 없음). 공중 처치 후 이어지는 적(옆 레인 → 옆 스와이프, 같은 줄 위 → 위 스와이프)은 그대로 한 번씩.
+- **끝(11-05)**: START RUN·SKIP 버튼 없음. 마지막 대사가 다 나온 뒤 `completeHold`(1.8초) → 검은 화면으로 페이드아웃(`endFadeOut` 0.6초) → 타이틀로 돌아와 페이드인(`endFadeIn` 0.5초, `ScreenFade`).
 - **줄바꿈**: TMP Settings의 Modern Hangul Line Breaking을 켬(한국어가 단어 중간에서 끊기지 않음, 게임 전체 적용).
 - **테스트**: `TutorialAcceptanceTests.SpeakerBriefsTimerThenSwipeGuideFollowsPromptAndSkipRestoresHud`, `HeldLessonTakesOnlyItsSwipeAndAWrongMoveRetriesByItself` + 레슨 10개 재생 테스트(브리핑은 탭, 모든 레슨이 정지 대기를 거침).
 

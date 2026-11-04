@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -24,7 +23,7 @@ namespace Deadline4Sec
         private CameraFeedbackController feedback;
         private TutorialCourseAssets assets;
         private Vector3 startPose;
-        private GameObject floor, stageRoot, panel, continueButton;
+        private GameObject floor, stageRoot, panel;
         private TutorialUIController ui;
         private TutorialStep[] briefing, lessons;
         private bool briefingAdvance, followUpShown;
@@ -35,7 +34,8 @@ namespace Deadline4Sec
         private int airKills, slamKills;
         private float missedFor, releasedAt = float.NegativeInfinity;
         private LessonInput releasedInput;
-        private bool releasedGrounded;
+        // One up swipe at an air enemy: the jump, then the homing attack by itself.
+        private float autoHomingFrom, autoHomingUntil = float.NegativeInfinity;
 
         public LessonState State { get; private set; }
         public int StepIndex { get; private set; }
@@ -159,7 +159,7 @@ namespace Deadline4Sec
             airKills = slamKills = 0;
             missedFor = 0f;
             ReleaseHold();
-            continueButton.SetActive(false);
+            autoHomingUntil = float.NegativeInfinity;
             CurrentStep = lessons[StepIndex];
             followUpShown = false;
             ui.ShowDialogue(LessonTitle, CurrentStep.dialogueText);
@@ -271,8 +271,23 @@ namespace Deadline4Sec
                 HandleFailure();
                 return;
             }
+            UpdateAutoHoming();
             UpdateCue(body);
             UpdateHold();
+        }
+
+        // After the up swipe that jumps toward an air enemy, the homing attack
+        // starts by itself once the runner is off the ground (no second swipe).
+        private bool AutoHomingPending => Time.time <= autoHomingUntil && !player.IsHoming;
+
+        private void UpdateAutoHoming()
+        {
+            if (Time.time > autoHomingUntil)
+                return;
+            if (player.IsHoming)
+                autoHomingUntil = float.NegativeInfinity;
+            else if (Time.time >= autoHomingFrom && !player.IsGrounded)
+                player.RequestJump();
         }
 
         private bool MissedLesson(Bounds body, bool passed)
@@ -291,11 +306,8 @@ namespace Deadline4Sec
         {
             if (!CurrentStep.pauseForInput || PromptInput == LessonInput.None)
                 return;
-            // The same swipe just given is still being carried out — except a
-            // jump that has left the ground: the next up is the homing attack.
-            float since = Time.time - releasedAt;
-            bool newPhase = releasedGrounded && !player.IsGrounded && since >= 0.1f;
-            if (PromptInput == releasedInput && since < 0.25f && !newPhase)
+            // The same swipe just given is still being carried out.
+            if (PromptInput == releasedInput && Time.time - releasedAt < 0.25f)
                 return;
             IsHoldingForInput = true;
             Time.timeScale = 0f;
@@ -321,7 +333,6 @@ namespace Deadline4Sec
             Time.timeScale = 1f;
             releasedInput = input;
             releasedAt = Time.time;
-            releasedGrounded = player != null && player.IsGrounded;
         }
 
         private void UpdateCue(Bounds body)
@@ -383,6 +394,8 @@ namespace Deadline4Sec
                 else if (StepIndex == 9 && !slam && !player.IsFastFalling)
                     PromptInput = LessonInput.Down;
             }
+            if (AutoHomingPending)
+                PromptInput = LessonInput.None; // the homing follows the jump by itself
             // The arrow and swiping hand show the input asked for right now.
             LessonInput guide = CurrentStep.showSwipeGuide ? PromptInput : LessonInput.None;
             string keys = null;
@@ -400,6 +413,11 @@ namespace Deadline4Sec
             left |= action == PlayerController.PlayerAction.Left;
             right |= action == PlayerController.PlayerAction.Right && (StepIndex != 0 || leftLaneReached);
             jumped |= action == PlayerController.PlayerAction.Jump;
+            if (action == PlayerController.PlayerAction.Jump && NextEnemy != null && NextEnemy.Type == Enemy.EnemyType.Air)
+            {
+                autoHomingFrom = Time.time + 0.08f;
+                autoHomingUntil = Time.time + 0.6f;
+            }
             slid |= action == PlayerController.PlayerAction.Slide;
             fastFall |= action == PlayerController.PlayerAction.FastFall;
             if (!followUpShown && !string.IsNullOrEmpty(CurrentStep.followUpText) &&
@@ -485,11 +503,23 @@ namespace Deadline4Sec
                 if (feedback != null)
                     feedback.StopAllFeedback();
                 ui.SetHighlight(TutorialHighlight.None, false);
+                ui.SetGuide(LessonInput.None, null);
+                ui.HideSkip();
                 ui.ShowDialogue("TUTORIAL COMPLETE", Look.completeText);
-                continueButton.SetActive(true);
                 PlayerPrefs.SetInt("Deadline4Sec.TutorialCompleted", 1);
                 PlayerPrefs.Save();
+                StartCoroutine(EndAfterLastLine());
             }
+        }
+
+        // No buttons at the end (2026-11-05): the last line is read out, then
+        // the screen fades to black, the title comes back and fades in.
+        private IEnumerator EndAfterLastLine()
+        {
+            while (ui.IsTyping)
+                yield return null;
+            yield return new WaitForSecondsRealtime(Look.completeHold);
+            ScreenFade.FadeOutThen(Look.endFadeOut, Look.endFadeIn, () => flow.FinishTutorial(false));
         }
 
         public void HandleFailure()
@@ -532,12 +562,6 @@ namespace Deadline4Sec
             ui.SetScreenFade(0f, 0.3f);
         }
 
-        public void ContinueToRun()
-        {
-            if (State == LessonState.Complete)
-                flow.FinishTutorial(true);
-        }
-
         private void CreateUI(Canvas canvas)
         {
             panel = new GameObject("TutorialHUD", typeof(RectTransform));
@@ -546,27 +570,15 @@ namespace Deadline4Sec
             rect.anchorMin = Vector2.zero;
             rect.anchorMax = Vector2.one;
             rect.offsetMin = rect.offsetMax = Vector2.zero;
-            // Speaker, highlight and swipe guide (below the button). A failed
-            // try retries by itself and SKIP is the only way out, so there is
-            // no TRY AGAIN / MENU button (2026-11-01).
+            // Speaker, highlight and swipe guide. A failed try retries by
+            // itself, SKIP is the way out and the end returns to the title by
+            // itself, so there are no buttons of its own (2026-11-01 / 11-05).
             ui = panel.AddComponent<TutorialUIController>();
             ui.Build(canvas, assets);
-            TMP_Text next = flow.CreateMenuButton(panel.transform, "START RUN", Vector2.zero,
-                new Vector2(360f, 80f), ContinueToRun);
-            continueButton = next.transform.parent.gameObject;
-            BottomButton(continueButton, new Vector2(0.5f, 0f), new Vector2(0f, 60f));
-            continueButton.SetActive(false);
         }
 
         private TutorialPresentation Look => assets.presentation ?? new TutorialPresentation();
         private string LessonTitle => (StepIndex + 1) + "/" + LessonCount + "  " + CurrentStep.title;
-
-        private static void BottomButton(GameObject button, Vector2 anchor, Vector2 position)
-        {
-            RectTransform rect = button.GetComponent<RectTransform>();
-            rect.anchorMin = rect.anchorMax = anchor;
-            rect.anchoredPosition = position;
-        }
 
         private void ClearStage()
         {

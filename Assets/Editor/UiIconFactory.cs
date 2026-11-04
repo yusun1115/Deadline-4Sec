@@ -34,7 +34,79 @@ namespace Deadline4Sec.Editor
                 ImportAsSprite(Folder + name + ".png", name == "ui_skin_card" ? new Vector4(48, 48, 48, 48) : Vector4.zero);
         }
 
+        // Settings sound / vibration toggles (2026-11-04), pink like the sketch:
+        // ON = speaker with waves / phone buzzing, OFF = speaker with X / still phone.
+        [MenuItem("Deadline 4 Sec/Art/Draw Setting Toggle Icons")]
+        public static void DrawSettingIcons()
+        {
+            Directory.CreateDirectory(Folder);
+            string[] names = { "icon_sound_on", "icon_sound_off", "icon_vibration_on", "icon_vibration_off" };
+            Func<Vector2, Vector2>[] shapes = { SoundOn, SoundOff, VibrationOn, VibrationOff };
+            for (int i = 0; i < names.Length; i++)
+                Draw(names[i], shapes[i], 0.035f, false, Pink);
+            AssetDatabase.Refresh();
+            foreach (string name in names)
+                ImportAsSprite(Folder + name + ".png", Vector4.zero);
+        }
+
         // ---------- shapes: p in [-0.5, 0.5], y up; negative = inside ----------
+
+        private const float NoAccent = 1f;
+
+        private static float Speaker(Vector2 p)
+        {
+            p.x += 0.08f;
+            float body = Box(p, new Vector2(-0.2f, 0f), new Vector2(0.07f, 0.09f), 0.015f);
+            // Cone widening to the right: between x -0.15 and 0.05.
+            float slope = Mathf.Abs(p.y) - 0.09f - 0.8f * (p.x + 0.15f);
+            float cone = Mathf.Max(Mathf.Max(-(p.x + 0.15f), p.x - 0.05f), slope / 1.28f);
+            return Mathf.Min(body, cone);
+        }
+
+        private static Vector2 SoundOn(Vector2 p)
+        {
+            float d = Speaker(p);
+            d = Mathf.Min(d, Segment(p, new Vector2(0.06f, 0.11f), new Vector2(0.2f, 0.21f), 0.035f));
+            d = Mathf.Min(d, Segment(p, new Vector2(0.07f, 0f), new Vector2(0.25f, 0f), 0.035f));
+            d = Mathf.Min(d, Segment(p, new Vector2(0.06f, -0.11f), new Vector2(0.2f, -0.21f), 0.035f));
+            return new Vector2(d, NoAccent);
+        }
+
+        private static Vector2 SoundOff(Vector2 p)
+        {
+            float d = Speaker(p);
+            d = Mathf.Min(d, Segment(p, new Vector2(0.1f, 0.1f), new Vector2(0.27f, -0.08f), 0.035f));
+            d = Mathf.Min(d, Segment(p, new Vector2(0.1f, -0.08f), new Vector2(0.27f, 0.1f), 0.035f));
+            return new Vector2(d, NoAccent);
+        }
+
+        private static float Phone(Vector2 p)
+        {
+            float outer = Box(p, Vector2.zero, new Vector2(0.12f, 0.21f), 0.04f);
+            float screen = Box(p, new Vector2(0f, 0.005f), new Vector2(0.06f, 0.13f), 0.015f);
+            return Mathf.Max(outer, -screen);
+        }
+
+        private static Vector2 VibrationOn(Vector2 p)
+        {
+            float d = Phone(p);
+            // A zigzag on each side.
+            for (int side = -1; side <= 1; side += 2)
+            {
+                float[] ys = { 0.17f, 0.085f, 0f, -0.085f, -0.17f };
+                for (int i = 0; i < ys.Length - 1; i++)
+                {
+                    Vector2 a = new Vector2(side * (i % 2 == 0 ? 0.2f : 0.27f), ys[i]);
+                    Vector2 b = new Vector2(side * (i % 2 == 0 ? 0.27f : 0.2f), ys[i + 1]);
+                    d = Mathf.Min(d, Segment(p, a, b, 0.022f));
+                }
+            }
+            return new Vector2(d, NoAccent);
+        }
+
+        private static Vector2 VibrationOff(Vector2 p) => new Vector2(Phone(p), NoAccent);
+
+        // ---------- menu icon shapes ----------
 
         private static float Circle(Vector2 p, Vector2 c, float r) => (p - c).magnitude - r;
 
@@ -102,7 +174,10 @@ namespace Deadline4Sec.Editor
             return new Vector2(d, accent);
         }
 
-        private static void Draw(string name, Func<Vector2, Vector2> shape, float outline, bool gradient)
+        private static void Draw(string name, Func<Vector2, Vector2> shape, float outline, bool gradient) =>
+            Draw(name, shape, outline, gradient, White);
+
+        private static void Draw(string name, Func<Vector2, Vector2> shape, float outline, bool gradient, Color bodyColor)
         {
             Texture2D tex = new Texture2D(Size, Size, TextureFormat.RGBA32, false);
             float px = 1f / Size;
@@ -114,7 +189,7 @@ namespace Deadline4Sec.Editor
                 float fill = Mathf.Clamp01(0.5f - s.x / px);
                 float edge = Mathf.Clamp01(0.5f - (s.x - outline) / px);
                 float accent = Mathf.Clamp01(0.5f - s.y / px) * fill;
-                Color body = gradient ? Color.Lerp(White, new Color(1f, 0.8f, 0.9f), Mathf.Clamp01(0.5f - p.y)) : White;
+                Color body = gradient ? Color.Lerp(bodyColor, new Color(1f, 0.8f, 0.9f), Mathf.Clamp01(0.5f - p.y)) : bodyColor;
                 Color c = Color.Lerp(Ink, body, fill);
                 c = Color.Lerp(c, Pink, accent);
                 c.a = edge;

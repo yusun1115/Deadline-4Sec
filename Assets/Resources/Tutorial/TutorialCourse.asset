@@ -69,6 +69,9 @@ MonoBehaviour:
       \uD574 \uBCF4\uC790."
     completeText: "\uC644\uBCBD\uD574! \uC801 \uCC98\uCE58\uC640 \uB2C8\uC5B4 \uBBF8\uC2A4\uB85C
       4\uCD08\uB97C \uACC4\uC18D \uB418\uB3CC\uB824. \uC774\uC81C \uC2E4\uC804\uC774\uC57C!"
+    completeHold: 1.8
+    endFadeOut: 0.6
+    endFadeIn: 0.5
   steps:
   - stepId: timer_intro
     kind: 0
@@ -197,8 +200,9 @@ MonoBehaviour:
   - stepId: air_homing
     kind: 1
     title: AIR HOMING
-    dialogueText: "\uC810\uD504 \uD6C4 \uC704\uB85C \uC2A4\uC640\uC774\uD504\uD574\uC11C
-      \uC801\uC744 \uBCA0\uACE0, \uBC14\uB85C \uC624\uB978\uCABD\uC73C\uB85C \uC2A4\uC640\uC774\uD504\uD574
+    dialogueText: "\uC704\uB85C \uD55C \uBC88 \uC2A4\uC640\uC774\uD504\uD558\uBA74
+      \uACF5\uC911 \uC801\uC5D0\uAC8C \uB0A0\uC544\uAC00 \uBCA0\uC5B4! \uCC98\uCE58
+      \uC9C1\uD6C4 \uC624\uB978\uCABD\uC73C\uB85C \uC2A4\uC640\uC774\uD504\uD574
       \uC606 \uC801\uAE4C\uC9C0 \uC774\uC5B4\uC11C \uBCA0\uC5B4!"
     followUpText: 
     highlightTarget: 0
@@ -228,9 +232,10 @@ MonoBehaviour:
   - stepId: stomp
     kind: 1
     title: STOMP
-    dialogueText: "\uACF5\uC911 \uC801\uC744 \uBCA0\uACE0 \uC67C\uCABD \uC2A4\uC640\uC774\uD504\uB85C
-      \uC774\uC5B4\uAC04 \uB4A4, \uC544\uB798\uB85C \uC2A4\uC640\uC774\uD504\uD574\uC11C
-      \uC801\uC758 \uBA38\uB9AC\uB97C \uBC1F\uC544!"
+    dialogueText: "\uC704\uB85C \uC2A4\uC640\uC774\uD504\uD574 \uACF5\uC911 \uC801\uC744
+      \uBCA0\uACE0 \uC67C\uCABD \uC2A4\uC640\uC774\uD504\uB85C \uC774\uC5B4\uAC04
+      \uB4A4, \uC544\uB798\uB85C \uC2A4\uC640\uC774\uD504\uD574\uC11C \uC801\uC758
+      \uBA38\uB9AC\uB97C \uBC1F\uC544!"
     followUpText: 
     highlightTarget: 0
     dimBackground: 0
@@ -244,9 +249,10 @@ MonoBehaviour:
   - stepId: ground_slam
     kind: 1
     title: GROUND SLAM
-    dialogueText: "\uB354 \uB192\uC774 \uC62C\uB77C\uAC00\uC11C \uC544\uB798\uB85C
-      \uC2A4\uC640\uC774\uD504! \uB545\uC744 \uB0B4\uB824\uCC0D\uC5B4 \uC8FC\uBCC0
-      \uC801\uAE4C\uC9C0 \uD55C \uBC88\uC5D0!"
+    dialogueText: "\uC704\uB85C \uC2A4\uC640\uC774\uD504\uD574 \uACF5\uC911 \uC801\uC744
+      \uBC1F\uACE0 \uB192\uC774 \uC62C\uB77C\uAC04 \uB4A4, \uC544\uB798\uB85C \uC2A4\uC640\uC774\uD504!
+      \uB545\uC744 \uB0B4\uB824\uCC0D\uC5B4 \uC8FC\uBCC0 \uC801\uAE4C\uC9C0 \uD55C
+      \uBC88\uC5D0!"
     followUpText: 
     highlightTarget: 0
     dimBackground: 0

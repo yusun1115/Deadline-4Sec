@@ -207,6 +207,13 @@ namespace Deadline4Sec
             }
         }
 
+        // The tutorial's end returns to the title by itself: no SKIP there.
+        public void HideSkip()
+        {
+            if (skipButton != null)
+                skipButton.gameObject.SetActive(false);
+        }
+
         public void ShowDialogue(string title, string text)
         {
             titleLabel.text = title ?? "";
@@ -468,6 +475,7 @@ namespace Deadline4Sec
             hiddenHud.Clear();
             if (skipButton != null)
             {
+                skipButton.gameObject.SetActive(true);
                 skipButton.anchorMin = skipAnchorMin;
                 skipButton.anchorMax = skipAnchorMax;
                 skipButton.pivot = skipPivot;

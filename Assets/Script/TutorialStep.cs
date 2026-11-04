@@ -79,13 +79,13 @@ namespace Deadline4Sec
                 TutorialInputType.SwipeRight, TutorialCondition.KillOnLowTimer, null, TutorialHighlight.Timer),
             Lesson("near_miss", "NEAR MISS", "장애물에 부딪히기 직전까지 기다렸다가 왼쪽으로 스와이프! 아슬아슬하게 피해야 니어 미스야.",
                 TutorialInputType.SwipeLeft, TutorialCondition.NearMiss),
-            Lesson("air_homing", "AIR HOMING", "점프 후 위로 스와이프해서 적을 베고, 바로 오른쪽으로 스와이프해 옆 적까지 이어서 베어!",
+            Lesson("air_homing", "AIR HOMING", "위로 한 번 스와이프하면 공중 적에게 날아가 베어! 처치 직후 오른쪽으로 스와이프해 옆 적까지 이어서 베어!",
                 TutorialInputType.SwipeUp, TutorialCondition.AirHomingKills),
             Lesson("fast_fall", "FAST FALL", "점프한 다음, 공중에서 아래로 스와이프하면 빠르게 착지해.",
                 TutorialInputType.SwipeUp, TutorialCondition.FastFallLanding, "지금! 아래로 스와이프!"),
-            Lesson("stomp", "STOMP", "공중 적을 베고 왼쪽 스와이프로 이어간 뒤, 아래로 스와이프해서 적의 머리를 밟아!",
+            Lesson("stomp", "STOMP", "위로 스와이프해 공중 적을 베고 왼쪽 스와이프로 이어간 뒤, 아래로 스와이프해서 적의 머리를 밟아!",
                 TutorialInputType.SwipeUp, TutorialCondition.Stomp),
-            Lesson("ground_slam", "GROUND SLAM", "더 높이 올라가서 아래로 스와이프! 땅을 내려찍어 주변 적까지 한 번에!",
+            Lesson("ground_slam", "GROUND SLAM", "위로 스와이프해 공중 적을 밟고 높이 올라간 뒤, 아래로 스와이프! 땅을 내려찍어 주변 적까지 한 번에!",
                 TutorialInputType.SwipeUp, TutorialCondition.GroundSlam),
         };
     }
@@ -140,5 +140,9 @@ namespace Deadline4Sec
         [Min(0.1f)] public float successDuration = 0.55f;
         [TextArea(2, 4)] public string failText = "앗, 아쉬워! 이번 단계를 다시 해 보자.";
         [TextArea(2, 4)] public string completeText = "완벽해! 적 처치와 니어 미스로 4초를 계속 되돌려. 이제 실전이야!";
+        [Tooltip("Seconds the last line stays after it is fully shown, before the fade to the title.")]
+        [Min(0f)] public float completeHold = 1.8f;
+        [Min(0f)] public float endFadeOut = 0.6f;
+        [Min(0f)] public float endFadeIn = 0.5f;
     }
 }
