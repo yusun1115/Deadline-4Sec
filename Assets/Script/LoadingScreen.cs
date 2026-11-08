@@ -36,9 +36,12 @@ namespace Deadline4Sec
         private const float FadeTime = 0.25f;
         private float target;
         private float shown;
+        private readonly HashSet<GameObject> ownObjects = new HashSet<GameObject>();
 
         private void Awake()
         {
+            foreach (GameObject root in gameObject.scene.GetRootGameObjects())
+                ownObjects.Add(root);
             GameFont.Apply(loadingText);
             GameFont.Apply(tipText);
             if (tipText != null)
@@ -102,6 +105,7 @@ namespace Deadline4Sec
                 : SceneManager.GetSceneByName(sceneToLoad);
             if (game.IsValid())
                 SceneManager.SetActiveScene(game);
+            MoveTheGamesObjects(game);
             target = ActivatedShare;
             yield return null; // the game scene's Start runs here
             target = 1f;
@@ -114,8 +118,21 @@ namespace Deadline4Sec
                 group.alpha = 1f - t / FadeTime;
                 yield return null;
             }
+            MoveTheGamesObjects(game);
             // Unloading this scene ends this coroutine; free the key art afterwards.
             SceneManager.UnloadSceneAsync(gameObject.scene).completed += _ => Resources.UnloadUnusedAssets();
+        }
+
+        // This scene stays the active one until the game scene has loaded, so what
+        // the game creates meanwhile (new GameObject in Awake, Start, sceneLoaded)
+        // lands here. It must not be unloaded along with this screen.
+        private void MoveTheGamesObjects(Scene game)
+        {
+            if (!game.IsValid())
+                return;
+            foreach (GameObject root in gameObject.scene.GetRootGameObjects())
+                if (!ownObjects.Contains(root))
+                    SceneManager.MoveGameObjectToScene(root, game);
         }
 
         private void Update()
