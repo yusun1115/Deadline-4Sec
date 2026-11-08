@@ -12,6 +12,7 @@ namespace Deadline4Sec
         public enum ObstacleType { LaneBlocker, JumpObstacle, SlideObstacle, RampTrain }
 
         [SerializeField] private ObstacleType obstacleType;
+        public ObstacleType Type => obstacleType;
         [Header("Near miss zone (extra space outside the solid collider)")]
         [SerializeField] private Vector3 nearMissMargin = new Vector3(0.95f, 0.65f, 1.25f);
         // A Near Miss is a last-moment escape (2026-11-01): the runner must have

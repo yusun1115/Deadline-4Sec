@@ -218,3 +218,5 @@ MonoBehaviour:
   owner: {fileID: 3846370354237658697}
   zoneType: 2
   highJumpClearance: 0.05
+  frontClearAbove: 1.75
+  afterAirKillClearAbove: 0.5

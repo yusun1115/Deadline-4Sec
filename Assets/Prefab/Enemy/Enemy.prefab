@@ -69,6 +69,8 @@ MonoBehaviour:
   owner: {fileID: 7445317943333019843}
   zoneType: 1
   highJumpClearance: 0.05
+  frontClearAbove: 1.75
+  afterAirKillClearAbove: 0.5
 --- !u!1 &2097064668027320917
 GameObject:
   m_ObjectHideFlags: 0
@@ -289,6 +291,8 @@ MonoBehaviour:
   owner: {fileID: 7445317943333019843}
   zoneType: 1
   highJumpClearance: 0.05
+  frontClearAbove: 1.75
+  afterAirKillClearAbove: 0.5
 --- !u!1 &7011211962844569028
 GameObject:
   m_ObjectHideFlags: 0
@@ -358,3 +362,5 @@ MonoBehaviour:
   owner: {fileID: 7445317943333019843}
   zoneType: 0
   highJumpClearance: 0.05
+  frontClearAbove: 1.75
+  afterAirKillClearAbove: 0.5

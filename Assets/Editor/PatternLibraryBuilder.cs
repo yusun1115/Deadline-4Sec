@@ -471,6 +471,7 @@ namespace Deadline4Sec.Editor
             data.FindProperty("category").enumValueIndex = (int)spec.Category;
             data.FindProperty("entryState").enumValueIndex = (int)spec.Entry;
             data.FindProperty("exitState").enumValueIndex = (int)spec.Exit;
+            data.FindProperty("intensity").intValue = IntensityOf(spec.Name);
             data.ApplyModifiedPropertiesWithoutUndo();
             int index = 1;
             foreach (Action<Transform> add in spec.Items)

@@ -65,6 +65,7 @@ MonoBehaviour:
   category: 0
   entryState: 0
   exitState: 0
+  intensity: 2
 --- !u!1001 &459936651933087745
 PrefabInstance:
   m_ObjectHideFlags: 0

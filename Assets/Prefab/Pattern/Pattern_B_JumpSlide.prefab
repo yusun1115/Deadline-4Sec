@@ -52,13 +52,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 319e993150a54bdd995d5f93921b7ae4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Deadline4Sec.CoursePattern
-  patternLength: 22
+  patternLength: 28
   referenceForwardSpeed: 10.2
   laneWidth: 2.5
   difficulty: 0
   category: 2
   entryState: 0
   exitState: 0
+  intensity: 2
 --- !u!1001 &336295495623112494
 PrefabInstance:
   m_ObjectHideFlags: 0

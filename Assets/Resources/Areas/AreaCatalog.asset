@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1667e6744c9a4e4429c0c3ef3b319f84, type: 3}
+  m_Name: AreaCatalog
+  m_EditorClassIdentifier: Assembly-CSharp::Deadline4Sec.AreaCatalog
+  areas:
+  - {fileID: 11400000, guid: c075f330e2da4ee469601c2d011f537d, type: 2}
+  - {fileID: 11400000, guid: 642d1c32433d837479d468fcad8d6618, type: 2}
+  - {fileID: 11400000, guid: b1f695130fc38c44dabfad1a994b7648, type: 2}
+  transitionPattern: {fileID: 3341435569639932629, guid: c451efa18faef9e40a0cd3214714a79b, type: 3}
+  showPatternDebugLogs: 0

@@ -636,6 +636,8 @@ namespace Deadline4Sec.AcceptanceTests
                     "Assets/Prefab/Pattern/" + names[i] + ".prefab");
                 prefabs.SetValue(prefab.GetComponent(Find("CoursePattern")), i);
             }
+            spawner.GetType().GetField("areaCatalog",
+                BindingFlags.NonPublic | BindingFlags.Instance).SetValue(spawner, null);
             spawner.GetType().GetField("patternPrefabs",
                 BindingFlags.NonPublic | BindingFlags.Instance).SetValue(spawner, prefabs);
             Assert.AreEqual(0, spawner.transform.childCount,

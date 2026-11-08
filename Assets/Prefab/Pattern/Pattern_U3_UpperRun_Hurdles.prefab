@@ -74,6 +74,7 @@ MonoBehaviour:
   category: 2
   entryState: 3
   exitState: 3
+  intensity: 3
 --- !u!1 &3776762564592230141
 GameObject:
   m_ObjectHideFlags: 0

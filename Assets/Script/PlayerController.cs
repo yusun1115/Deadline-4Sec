@@ -959,6 +959,12 @@ namespace Deadline4Sec
                 (slideAttackActive && TryKillContactEnemy(enemy, "Slide Attack")))
                 return false;
 
+            // Coming down out of an air kill, grazing the back of an enemy already
+            // flown past isn't a hit: at low frame rates the arc clips its edge.
+            if (airComboReady && !isGrounded &&
+                transform.position.z > enemy.transform.position.z)
+                return false;
+
             Debug.Log("Game Over: Hit Enemy Without Attack");
             gameTimer.TriggerFatalContactFrom(collider);
             return true;

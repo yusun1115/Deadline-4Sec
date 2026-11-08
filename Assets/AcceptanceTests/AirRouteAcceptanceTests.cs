@@ -178,6 +178,7 @@ namespace Deadline4Sec.AcceptanceTests
             yield return new EnterPlayMode();
             yield return null;
             Component spawner = Get("PatternSpawner");
+            Set(spawner, "areaCatalog", null); // the air route's own rules, on the whole library
             Set(spawner, "airRouteStartsAtSeconds", 0f);
             Set(spawner, "mediumStartsAtSeconds", 0f);
             Set(spawner, "nextAirRouteGap", 0);
@@ -242,6 +243,7 @@ namespace Deadline4Sec.AcceptanceTests
             Array prefabs = Array.CreateInstance(T("CoursePattern"), course.Length);
             for (int i = 0; i < course.Length; i++)
                 prefabs.SetValue(Pattern(course[i]), i);
+            Set(spawner, "areaCatalog", null);
             Set(spawner, "patternPrefabs", prefabs);
             Set(spawner, "airRouteStartsAtSeconds", 0f);
             Set(spawner, "mediumStartsAtSeconds", 0f);

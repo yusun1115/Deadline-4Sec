@@ -17,7 +17,7 @@ namespace Deadline4Sec
         public const float UpperDeckHeight = 8f;
 
         public enum DifficultyLevel { Easy, Medium, Hard }
-        public enum PatternCategory { GroundCombat, AirCombat, Obstacle, Stomp, Mixed, AirRoute, WallRun }
+        public enum PatternCategory { GroundCombat, AirCombat, Obstacle, Stomp, Mixed, AirRoute, WallRun, AreaTransition }
         public enum TravelState { Ground, Air, Any, Upper }
 
         [SerializeField, Min(1f)] private float patternLength = 20f;
@@ -28,16 +28,21 @@ namespace Deadline4Sec
         [SerializeField] private PatternCategory category = PatternCategory.GroundCombat;
         [SerializeField] private TravelState entryState = TravelState.Ground;
         [SerializeField] private TravelState exitState = TravelState.Ground;
+        [Tooltip("1 rest, 2 light, 3 ordinary fight or dodge, 4 high focus, 5 strong risk.")]
+        [SerializeField, Range(1, 5)] private int intensity = 3;
 
         public DifficultyLevel Difficulty => difficulty;
         public PatternCategory Category => category;
         public TravelState EntryState => entryState;
         public TravelState ExitState => exitState;
+        public int Intensity => intensity;
         public bool IsAirRouteEntry => exitState == TravelState.Upper && entryState != TravelState.Upper;
         public bool IsUpperRun => entryState == TravelState.Upper && exitState == TravelState.Upper;
         public bool IsUpperReturn => entryState == TravelState.Upper && exitState != TravelState.Upper;
         // Wall Run (2026-10-18): a special Ground -> Ground section with a floor gap.
         public bool IsWallRun => category == PatternCategory.WallRun;
+        // Area transition (2026-11-06): the tunnel between two areas.
+        public bool IsAreaTransition => category == PatternCategory.AreaTransition;
 
         public float PatternLength
         {
@@ -123,7 +128,7 @@ namespace Deadline4Sec
             Vector3 start = transform.position;
             Vector3 end = transform.TransformPoint(0f, 0f, patternLength);
             Handles.Label(start + Vector3.up * 0.5f,
-                name + " START | " + difficulty + " | " + category +
+                name + " START | " + difficulty + " | I" + intensity + " | " + category +
                 " | " + entryState + " → " + exitState);
             Handles.Label(end + Vector3.up * 0.5f,
                 "END  ~" + (patternLength / referenceForwardSpeed).ToString("0.0") + "s");

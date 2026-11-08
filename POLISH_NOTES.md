@@ -26,6 +26,7 @@
 | Prepare Tutorial Course | 튜토리얼 코스 에셋(`Resources/Tutorial/TutorialCourse.asset`)에 실제 적·장애물 프리팹·바닥 머티리얼 연결. (2026-11-01) 화자·말풍선·스와이프 화살표·손 스프라이트(`Art/Tutorial`)도 연결, 단계 목록이 비어 있을 때만 기본 12단계로 채움(인스펙터에서 고친 문구 유지). 씬은 건드리지 않음 |
 | UI/Apply Ranking Style To Windows | (2026-11-01) `ui_panel_gothic` / `ui_button_gothic`가 남은 창(설정·결과·부활·선물상자·업그레이드·업그레이드 팝업·튜토리얼 스킵 확인·SKIP·모드 선택 SELECT)을 랭킹/업적 스타일로 통일: 패널 = 어두운 자주색 + 핑크 외곽선 + 위/아래 핑크 포인트 바, 버튼 = 자주색 + 포인트색 외곽선·왼쪽 띠·글자(뒤로/아니오/포기/메인은 연핑크), 크기는 고딕 아트의 투명 여백만큼 축소(가로 92%, 세로 80%). 인게임 타이머 프레임은 그대로. 업그레이드 창은 업적 창 배치(넓은 프레임 + 화면 전체 스크롤 목록)로, 소모 아이템 칸은 목록 맨 아래 항목(스크롤해서 봄). 고딕 아트를 쓰는 예전 메뉴(UI Skin / Title·Upgrade 배치 / Mode Select)를 다시 실행했다면 이 메뉴도 다시 실행. 열린 씬이 이미 수정 중이면 저장하지 않음 |
 | UI/Apply Settings Icon Buttons | (2026-11-04) 설정 화면: SOUND / VIBRATION을 나란히 놓인 정사각형 아이콘 버튼(190×190)으로 바꾸고 TUTORIAL·BACK은 아래 넓은 버튼. 아이콘은 `UI/icon_sound_on·off`, `icon_vibration_on·off`(없으면 `Art/Draw Setting Toggle Icons`로 먼저 그림 — 같은 이름의 PNG로 교체 가능), 버튼의 `SettingToggleIcon`이 저장된 설정에 따라 ON/OFF 아이콘으로 바꾸고 OFF는 흐리게. On Click(ToggleSound / ToggleVibration)과 버튼 이름은 그대로, 글자 라벨은 숨김. 세 씬 적용, 열린 씬이 이미 수정 중이면 저장하지 않음 |
+| Course/Build Areas | (2026-11-06) Area 시스템 데이터: 전환 터널(`Decor_AreaTunnel`, `Pattern_AreaTransition_Tunnel`), 회복 패턴(`Pattern_V1_Landing`, `V2_SoulWalk`), 성당·심연 장애물 모델 각 3종, 바닥·덱·장식 재질, `Resources/Areas`의 Area 에셋과 카탈로그 생성. 씬은 건드리지 않음. 다시 실행해도 Area 에셋의 길이·간격·룩 값은 유지 |
 | UI/Apply Result Screen Layout | 결과창 정보 계층(큰 SCORE → 거리/콤보/시간 3열 → NEW BEST → PERSONAL BEST → RUN REWARD → MAIN MENU \| RETRY 가로 버튼) + 뒤 어두운 오버레이 + `ResultPresenter` 연결. 기존 오브젝트 이름·참조·On Click 유지, ConfirmButton은 비활성(2026-10-09 OPEN REWARDS 제거 요청 — 상자는 두 버튼 모두 기존 상자 오픈 흐름을 먼저 거침). 세 씬 적용 |
 | UI/Build Loading Scene | `Assets/Scenes/Loading.unity` 생성(키아트 + LOADING... + bg/fill/frame 게이지 + 랜덤 팁) 후 Build Settings 0번에 배치. 다시 실행해도 인스펙터에 적은 팁 목록은 유지 |
 | UI/Apply Number Font To HUD | CallifontSharpie-Bold TMP 에셋 생성(`Resources/Fonts/CallifontSharpie-Bold SDF`) + HUD 숫자 라벨(타이머·점수·거리·코인·선물상자 수)에 `NumericLabel` 부착·크기 보정 |
@@ -229,6 +230,23 @@
 
 - **Near Miss = 마지막 순간 회피**: 기존 조건(장애물 주변 near 구역을 몸 전체가 지나가고 닿지 않음)에 더해, 장애물 앞 `lastMomentDistance`(기본 2.6m) 안에서 장애물과 정면으로 겹치는(좌우·높이) 충돌 코스에 있었어야 함(`Obstacle.HeadingInto`). 옆 레인으로 그냥 지나가거나(예: 전철 옆 레인 통과) 미리 피하면 Near Miss가 아님. 테스트 `ClosePassAwardsOneNearMiss`(막판 회피 = 인정), `StraightClosePassIsNotANearMiss`(옆 통과 = 불인정).
 - **Ground Slam 반동 제거**: 충격파 판정 후 튀어 오르지 않고 바로 착지해 계속 달림(`groundSlamBouncePower` 삭제, 씬에 남은 값은 무시됨). 공중 콤보 상태도 해제.
+
+## Area / Biome (2026-11-06, AreaBiome,Pacing.md)
+
+- **현재 단계**: Phase 1~5 완료(Area 데이터, Soul Railway 등록, Transition, Broken Cathedral + Wall Run, Clockwork Abyss + Air Route). 순서는 철도 → 성당 → 심연 → 철도 순환. Phase 6~8(Intensity, Pacing Block, 후보 필터링)도 적용.
+- **Air Route 연결**: 심연의 특수 풀(U1·U5 진입, U2·U3 상층, U4 복귀). 앞에 일반 2개, 이후 3~5개 간격으로 등장. 상층에 있는 동안은 Transition이 나오지 않고, 복귀 후에 나옴. 상층 패턴은 지역 패턴 수에 세지 않음.
+- **패턴에 든 재질**: 상층 덱·벽 패널(`floorMaterial`), 덱 가장자리(`deckEdgeMaterial`), 아치·게이트(`decorMaterial`)를 스폰할 때 지역 재질로 교체.
+- **관리 위치**: `AreaDirector`(PatternSpawner가 런타임에 추가). `SpawnArea` = 새 패턴을 만드는 지역(터널이 스폰될 때 바뀜), `CurrentArea` = 플레이어가 있는 지역(카메라가 터널 안에 들어오면 바뀜).
+- **데이터**: `Resources/Areas/AreaCatalog`(순서, 전환 패턴, `showPatternDebugLogs`) → `Area_*`(`AreaDefinition`: 패턴 풀, 특수 풀, `minPatterns/maxPatterns`, 특수 구간 간격, 룩, 바닥, 장애물 스킨). 씬에 설정을 두지 않음. Spawner의 `areaCatalog`를 비우면 카탈로그를 불러오고, 런타임에 null로 두면 예전처럼 `patternPrefabs` 전체로 동작(규칙 테스트가 이 방식을 씀).
+- **Transition**: Area의 패턴 수(8~12, 특수 구간을 아직 못 봤으면 최대 3개 더)를 채우면 터널이 나옴. 터널은 양쪽 벽·천장으로 주변을 가리고 끝의 포털이 앞쪽 코스를 가림. 카메라가 입구에서 6m 들어오면 하늘·안개·조명·배경을 교체(0.6초 블렌드). 포털은 이 교체를 가리는 역할만 하고, 교체 후 카메라가 8m→18m 지점을 지나는 동안 가운데부터 열림(`revealFrom/revealTo`, 셰이더 `AreaPortal`). 플레이어가 출구 약 19m 전에 있을 때 완전히 열려 다음 위험물이 보임. 나오면 지역 이름을 2초 표시. 양옆 레인 적 2마리로 Deadline 리셋 기회 유지.
+- **배경**: `EnvironmentScroller`가 "현재/다음" 두 개까지만 유지. 다음 배경은 터널 스폰 때 비활성으로 만들고, 교체 때 이전 배경과 메시·재질을 삭제. 테마 메시는 `EnvironmentScroller.Themes.cs`.
+- **장애물 스킨**: 판정 박스는 그대로, `ObstacleVisual`이 스폰 중인 Area의 모델을 박스에 맞춰 늘림(석상/잔해/부서진 아치, 현재는 절차적 메시). 전철 패턴은 성당 풀에서 제외.
+- **Wall Run 연결**: 성당의 특수 풀. 시간 조건(45초) 대신 Area 안 패턴 수로 등장(앞에 일반 2개, 이후 3~5개 간격). 나오기 전까지는 지상 출구 패턴만 골라 Wall Run으로 이어지게 함.
+- **회복 패턴이 필요했던 이유**: 공중 패턴은 출구가 전부 Air이고 지상으로 돌아오는 길이 Air Route뿐이었음. `V1/V2`는 어디서든 들어와 지상으로 끝남. Stomp 반동 체공(최대 약 28m)을 고려해 첫 적을 28m 뒤에 둠.
+- **공중 처치 직후 의문사 수정(2026-11-07)**: 지상 적 정면 공격 범위는 일반 점프로 못 넘도록 머리 위로 높게 서 있음(바닥 위 약 3.24m). `Pattern_E_MixedRisk`처럼 공중 적 3.5m 뒤에 지상 적이 있으면 공중 처치 직후 머리 위를 날고 있는데도 이 범위에 닿아 죽었음. `EnemyAttackZone.frontClearAbove`(1.75): 발이 범위 바닥보다 이만큼 위면 안전(바닥 위 약 2m). 공중 처치 뒤 착지 전(`IsAirComboReady`)에는 `afterAirKillClearAbove`(0.5, 바닥 위 약 0.74m)까지 낮춤. 높이만으로는 12m/s에서 내려오는 궤적이 적을 지나기 전에 선을 넘어 여전히 죽었음. 적 몸통도 공중 처치 뒤 이미 지나친 적이면 스치기만 한 것으로 봄(30fps에서 뒤쪽 모서리에 걸렸음). 일반 점프 최고점(1.68m)은 공중 처치가 아니라 그대로 죽음. 값은 프리팹에 저장(기본값만 바꾸면 임포트 캐시 때문에 반영되지 않음). 테스트: `AirKillOverGroundEnemyAcceptanceTests`.
+- **Pacing**: 패턴마다 `CoursePattern.intensity`(1~5), Area마다 `AreaDefinition.pacingBlocks`(첫 블록이 그 지역의 대표 곡선이자 시작). `PacingDirector`가 목표 강도를 정하고 `PatternSpawner`가 후보 중 가장 가까운 강도를 고름. 난이도 등급은 잠금 해제 용도로만 남음(20초 전 Easy, 45초 전 Hard 없음). 최근 3개 프리팹 제외, 강도 4 이상 연속 2개까지, 5 다음 5 금지, 목표가 3 미만일 때는 특수 구간 대기. 값은 PatternSpawner의 Pacing 항목과 `AreaCatalog.showPatternDebugLogs`(선택 로그, 간격 초과 조합 포함). 테스트: `PacingAcceptanceTests`.
+- **쉬운 패턴이 최고 속도로 돌아옴**: 예전엔 45초 뒤 Easy가 안 나와서 몰랐던 문제. `B_JumpSlide`가 점프 장애물로 끝나고 뒤가 6m뿐이라 16m/s에서 착지 전에 다음 패턴 장애물이 와서 봇이 죽음(B→Q). 길이 22→28m. Easy 패턴의 체감 강도가 최고 속도에선 숫자보다 높을 수 있으니 플레이로 확인 필요.
+- **테스트**: `AreaAcceptanceTests`(카탈로그, 코스 순환, 터널 안 전환·배경 누적 없음·스킨). 코스 리플레이가 터널을 포함해 3분 주행, 리셋 간격 최대 3.47초.
 
 ## Tripo 사용 기록
 

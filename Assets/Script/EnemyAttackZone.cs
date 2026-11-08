@@ -15,6 +15,16 @@ namespace Deadline4Sec
         [SerializeField] private Enemy owner;
         [SerializeField] private AttackZoneType zoneType;
         [SerializeField, Min(0f)] private float highJumpClearance = 0.05f;
+        // The front zone stands far above the enemy's head so a plain jump can't
+        // clear it (spec 11.1: a jump peaks with the feet ~1.68 m up). Well above
+        // that the runner is flying over it, out of an air kill or a bounce, and
+        // nothing on screen touches it (2026-11-07): feet this far over the
+        // zone's base are safe, ~2 m off the floor.
+        [SerializeField, Min(0f)] private float frontClearAbove = 1.75f;
+        // An air kill's arc is already falling as it passes a ground enemy placed
+        // right behind the air enemy, with no time to answer. Only an air kill
+        // gets here, so a plain jump still can't use this lower line.
+        [SerializeField, Min(0f)] private float afterAirKillClearAbove = 0.5f;
 
         private BoxCollider zoneCollider;
         private PlayerController trackedPlayer;
@@ -86,7 +96,7 @@ namespace Deadline4Sec
                 return;
             }
 
-            if (IsSafelyAboveSideAttack())
+            if (IsSafelyAboveAttack())
             {
                 ClearTrackedPlayer();
                 return;
@@ -114,14 +124,20 @@ namespace Deadline4Sec
                 zoneCollider.enabled = false;
         }
 
-        private bool IsSafelyAboveSideAttack()
+        private bool IsSafelyAboveAttack()
         {
-            if (zoneType != AttackZoneType.GroundSide || trackedCollider == null ||
-                zoneCollider == null)
+            if (trackedCollider == null || zoneCollider == null)
                 return false;
 
-            return trackedCollider.bounds.min.y >=
-                zoneCollider.bounds.max.y + highJumpClearance;
+            float feet = trackedCollider.bounds.min.y;
+            if (zoneType == AttackZoneType.GroundSide)
+                return feet >= zoneCollider.bounds.max.y + highJumpClearance;
+            if (zoneType == AttackZoneType.GroundFront)
+                return feet >= zoneCollider.bounds.min.y +
+                    (trackedPlayer != null && trackedPlayer.IsAirComboReady
+                        ? afterAirKillClearAbove
+                        : frontClearAbove);
+            return false;
         }
 
         private void TriggerEnemyAttack()
@@ -131,7 +147,7 @@ namespace Deadline4Sec
                 : zoneType == AttackZoneType.GroundSide
                     ? "Game Over: Ground Enemy Side Attack"
                     : "Game Over: Air Enemy Down Attack";
-            Debug.Log(reason);
+                        Debug.Log(reason);
             gameTimer.TriggerFatalContactFrom(zoneCollider);
             ClearTrackedPlayer();
         }
@@ -152,6 +168,8 @@ namespace Deadline4Sec
             if (owner == null)
                 owner = GetComponentInParent<Enemy>();
             highJumpClearance = Mathf.Max(0f, highJumpClearance);
+            frontClearAbove = Mathf.Max(0f, frontClearAbove);
+            afterAirKillClearAbove = Mathf.Max(0f, afterAirKillClearAbove);
         }
 
         private void OnDrawGizmosSelected()

@@ -7,7 +7,10 @@ namespace Deadline4Sec
     // chains and banners, a looming clock tower, a cloud sea) from procedural
     // meshes once, then recycles the pieces ahead of the camera. Visual only:
     // no colliders, so gameplay and pattern fairness are untouched.
-    public sealed class EnvironmentScroller : MonoBehaviour
+    // Each area has its own backdrop (2026-11-06, themes in
+    // EnvironmentScroller.Themes.cs): at most the current one and the next are
+    // alive; the old one and its meshes are removed at the swap.
+    public sealed partial class EnvironmentScroller : MonoBehaviour
     {
         [SerializeField] private Material silhouetteMaterial;
         [SerializeField] private Transform followTarget;
@@ -35,29 +38,118 @@ namespace Deadline4Sec
         private static readonly Color BannerMark = new Color(0.95f, 0.15f, 0.42f, 1f);
         private static readonly Color ClockFace = new Color(0.9f, 0.82f, 0.86f, 1f);
 
-        private readonly List<Transform> pillars = new List<Transform>();
-        private readonly List<Transform> spires = new List<Transform>();
-        private Transform clockTower;
-        private Transform cloudSea;
-        private Transform clockHandHour;
-        private Transform clockHandMinute;
+        // A turning part (clock hand, gear): around its local Z, degrees per second.
+        private struct Spinner
+        {
+            public Transform Part;
+            public float Speed;
+            public float Phase;
+        }
+
+        private sealed class Backdrop
+        {
+            public Transform Root;
+            public Material Material;
+            public bool OwnsMaterial;
+            public float BuiltAtZ;
+            public Transform Landmark;
+            public Vector3 LandmarkOffset;
+            public Transform CloudSea;
+            public readonly List<Transform> Pillars = new List<Transform>();
+            public readonly List<Transform> Spires = new List<Transform>();
+            public readonly List<Spinner> Spinners = new List<Spinner>();
+            public readonly List<Mesh> Meshes = new List<Mesh>();
+        }
+
+        private Backdrop current;
+        private Backdrop prepared;
+        private Backdrop building;
         private float trackX;
+
+        // For tests: pieces alive under this object.
+        public int BackdropCount => transform.childCount;
+        public AreaType ShownArea { get; private set; }
 
         private void Awake()
         {
             if (followTarget == null && Camera.main != null)
                 followTarget = Camera.main.transform;
             trackX = transform.position.x;
-            Random.State saved = Random.state;
-            Random.InitState(seed);
-            Build();
-            Random.state = saved;
+            current = CreateBackdrop(AreaType.SoulRailway, silhouetteMaterial, false);
         }
 
-        private void Build()
+        // Builds the next area's backdrop out of sight, ready for the swap.
+        public void PrepareArea(AreaType area, Color haze)
         {
-            float startZ = followTarget != null ? followTarget.position.z : 0f;
+            if (prepared != null)
+                DestroyBackdrop(prepared);
+            Material material = new Material(silhouetteMaterial) { name = "Silhouette " + area };
+            material.SetColor("_HazeColor", haze);
+            prepared = CreateBackdrop(area, material, true);
+            prepared.Root.gameObject.SetActive(false);
+            preparedArea = area;
+        }
 
+        // Called with the camera inside a transition tunnel: nothing to see the change.
+        public void ShowPreparedArea()
+        {
+            if (prepared == null)
+                return;
+            float z = followTarget != null ? followTarget.position.z : 0f;
+            float shift = z - prepared.BuiltAtZ;
+            foreach (Transform p in prepared.Pillars)
+                p.position += Vector3.forward * shift;
+            foreach (Transform s in prepared.Spires)
+                s.position += Vector3.forward * shift;
+            prepared.Root.gameObject.SetActive(true);
+            DestroyBackdrop(current);
+            current = prepared;
+            prepared = null;
+            ShownArea = preparedArea;
+        }
+
+        private AreaType preparedArea;
+
+        private Backdrop CreateBackdrop(AreaType area, Material material, bool ownsMaterial)
+        {
+            GameObject root = new GameObject("Backdrop " + area);
+            root.transform.SetParent(transform, false);
+            building = new Backdrop { Root = root.transform, Material = material, OwnsMaterial = ownsMaterial };
+            building.BuiltAtZ = followTarget != null ? followTarget.position.z : 0f;
+            Random.State saved = Random.state;
+            Random.InitState(seed + (int)area);
+            switch (area)
+            {
+                case AreaType.BrokenCathedral: BuildCathedral(building.BuiltAtZ); break;
+                case AreaType.ClockworkAbyss: BuildClockwork(building.BuiltAtZ); break;
+                default: Build(building.BuiltAtZ); break;
+            }
+            Random.state = saved;
+            Backdrop built = building;
+            building = null;
+            return built;
+        }
+
+        private static void DestroyBackdrop(Backdrop backdrop)
+        {
+            if (backdrop.Root != null)
+                Destroy(backdrop.Root.gameObject);
+            foreach (Mesh mesh in backdrop.Meshes)
+                Destroy(mesh);
+            if (backdrop.OwnsMaterial)
+                Destroy(backdrop.Material);
+        }
+
+        private void OnDestroy()
+        {
+            if (current != null)
+                DestroyBackdrop(current);
+            if (prepared != null)
+                DestroyBackdrop(prepared);
+        }
+
+        private void Build(float startZ)
+        {
             Mesh pillarMesh = BuildPillarMesh();
             for (int i = 0; i < pillarCount; i++)
             {
@@ -66,7 +158,7 @@ namespace Deadline4Sec
                 p.position = new Vector3(trackX + side * pillarOffsetX, 0f,
                     startZ - 10f + (i / 2) * pillarSpacing + (side > 0 ? pillarSpacing * 0.5f : 0f));
                 p.localScale = new Vector3(side, 1f, 1f);
-                pillars.Add(p);
+                building.Pillars.Add(p);
             }
 
             Mesh[] spireMeshes = new Mesh[6];
@@ -81,31 +173,35 @@ namespace Deadline4Sec
                 s.rotation = Quaternion.Euler(0f, Random.Range(-20f, 20f), 0f);
                 float k = Random.Range(0.8f, 1.3f);
                 s.localScale = new Vector3(k, k, k);
-                spires.Add(s);
+                building.Spires.Add(s);
             }
 
-            clockTower = Spawn("ClockTower", BuildClockTowerMesh());
-            clockHandHour = Spawn("ClockHourHand", BuildBox(new Vector3(-0.6f, 0f, -0.4f), new Vector3(0.6f, 7f, 0f), ClockFace));
-            clockHandMinute = Spawn("ClockMinuteHand", BuildBox(new Vector3(-0.4f, 0f, -0.5f), new Vector3(0.4f, 10f, 0f), ClockFace));
+            Transform clockTower = Spawn("ClockTower", BuildClockTowerMesh());
+            Transform clockHandHour = Spawn("ClockHourHand", BuildBox(new Vector3(-0.6f, 0f, -0.4f), new Vector3(0.6f, 7f, 0f), ClockFace));
+            Transform clockHandMinute = Spawn("ClockMinuteHand", BuildBox(new Vector3(-0.4f, 0f, -0.5f), new Vector3(0.4f, 10f, 0f), ClockFace));
             clockHandHour.SetParent(clockTower, false);
             clockHandMinute.SetParent(clockTower, false);
             clockHandHour.localPosition = clockHandMinute.localPosition = new Vector3(0f, 66f, -9.2f);
+            building.Landmark = clockTower;
+            building.LandmarkOffset = clockTowerOffset;
+            building.Spinners.Add(new Spinner { Part = clockHandMinute, Speed = -24f });
+            building.Spinners.Add(new Spinner { Part = clockHandHour, Speed = -2f, Phase = -40f });
 
-            cloudSea = Spawn("CloudSea", BuildCloudSeaMesh());
+            building.CloudSea = Spawn("CloudSea", BuildCloudSeaMesh());
         }
 
         private void LateUpdate()
         {
-            if (followTarget == null)
+            if (followTarget == null || current == null)
                 return;
             float z = followTarget.position.z;
 
             float pillarLoop = (pillarCount / 2) * pillarSpacing;
-            foreach (Transform p in pillars)
+            foreach (Transform p in current.Pillars)
                 if (p.position.z < z - 14f)
                     p.position += Vector3.forward * pillarLoop;
 
-            foreach (Transform s in spires)
+            foreach (Transform s in current.Spires)
                 if (s.position.z < z - 30f)
                 {
                     s.position += Vector3.forward * (spireSpan + 30f);
@@ -115,20 +211,22 @@ namespace Deadline4Sec
                 }
 
             // Landmarks ride with the camera so they always loom on the horizon.
-            clockTower.position = new Vector3(trackX + clockTowerOffset.x, clockTowerOffset.y, z + clockTowerOffset.z);
-            cloudSea.position = new Vector3(trackX, cloudSeaY, z + 150f);
+            current.Landmark.position = new Vector3(trackX + current.LandmarkOffset.x, current.LandmarkOffset.y, z + current.LandmarkOffset.z);
+            current.CloudSea.position = new Vector3(trackX, cloudSeaY, z + 150f);
             float t = Time.time;
-            clockHandMinute.localRotation = Quaternion.Euler(0f, 0f, -t * 24f);
-            clockHandHour.localRotation = Quaternion.Euler(0f, 0f, -t * 2f - 40f);
+            foreach (Spinner spinner in current.Spinners)
+                spinner.Part.localRotation = Quaternion.Euler(0f, 0f, t * spinner.Speed + spinner.Phase);
         }
 
         private Transform Spawn(string name, Mesh mesh)
         {
             GameObject go = new GameObject(name);
-            go.transform.SetParent(transform, false);
+            go.transform.SetParent(building.Root, false);
             go.AddComponent<MeshFilter>().sharedMesh = mesh;
+            if (!building.Meshes.Contains(mesh))
+                building.Meshes.Add(mesh);
             MeshRenderer r = go.AddComponent<MeshRenderer>();
-            r.sharedMaterial = silhouetteMaterial;
+            r.sharedMaterial = building.Material;
             r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             r.receiveShadows = false;
             return go.transform;

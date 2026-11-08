@@ -46,6 +46,13 @@ namespace Deadline4Sec.AcceptanceTests
             return Replay(98765, 30, "course-replay-long.txt", 180f);
         }
 
+        // Phase 9: the rising and falling course, a second long run.
+        [UnityTest]
+        public IEnumerator AnotherLongRunKeepsTheDeadlineFair()
+        {
+            return Replay(4242, 60, "course-replay-long-2.txt", 180f);
+        }
+
         private static IEnumerator Replay(int seed, int framesPerSecond, string evidenceFile, float duration = 60f)
         {
             EditorSceneManager.OpenScene("Assets/Scenes/EndlessRun.unity");
@@ -92,8 +99,8 @@ namespace Deadline4Sec.AcceptanceTests
                         if (z < pattern.transform.position.z || !seenPatternIds.Add(pattern.GetInstanceID()))
                             continue;
                         entered.Add(pattern.name);
-                        trace.AppendLine($"ENTER t={time:F2} z={z:F2} {pattern.name} tier={Read(pattern, "Difficulty")} feet={player.GetComponent<CharacterController>().bounds.min.y:F2}");
-                        string difficulty = Read(pattern, "Difficulty").ToString();
+                        trace.AppendLine($"ENTER t={time:F2} z={z:F2} {pattern.name} tier={Read(pattern, "Difficulty")} intensity={Read(pattern, "Intensity")} feet={player.GetComponent<CharacterController>().bounds.min.y:F2}");
+                        string difficulty = (bool)Read(pattern, "IsAreaTransition") ? "Transition" : Read(pattern, "Difficulty").ToString();
                         string category = Read(pattern, "Category").ToString();
                         Assert.AreNotEqual(previousPattern, pattern.name,
                             "The same prefab appeared consecutively.");
@@ -106,8 +113,6 @@ namespace Deadline4Sec.AcceptanceTests
                             "Medium entered before the actual run-time unlock.");
                         Assert.IsFalse(difficulty == "Hard" && time < 45f,
                             "Hard entered before the actual run-time unlock.");
-                        Assert.IsFalse(difficulty == "Easy" && time >= 45f,
-                            "Easy entered after the hard-tier transition.");
                     }
                     int score = (int)Read(run, "CurrentScore");
                     if (score > previousScore)
@@ -180,6 +185,31 @@ namespace Deadline4Sec.AcceptanceTests
             actions[key] = time;
             trace.AppendLine($"WALL t={time:F2} z={player.transform.position.z:F2} {command} -> {target.name}");
             Input(player, command);
+        }
+
+        // High on a stomp bounce: the bar passes below. Diving at it from up there
+        // would hit it before the slide starts.
+        private static bool WillFlyOver(Component player, Component obstacle, Bounds bounds, float distance, float speed)
+        {
+            float t = (distance + 1f) / speed;
+            float feet = bounds.min.y + Field<float>(player, "verticalSpeed") * t -
+                0.5f * Mathf.Abs(Field<float>(player, "gravity")) * t * t;
+            return feet > obstacle.GetComponent<Collider>().bounds.max.y + 0.1f;
+        }
+
+        private static bool StompWindowIsMissed(float feet, float verticalSpeed, float gravity,
+            float distance, float speed, float headTop)
+        {
+            for (float t = 0f; t < 1.5f; t += 1f / 60f)
+            {
+                float d = distance - speed * t;
+                float f = feet + verticalSpeed * t - 0.5f * gravity * t * t;
+                if (d < 0f || d <= speed * (f - headTop) / 22f + 0.8f)
+                    return false;
+                if (d < 3f && f < 2.04f)
+                    return true;
+            }
+            return false;
         }
 
         private static void Drive(Component player, float centerX, float time,
@@ -280,7 +310,13 @@ namespace Deadline4Sec.AcceptanceTests
                         else if (zoneType == "GroundSide")
                             sideTop = Mathf.Max(sideTop, zone.GetComponent<Collider>().bounds.max.y);
                     }
-                    if (peakFeet < frontTop + 0.05f && bounds.min.y > sideTop + 0.05f &&
+                    // Coming down from a stomp bounce, the natural fall can reach the
+                    // front zone before the fast fall window below ever opens. A player
+                    // would step aside, so does the bot.
+                    bool droppingIntoFront = !Field<bool>(player, "isFastFalling") && StompWindowIsMissed(bounds.min.y,
+                        Field<float>(player, "verticalSpeed"), Mathf.Abs(Field<float>(player, "gravity")),
+                        nextDistance, speed, next.GetComponent<Collider>().bounds.max.y);
+                    if ((peakFeet < frontTop + 0.05f || droppingIntoFront) && bounds.min.y > sideTop + 0.05f &&
                         nextDistance > 3.2f && nextDistance < 6f)
                     {
                         if (lane == targetLane)
@@ -308,7 +344,8 @@ namespace Deadline4Sec.AcceptanceTests
                 if (lane != targetLane && nextDistance > 4.5f)
                     command = targetLane > lane ? "RequestMoveRight" : "RequestMoveLeft";
                 else if (obstacleType == "SlideObstacle" && nextDistance <= speed * 0.25f + 1f &&
-                    !Field<bool>(player, "isSliding") && !Field<bool>(player, "isFastFalling"))
+                    !Field<bool>(player, "isSliding") && !Field<bool>(player, "isFastFalling") &&
+                    !WillFlyOver(player, next, bounds, nextDistance, speed))
                 {
                     // Down in the air is the normal fast-fall input; landing then
                     // continues into a ground slide without a second input.

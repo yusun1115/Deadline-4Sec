@@ -5,6 +5,7 @@ namespace Deadline4Sec
     // Replaces the obstacle's graybox cube look with a model stretched to the
     // exact hazard box, so what the player sees is what kills them. Without a
     // model, the cube gets the gothic stone material and a glowing danger edge.
+    // An area can give the same hazard box another model (2026-11-06).
     public sealed class ObstacleVisual : MonoBehaviour
     {
         [SerializeField] private GameObject modelPrefab;
@@ -12,12 +13,19 @@ namespace Deadline4Sec
         [SerializeField] private Material fallbackMaterial;
         [SerializeField, Range(0.5f, 1.2f)] private float fill = 1f;
 
+        // Set by PatternSpawner around Instantiate, for the area being built.
+        public static ObstacleSkinSet ActiveSkins;
+
         private void Awake()
         {
             BoxCollider box = GetComponent<BoxCollider>();
             MeshRenderer graybox = GetComponent<MeshRenderer>();
             if (box == null)
                 return;
+            ObstacleSkin skin = ActiveSkins != null && TryGetComponent(out Obstacle obstacle) ? ActiveSkins.For(obstacle.Type) : null;
+            bool skinned = skin != null && skin.model != null;
+            GameObject modelPrefab = skinned ? skin.model : this.modelPrefab;
+            Vector3 modelEuler = skinned ? skin.euler : this.modelEuler;
             if (modelPrefab == null)
             {
                 if (graybox != null && fallbackMaterial != null)

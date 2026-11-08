@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Deadline4Sec
 {
@@ -27,6 +28,12 @@ namespace Deadline4Sec
         [SerializeField] private int fixedSeed = 12345;
         [SerializeField] private bool showDebugLogs;
 
+        // Areas (2026-11-06): with a catalog, the pattern pool, the signature
+        // section and the floor come from the area being built; transitions
+        // connect the areas. Without one this spawner works from patternPrefabs.
+        [Header("Areas (empty: Resources/Areas/AreaCatalog)")]
+        [SerializeField] private AreaCatalog areaCatalog;
+
         // Air Route (2026-10-16): a Ground → Upper entry pattern (air-enemy chain
         // up to the deck, lower route kept below), 1–2 Upper → Upper runs, then an
         // Upper → Ground return. It appears only after airRouteStartsAtSeconds and
@@ -46,7 +53,18 @@ namespace Deadline4Sec
         [SerializeField, Min(0f)] private float wallRunStartsAtSeconds = 45f;
         [SerializeField, Min(1)] private int patternsBetweenWallRunsMin = 6;
         [SerializeField, Min(1)] private int patternsBetweenWallRunsMax = 10;
-        [SerializeField, Min(0)] private int normalPatternsAfterSpecial = 3;
+        [FormerlySerializedAs("normalPatternsAfterSpecial")]
+        [SerializeField, Min(0)] private int minNormalPatternsBetweenSpecial = 3;
+
+        // Pacing (2026-11-08): in an area the next pattern is the one closest to
+        // the target of the current pacing block. The difficulty tiers only decide
+        // what is unlocked yet; Classic and Deadline build the same course.
+        [Header("Pacing (areas)")]
+        [SerializeField, Range(1, 8)] private int recentPatternMemory = 3;
+        [SerializeField, Range(1, 5)] private int highIntensityFrom = 4;
+        [SerializeField, Min(1)] private int maxHighIntensityInARow = 2;
+        [Tooltip("A signature section waits for a beat of the curve at least this strong.")]
+        [SerializeField, Range(1, 5)] private int specialFromTargetIntensity = 3;
 
         [Header("Pickup rarity (coins always appear)")]
         [SerializeField, Range(0f, 1f)] private float powerUpChance = 0.3f;
@@ -84,6 +102,13 @@ namespace Deadline4Sec
         private int categoryStreak;
         private float nextStartZ;
         private bool floorMaterialWarningShown;
+        private AreaDirector areas;
+        private Material floorOverride;
+        private PacingDirector pacing;
+        private readonly List<CoursePattern> recentPatterns = new List<CoursePattern>();
+
+        private bool AreasActive => areas != null && areaCatalog != null && areaCatalog.IsUsable;
+        private CoursePattern[] Pool => AreasActive ? areas.ActivePool : patternPrefabs;
 
         private struct SpawnedPattern
         {
@@ -107,6 +132,16 @@ namespace Deadline4Sec
             nextWallRunGap = RollWallRunGap();
             nextStartZ = transform.position.z;
             ApplyExistingFloorMaterials();
+            if (areaCatalog == null)
+                areaCatalog = Resources.Load<AreaCatalog>(AreaCatalog.ResourcePath);
+            if (areaCatalog != null && areaCatalog.IsUsable)
+            {
+                areas = gameObject.AddComponent<AreaDirector>();
+                areas.Begin(areaCatalog, useFixedSeed ? new System.Random(fixedSeed + 32452843) : new System.Random());
+                pacing = new PacingDirector(useFixedSeed ? new System.Random(fixedSeed + 49979687) : new System.Random(),
+                    highIntensityFrom, maxHighIntensityInARow);
+                pacing.UseBlocks(areas.SpawnArea.pacingBlocks);
+            }
         }
 
         private void Start()
@@ -193,7 +228,8 @@ namespace Deadline4Sec
             float arrivalTime = currentTime +
                 Mathf.Max(0f, nextStartZ - player.transform.position.z) / speed;
 
-            int minimumDifficulty = arrivalTime >= hardStartsAtSeconds ? 1 : 0;
+            // In an area the pacing brings the easy patterns back on purpose.
+            int minimumDifficulty = !AreasActive && arrivalTime >= hardStartsAtSeconds ? 1 : 0;
             // Homing can reach queued patterns much sooner than an auto-run
             // estimate. Unlock new tiers only after the actual run threshold;
             // retain the estimate to phase Easy out of the queued course.
@@ -204,10 +240,23 @@ namespace Deadline4Sec
             if (previousPrefab != null && previousPrefab.ExitState == CoursePattern.TravelState.Upper)
                 return ChooseUpperPattern();
 
+            if (AreasActive && areas.TransitionDue)
+            {
+                CoursePattern transition = areas.TransitionPattern;
+                bool connects = previousPrefab == null || StatesConnect(previousPrefab.ExitState, transition.EntryState);
+                if (transition != previousPrefab && connects && OpportunityGapIsSafe(transition))
+                    return transition;
+            }
+
             CollectCandidates(minimumDifficulty, maximumDifficulty, true);
-            bool specialAllowed = patternsSinceSpecial >= normalPatternsAfterSpecial;
-            bool airRouteDue = specialAllowed && arrivalTime >= airRouteStartsAtSeconds && patternsSinceAirRoute >= nextAirRouteGap;
-            bool wallRunDue = specialAllowed && arrivalTime >= wallRunStartsAtSeconds && patternsSinceWallRun >= nextWallRunGap;
+            bool specialAllowed = patternsSinceSpecial >= minNormalPatternsBetweenSpecial &&
+                (!AreasActive || pacing.TargetIntensity >= specialFromTargetIntensity);
+            // In an area its signature section follows the area's own spacing
+            // (the area is what unlocks it, not the run time).
+            bool airRouteDue = specialAllowed && (AreasActive ? areas.SpecialDue :
+                arrivalTime >= airRouteStartsAtSeconds && patternsSinceAirRoute >= nextAirRouteGap);
+            bool wallRunDue = specialAllowed && (AreasActive ? areas.SpecialDue :
+                arrivalTime >= wallRunStartsAtSeconds && patternsSinceWallRun >= nextWallRunGap);
             // Both due: the more overdue one first, so neither starves the other.
             bool wallRunFirst = wallRunDue && (!airRouteDue ||
                 patternsSinceWallRun - nextWallRunGap >= patternsSinceAirRoute - nextAirRouteGap);
@@ -217,14 +266,14 @@ namespace Deadline4Sec
                 {
                     if (!wallRunDue)
                         continue;
-                    List<CoursePattern> wallRuns = candidates.FindAll(p => p.IsWallRun);
+                    List<CoursePattern> wallRuns = candidates.FindAll(p => p.IsWallRun && PacingAllows(p));
                     if (wallRuns.Count > 0)
                         return wallRuns[wallRunRandom.Next(wallRuns.Count)];
                 }
                 else if (airRouteDue)
                 {
                     // Due: take an air-route entry when one fits here (else try again next pattern).
-                    CoursePattern entry = PickWhere(p => p.IsAirRouteEntry);
+                    CoursePattern entry = PickWhere(p => p.IsAirRouteEntry && PacingAllows(p));
                     if (entry != null)
                         return entry;
                 }
@@ -233,10 +282,37 @@ namespace Deadline4Sec
             // A wall run is waiting (spacing after a special section, or a
             // Ground predecessor): keep the course on the ground meanwhile, since
             // an air-combo stretch only leads back down through an air route.
-            if (arrivalTime >= wallRunStartsAtSeconds && patternsSinceWallRun >= nextWallRunGap &&
-                candidates.Exists(p => p.ExitState == CoursePattern.TravelState.Ground))
+            bool wallRunWaiting = AreasActive
+                ? areas.SpecialIsWallRun && (!areas.SpecialDoneInArea || areas.SpecialDue)
+                : arrivalTime >= wallRunStartsAtSeconds && patternsSinceWallRun >= nextWallRunGap;
+            if (wallRunWaiting && candidates.Exists(p => p.ExitState == CoursePattern.TravelState.Ground))
                 candidates.RemoveAll(p => p.ExitState != CoursePattern.TravelState.Ground);
-            return candidates.Count == 0 ? null : candidates[random.Next(candidates.Count)];
+            // An area's pool is smaller than the whole library: rather than stop
+            // the course, let the tier and category limits go for this one pick.
+            if (candidates.Count == 0 && AreasActive)
+            {
+                CollectCandidates(0, 2, false);
+                candidates.RemoveAll(p => p.IsAirRouteEntry || p.IsWallRun);
+            }
+            if (candidates.Count == 0)
+                return null;
+            return AreasActive ? PickClosestToTarget() : candidates[random.Next(candidates.Count)];
+        }
+
+        private bool PacingAllows(CoursePattern prefab) => !AreasActive || pacing.Allows(prefab.Intensity);
+
+        // Exact intensity first, then the nearest ones. Hard patterns stay out after
+        // a hard stretch, unless nothing else fits here.
+        private CoursePattern PickClosestToTarget()
+        {
+            if (candidates.Exists(PacingAllows))
+                candidates.RemoveAll(p => !PacingAllows(p));
+            int target = pacing.TargetIntensity;
+            int closest = int.MaxValue;
+            foreach (CoursePattern candidate in candidates)
+                closest = Mathf.Min(closest, Mathf.Abs(candidate.Intensity - target));
+            candidates.RemoveAll(p => Mathf.Abs(p.Intensity - target) != closest);
+            return candidates[random.Next(candidates.Count)];
         }
 
         private CoursePattern PickWhere(Predicate<CoursePattern> match)
@@ -253,7 +329,7 @@ namespace Deadline4Sec
             for (int pass = 0; pass < 2; pass++)
             {
                 candidates.Clear();
-                foreach (CoursePattern prefab in patternPrefabs)
+                foreach (CoursePattern prefab in Pool)
                 {
                     if (prefab == null || prefab == previousPrefab || prefab.PatternLength <= 0f ||
                         prefab.EntryState != CoursePattern.TravelState.Upper)
@@ -280,10 +356,10 @@ namespace Deadline4Sec
             bool avoidCategoryStreak)
         {
             candidates.Clear();
-            if (patternPrefabs == null)
+            if (Pool == null)
                 return;
 
-            foreach (CoursePattern prefab in patternPrefabs)
+            foreach (CoursePattern prefab in Pool)
             {
                 if (prefab == null || prefab == previousPrefab || prefab.PatternLength <= 0f)
                     continue;
@@ -297,6 +373,8 @@ namespace Deadline4Sec
                     continue;
                 if (avoidCategoryStreak && categoryStreak >= 2 &&
                     prefab.Category == previousCategory)
+                    continue;
+                if (avoidCategoryStreak && recentPatterns.Contains(prefab))
                     continue;
                 if (!OpportunityGapIsSafe(prefab))
                     continue;
@@ -315,7 +393,10 @@ namespace Deadline4Sec
             {
                 if (!previousPrefab.TryGetOpportunityRange(out _, out float previousLast) ||
                     previousPrefab.PatternLength - previousLast + opportunityPositions[0] > maximumGap)
+                {
+                    LogUnsafeGap(next, "after " + previousPrefab.name);
                     return false;
+                }
             }
             else if (Mathf.Max(0f, nextStartZ - (openingGoZ ?? player.transform.position.z)) +
                      opportunityPositions[0] > maximumGap)
@@ -325,8 +406,17 @@ namespace Deadline4Sec
 
             for (int i = 1; i < opportunityPositions.Count; i++)
                 if (opportunityPositions[i] - opportunityPositions[i - 1] > maximumGap)
+                {
+                    LogUnsafeGap(next, "inside the pattern");
                     return false;
+                }
             return true;
+        }
+
+        private void LogUnsafeGap(CoursePattern next, string where)
+        {
+            if (AreasActive && areaCatalog.showPatternDebugLogs)
+                Debug.Log($"Deadline gap over {maxOpportunityGapSeconds}s: {next.name} {where}");
         }
 
         private static bool StatesConnect(CoursePattern.TravelState exitState,
@@ -342,11 +432,18 @@ namespace Deadline4Sec
         private void SpawnPattern(CoursePattern prefab)
         {
             float startZ = nextStartZ;
+            AreaDefinition area = AreasActive ? areas.SpawnArea : null;
+            // Obstacles pick their model while they wake up, during Instantiate.
+            ObstacleVisual.ActiveSkins = area != null ? area.obstacleSkins : null;
             CoursePattern instance = Instantiate(prefab,
                 new Vector3(transform.position.x, transform.position.y, startZ),
                 transform.rotation, transform);
+            ObstacleVisual.ActiveSkins = null;
             instance.name = prefab.name;
             ThinOutPickups(instance);
+            floorOverride = area != null ? area.floorMaterial : null;
+            if (area != null)
+                ApplyAreaMaterials(instance, area);
             if (createFloorUnderPatterns)
                 AddGrayboxFloor(instance, startZ);
 
@@ -358,6 +455,16 @@ namespace Deadline4Sec
                 categoryStreak = 1;
             previousCategory = prefab.Category;
             previousPrefab = prefab;
+            if (AreasActive)
+            {
+                recentPatterns.Add(prefab);
+                if (recentPatterns.Count > recentPatternMemory)
+                    recentPatterns.RemoveAt(0);
+                if (areaCatalog.showPatternDebugLogs)
+                    Debug.Log($"Area: {areas.SpawnArea.areaId} | Pacing Block: {pacing.BlockName} | Target Intensity: {pacing.TargetIntensity} | " +
+                        $"Selected Pattern: {prefab.name} | Actual Intensity: {prefab.Intensity}");
+                pacing.Record(prefab.Intensity, !prefab.IsAreaTransition && prefab.EntryState != CoursePattern.TravelState.Upper);
+            }
             if (prefab.IsAirRouteEntry)
             {
                 upperPatternsInRoute = 0;
@@ -382,8 +489,38 @@ namespace Deadline4Sec
             else
                 patternsSinceSpecial++;
 
+            if (AreasActive)
+            {
+                if (prefab.IsAreaTransition)
+                {
+                    areas.NotifyTransitionSpawned(instance);
+                    pacing.UseBlocks(areas.SpawnArea.pacingBlocks);
+                }
+                else if (prefab.EntryState != CoursePattern.TravelState.Upper)
+                    areas.NotifyPatternSpawned(prefab);
+            }
+
             if (showDebugLogs)
                 Debug.Log("Spawn Pattern: " + prefab.name + " | " + prefab.Difficulty);
+        }
+
+        // What the pattern prefabs carry themselves, in the area's own colours.
+        private void ApplyAreaMaterials(CoursePattern instance, AreaDefinition area)
+        {
+            if (area.floorMaterial == null && area.deckEdgeMaterial == null && area.decorMaterial == null)
+                return;
+            foreach (Renderer part in instance.GetComponentsInChildren<Renderer>(true))
+            {
+                Material material = part.sharedMaterial;
+                if (material == null)
+                    continue;
+                if (area.floorMaterial != null && material == floorMaterial)
+                    part.sharedMaterial = area.floorMaterial; // upper decks, wall panels
+                else if (area.deckEdgeMaterial != null && material.name == "DeckEdgeGlow")
+                    part.sharedMaterial = area.deckEdgeMaterial;
+                else if (area.decorMaterial != null && material.name == "DecorStone")
+                    part.sharedMaterial = area.decorMaterial;
+            }
         }
 
         // Authored pickups are candidates, not guarantees: each power-up and gift
@@ -449,6 +586,11 @@ namespace Deadline4Sec
         {
             if (floorRenderer == null)
                 return;
+            if (floorOverride != null)
+            {
+                floorRenderer.sharedMaterial = floorOverride;
+                return;
+            }
             if (floorMaterial == null)
             {
                 if (!floorMaterialWarningShown)

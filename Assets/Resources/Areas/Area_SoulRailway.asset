@@ -1,0 +1,107 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a582412685e73e45bbb6502aee033d2, type: 3}
+  m_Name: Area_SoulRailway
+  m_EditorClassIdentifier: Assembly-CSharp::Deadline4Sec.AreaDefinition
+  areaId: 0
+  displayName: SOUL RAILWAY
+  patternPool:
+  - {fileID: 7467315862149677277, guid: 2d12d54c4bdad8a4c8a5c38c66c5bb50, type: 3}
+  - {fileID: 188166388134244644, guid: 8c13bd3bd0d9e584cb72a325624005bc, type: 3}
+  - {fileID: 6608589159667781400, guid: ea25b8f17de572b4c9718fbad62d2836, type: 3}
+  - {fileID: 4617235219765018225, guid: d2b2429c9fc6b2c4ca03cf5aa8bfdcb7, type: 3}
+  - {fileID: 919160313555712500, guid: f04ab9f59f7c9b24eb978cb8defcc6bd, type: 3}
+  - {fileID: 1405739106273453165, guid: 6de8d143370e3ea4887ee4af710d63ef, type: 3}
+  - {fileID: 5688978718464318079, guid: f2c0b5354c31bb5439a86dbca8843003, type: 3}
+  - {fileID: 3164173881058815412, guid: 0329dcdfbbaab6041bf85f7ccd3044ab, type: 3}
+  - {fileID: 389579872091985628, guid: 59910a66c4c64694eb328443ba616d63, type: 3}
+  - {fileID: 2749556614660312204, guid: e8583af93f4f15646b31b5d864258c51, type: 3}
+  - {fileID: 4714010298021824912, guid: f3fbf654547ecfa46923511dcd40dd40, type: 3}
+  - {fileID: 6254722436317516375, guid: 38b82b2f2539d114c98f78f8c63461d5, type: 3}
+  - {fileID: 6413989192080567328, guid: 2cf91d9ee87300d4c881deb09ae77375, type: 3}
+  - {fileID: 6649115267649377778, guid: 3ab2c5ec83bb3fd4db8ccea197cacc72, type: 3}
+  - {fileID: 3253217184399432531, guid: 0b2dbbcc6479cb547ac0da245e7a173f, type: 3}
+  - {fileID: 8713329268765008961, guid: 293dce307e005db4086fca2348830531, type: 3}
+  - {fileID: 6005553758282169145, guid: 11c6ae8ccf483194db92612e3c055b84, type: 3}
+  - {fileID: 7589185495105231990, guid: 10aaa37d2c28fb54385d6543498d8e78, type: 3}
+  - {fileID: 6085232530072709498, guid: c142c088a2bd4d74f9e906eb4be37bee, type: 3}
+  - {fileID: 2965134555988497185, guid: 0bf16653d0bc3a14387f13ea101df0c0, type: 3}
+  - {fileID: 2337649024104865414, guid: a69e5448879169446bf56068012aedfb, type: 3}
+  - {fileID: 5138080636246227030, guid: 0017efd0256e61b4288fdd17861fd794, type: 3}
+  specialPatternPool: []
+  minPatterns: 8
+  maxPatterns: 12
+  firstSpecialAfterPatterns: 2
+  patternsBetweenSpecialMin: 3
+  patternsBetweenSpecialMax: 5
+  pacingBlocks:
+  - blockName: Steady
+    weight: 3
+    targets:
+    - 2
+    - 3
+    - 2
+    - 4
+  - blockName: BuildUp
+    weight: 1
+    targets:
+    - 1
+    - 2
+    - 3
+    - 4
+  - blockName: Recovery
+    weight: 2
+    targets:
+    - 3
+    - 2
+    - 1
+  - blockName: Flow
+    weight: 2
+    targets:
+    - 2
+    - 3
+    - 3
+    - 2
+  - blockName: Spike
+    weight: 1
+    targets:
+    - 2
+    - 4
+    - 5
+    - 2
+  look:
+    skyTop: {r: 0.049999967, g: 0.03, b: 0.08999997, a: 1}
+    skyMid: {r: 0.15999994, g: 0.08999997, b: 0.21999994, a: 1}
+    skyHorizon: {r: 0.5499999, g: 0.41999993, b: 0.62, a: 1}
+    skyCloud: {r: 0.41999993, g: 0.29999995, b: 0.5, a: 1}
+    moon: {r: 1, g: 0.93, b: 0.92, a: 1}
+    moonGlow: {r: 0.95, g: 0.5499999, b: 0.75, a: 1}
+    fog: {r: 0.2, g: 0.14, b: 0.27, a: 1}
+    ambientSky: {r: 0.5, g: 0.4, b: 0.66, a: 1}
+    ambientEquator: {r: 0.36, g: 0.26, b: 0.44, a: 1}
+    ambientGround: {r: 0.12, g: 0.08, b: 0.15, a: 1}
+    sun: {r: 0.92, g: 0.82, b: 1, a: 1}
+    haze: {r: 0.2, g: 0.14, b: 0.27, a: 1}
+    accent: {r: 1, g: 0.2, b: 0.55, a: 1}
+  floorMaterial: {fileID: 0}
+  deckEdgeMaterial: {fileID: 0}
+  decorMaterial: {fileID: 0}
+  obstacleSkins:
+    laneBlocker:
+      model: {fileID: 0}
+      euler: {x: 0, y: 0, z: 0}
+    jumpObstacle:
+      model: {fileID: 0}
+      euler: {x: 0, y: 0, z: 0}
+    slideObstacle:
+      model: {fileID: 0}
+      euler: {x: 0, y: 0, z: 0}

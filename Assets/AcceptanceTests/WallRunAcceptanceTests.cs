@@ -208,6 +208,7 @@ namespace Deadline4Sec.AcceptanceTests
             MethodInfo choose = spawner.GetType().GetMethod("ChooseNextPattern", BindingFlags.Instance | BindingFlags.NonPublic);
             MethodInfo spawn = spawner.GetType().GetMethod("SpawnPattern", BindingFlags.Instance | BindingFlags.NonPublic);
             PropertyInfo runTime = run.GetType().GetProperty("CurrentRunTime");
+            Set(spawner, "areaCatalog", null); // the wall run's own rules, on the whole library
             Set(spawner, "mediumStartsAtSeconds", 0f);
 
             // Before wallRunStartsAtSeconds (45, judged by the estimated arrival
@@ -309,6 +310,7 @@ namespace Deadline4Sec.AcceptanceTests
             Array prefabs = Array.CreateInstance(T("CoursePattern"), course.Length);
             for (int i = 0; i < course.Length; i++)
                 prefabs.SetValue(Pattern(course[i]), i);
+            Set(spawner, "areaCatalog", null);
             Set(spawner, "patternPrefabs", prefabs);
             Set(spawner, "wallRunStartsAtSeconds", 0f);
             Set(spawner, "nextWallRunGap", 0);
