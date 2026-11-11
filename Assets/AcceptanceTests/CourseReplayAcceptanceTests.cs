@@ -67,6 +67,11 @@ namespace Deadline4Sec.AcceptanceTests
             spawner.GetType().GetField("random", BindingFlags.Instance | BindingFlags.NonPublic)
                 .SetValue(spawner, new System.Random(seed));
             float centerX = Field<float>(player, "centerX");
+            // First-run help (2026-11-11): markers on the first enemies, and the
+            // swipe guide in the first wall run's entry only.
+            Component assist = null;
+            Component firstWall = null;
+            bool sawMarker = false, sawWallGuide = false;
             HashSet<string> entered = new HashSet<string>();
             HashSet<int> seenPatternIds = new HashSet<int>();
             Dictionary<int, float> actionTimes = new Dictionary<int, float>();
@@ -129,6 +134,22 @@ namespace Deadline4Sec.AcceptanceTests
                         trace.AppendLine($"DEATH t={time:F2} z={z:F2} x={player.transform.position.x-centerX:F2} feet={player.GetComponent<CharacterController>().bounds.min.y:F2}");
                         Assert.Fail($"Production course replay died. See Verification/{evidenceFile}. " + trace.ToString().Substring(Math.Max(0, trace.Length - 1800)));
                     }
+                    if (assist == null)
+                        assist = Get("RunAssistGuide");
+                    if (assist != null)
+                    {
+                        sawMarker |= (int)Read(assist, "VisibleMarkers") > 0;
+                        Component wall = (Component)Find("WallRunSection").GetMethod("FindEntry")
+                            .Invoke(null, new object[] { player.GetComponent<CharacterController>().bounds.center });
+                        if (wall != null && firstWall == null)
+                            firstWall = wall;
+                        if ((bool)Read(assist, "WallGuideVisible"))
+                        {
+                            Assert.IsTrue(wall != null && wall == firstWall, "The swipe guide shows only in the first wall run's entry.");
+                            Assert.AreEqual(Read(wall, "Available").ToString() == "Right" ? 1 : -1, (int)Read(assist, "WallGuideSide"));
+                            sawWallGuide = true;
+                        }
+                    }
                     if (Time.timeScale > 0f)
                         Drive(player, centerX, time, actionTimes, bypassedEnemies, trace);
                     else
@@ -141,6 +162,12 @@ namespace Deadline4Sec.AcceptanceTests
                 // The library grew from 5 to 17 patterns (2026-10-01); a run no longer
                 // visits every prefab, so require variety instead of the original five.
                 Assert.GreaterOrEqual(entered.Count, 6, "The course should mix many different patterns.");
+                Assert.IsNotNull(assist, "The run help is attached.");
+                Assert.AreEqual(10, (int)Read(assist, "GuidedCount"), "Markers for the first ten enemies only.");
+                Assert.IsTrue(sawMarker, "A target marker showed.");
+                if (firstWall != null)
+                    Assert.IsTrue(sawWallGuide, "The first wall run showed the swipe guide.");
+                trace.AppendLine($"ASSIST guided={Read(assist, "GuidedCount")} wallGuide={sawWallGuide}");
                 trace.AppendLine($"FINISH time={Read(run, "CurrentRunTime")} score={Read(run, "CurrentScore")} distance={Read(run, "Distance")} rewards={rewardCount} maximumRewardGap={maximumRewardGap.ToString("F2", CultureInfo.InvariantCulture)}");
             }
             finally

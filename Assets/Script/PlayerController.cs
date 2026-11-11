@@ -9,7 +9,7 @@ using UnityEngine.InputSystem;
 namespace Deadline4Sec
 {
     [RequireComponent(typeof(CharacterController))]
-    public sealed class PlayerController : MonoBehaviour
+    public sealed partial class PlayerController : MonoBehaviour
     {
         public enum PlayerAction { Left, Right, Jump, Slide, Homing, FastFall, SlamStart, SlamImpact }
         public event Action<PlayerAction> ActionPerformed;
@@ -683,7 +683,7 @@ namespace Deadline4Sec
             return true;
         }
 
-        private Enemy FindAirTarget(int requiredSide = 0)
+        private Enemy FindAirTarget(int requiredSide = 0, bool quiet = false)
         {
             Vector3 origin = characterController.bounds.center;
             Enemy[] candidates = FindObjectsByType<Enemy>(FindObjectsSortMode.None);
@@ -718,7 +718,8 @@ namespace Deadline4Sec
                 best = enemy;
                 bestScore = score;
             }
-            Debug.Log($"Air Target Scan: {airCount} Air Enemy, {eligibleCount} in front/range");
+            if (!quiet)
+                Debug.Log($"Air Target Scan: {airCount} Air Enemy, {eligibleCount} in front/range");
             return best;
         }
 

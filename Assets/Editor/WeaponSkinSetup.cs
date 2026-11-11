@@ -32,6 +32,9 @@ namespace Deadline4Sec.Editor
         {
             public string Model, Texture, DisplayName;
             public float GripHeight; // fraction of the height above the bottom
+            // Turned half a turn around the shaft: the model's edge faces the
+            // other way from the others (BLOOD MOON, 2026-11-11).
+            public bool FlipBlade;
             public WeaponSkinFx.Effect Effect;
             public Color Accent, Secondary;
         }
@@ -45,7 +48,7 @@ namespace Deadline4Sec.Editor
                 Effect = WeaponSkinFx.Effect.Starlight, Accent = new Color(1f, 0.82f, 0.3f), Secondary = new Color(1f, 0.97f, 0.8f) },
             new SkinArt { Model = "FROSTBITE", Texture = "FROST_BITE", DisplayName = "FROST BITE", GripHeight = 0.335f,
                 Effect = WeaponSkinFx.Effect.FrostBite, Accent = new Color(0.45f, 0.85f, 1f), Secondary = new Color(0.85f, 0.97f, 1f) },
-            new SkinArt { Model = "BLOODMOON", Texture = "BLOOD_MOON", DisplayName = "BLOOD MOON", GripHeight = 0.13f,
+            new SkinArt { Model = "BLOODMOON", Texture = "BLOOD_MOON", DisplayName = "BLOOD MOON", GripHeight = 0.13f, FlipBlade = true,
                 Effect = WeaponSkinFx.Effect.BloodMoon, Accent = new Color(1f, 0.1f, 0.18f), Secondary = new Color(1f, 0.42f, 0.2f) },
             new SkinArt { Model = "CYBERDEATH", Texture = "CYBER_DEATH", DisplayName = "CYBER DEATH", GripHeight = 0.335f,
                 Effect = WeaponSkinFx.Effect.CyberDeath, Accent = new Color(0.3f, 1f, 0.35f), Secondary = new Color(0.55f, 1f, 0.9f) },
@@ -147,8 +150,9 @@ namespace Deadline4Sec.Editor
             GameObject root = new GameObject("WeaponSkin_" + art.Model);
             GameObject visual = new GameObject("Model");
             visual.transform.SetParent(root.transform, false);
-            visual.transform.localPosition = -grip;
-            visual.transform.localRotation = model.transform.localRotation;
+            Quaternion turn = art.FlipBlade ? Quaternion.Euler(0f, 180f, 0f) : Quaternion.identity;
+            visual.transform.localPosition = turn * -grip;
+            visual.transform.localRotation = turn * model.transform.localRotation;
             visual.transform.localScale = model.transform.localScale;
             visual.AddComponent<MeshFilter>().sharedMesh = source.sharedMesh;
             MeshRenderer renderer = visual.AddComponent<MeshRenderer>();
@@ -161,6 +165,7 @@ namespace Deadline4Sec.Editor
             blade.center -= grip;
             float bladeBottom = blade.min.y + blade.size.y * (art.GripHeight < 0.2f ? 0.28f : 0.45f);
             blade.SetMinMax(new Vector3(blade.min.x, bladeBottom, blade.min.z - 0.05f), new Vector3(blade.max.x, blade.max.y, blade.max.z + 0.05f));
+            blade.center = turn * blade.center; // a half turn keeps the extents
             WeaponSkinFx fx = root.AddComponent<WeaponSkinFx>();
             fx.Configure(art.Effect, art.Accent, art.Secondary, blade);
 

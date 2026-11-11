@@ -231,6 +231,12 @@
 - **Near Miss = 마지막 순간 회피**: 기존 조건(장애물 주변 near 구역을 몸 전체가 지나가고 닿지 않음)에 더해, 장애물 앞 `lastMomentDistance`(기본 2.6m) 안에서 장애물과 정면으로 겹치는(좌우·높이) 충돌 코스에 있었어야 함(`Obstacle.HeadingInto`). 옆 레인으로 그냥 지나가거나(예: 전철 옆 레인 통과) 미리 피하면 Near Miss가 아님. 테스트 `ClosePassAwardsOneNearMiss`(막판 회피 = 인정), `StraightClosePassIsNotANearMiss`(옆 통과 = 불인정).
 - **Ground Slam 반동 제거**: 충격파 판정 후 튀어 오르지 않고 바로 착지해 계속 달림(`groundSlamBouncePower` 삭제, 씬에 남은 값은 무시됨). 공중 콤보 상태도 해제.
 
+## 런 초반 도움말 (2026-11-11, 플레이 테스트 피드백)
+
+- **타겟 표시**: 매 판 처음 만나는 적 10마리에 표시. `PlayerController.TryGetKillWindow`가 실제 공격 판정 박스·속도·지속시간과 적의 공격 범위(옆/아래)로 "지금 스와이프하면 처치되는지"와 "몇 초 뒤 열리는지"를 계산. 옆 레인 공격의 실제 처치 구간이 0.2초 남짓이라, 열리기 0.75초 전부터 크고 흐리게 나타나 줄어들고, 처치 가능한 동안 작고 선명하게 깜빡임. 지원: 옆 레인 공격(지상 적), 점프 공격·호밍(공중 적), 급강하 스톰프·그라운드 슬램.
+- **Wall Run 안내**: 매 판 첫 Wall Run 구간의 진입 범위 안에서 튜토리얼 스와이프 안내(`tutorial_swipe_arrow`, `tutorial_swipe_hand`)를 열린 벽 방향으로 표시. 붙거나 범위를 벗어나면 끝.
+- 위치: `RunAssistGuide`(GameFlowManager에 자동 부착, 튜토리얼에서는 꺼짐), 표시 그림 `FxSprites.Reticle`/`ReticleOutline`(Resources/HUD/fx_reticle.png를 넣으면 그 그림 사용). 테스트: `RunAssistAcceptanceTests`(표시 첫/중간/마지막 프레임 스와이프는 처치, 직전은 빗나감), 코스 리플레이(10마리, 첫 Wall Run 안내).
+
 ## Area / Biome (2026-11-06, AreaBiome,Pacing.md)
 
 - **현재 단계**: Phase 1~5 완료(Area 데이터, Soul Railway 등록, Transition, Broken Cathedral + Wall Run, Clockwork Abyss + Air Route). 순서는 철도 → 성당 → 심연 → 철도 순환. Phase 6~8(Intensity, Pacing Block, 후보 필터링)도 적용.

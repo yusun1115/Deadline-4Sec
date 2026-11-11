@@ -18,13 +18,17 @@ namespace Deadline4Sec
         public static readonly Func<Sprite>[] All =
         {
             () => Vignette, () => Frost, () => Glow, () => Ring, () => Shard, () => Crack,
-            () => ChainLink, () => Padlock, () => EdgeGlow, () => Streak, () => EdgeGlowBox, () => RoundedBox,
+            () => ChainLink, () => Padlock, () => EdgeGlow, () => Streak, () => EdgeGlowBox, () => RoundedBox, () => Reticle, () => ReticleOutline,
         };
 
         public static Sprite Vignette => Get("fx_vignette", 256, 256, VignetteAlpha);
         public static Sprite Frost => Get("fx_frost", 256, 256, FrostAlpha);
         public static Sprite Glow => Get("fx_glow", 128, 128, GlowAlpha);
         public static Sprite Ring => Get("fx_ring", 256, 256, RingAlpha);
+        // Target marker (first-run help, 2026-11-11): a ring crossed by four ticks.
+        public static Sprite Reticle => Get("fx_reticle", 256, 256, ReticleAlpha);
+        // The same shape, thicker: a dark edge so the marker reads on pink enemies.
+        public static Sprite ReticleOutline => Get("fx_reticle_outline", 256, 256, ReticleOutlineAlpha);
         public static Sprite Shard => Get("fx_shard", 64, 128, ShardAlpha);
         public static Sprite Crack => Get("fx_crack", 256, 128, null, CrackPixels);
         public static Sprite ChainLink => Get("fx_chain_link", 96, 48, LinkAlpha);
@@ -126,6 +130,24 @@ namespace Deadline4Sec
             float d = Vector2.Distance(new Vector2(u, v), new Vector2(0.5f, 0.5f)) * 2f;
             float a = Mathf.Clamp01(1f - d);
             return a * a;
+        }
+
+        private static float ReticleAlpha(float u, float v) => ReticleShape(u, v, 0.055f, 0.06f, 0f);
+
+        private static float ReticleOutlineAlpha(float u, float v) => ReticleShape(u, v, 0.1f, 0.1f, 0.035f);
+
+        private static float ReticleShape(float u, float v, float ringHalf, float tickHalf, float grow)
+        {
+            float x = u * 2f - 1f, y = v * 2f - 1f;
+            float d = Mathf.Sqrt(x * x + y * y);
+            float ring = Mathf.Clamp01((1f - Mathf.Abs(d - 0.74f) / ringHalf) * 1.6f);
+            // Ticks: along the axes, from inside the ring to past it, rounded.
+            float along = Mathf.Max(Mathf.Abs(x), Mathf.Abs(y));
+            float across = Mathf.Min(Mathf.Abs(x), Mathf.Abs(y));
+            float from = 0.56f - grow, to = 0.94f + grow;
+            float tick = along > from && along < to ? Mathf.Clamp01(1f - across / tickHalf) : 0f;
+            tick *= Mathf.Clamp01((to - along) / 0.03f) * Mathf.Clamp01((along - from) / 0.03f);
+            return Mathf.Max(ring, Mathf.Clamp01(tick * 1.6f));
         }
 
         private static float RingAlpha(float u, float v)

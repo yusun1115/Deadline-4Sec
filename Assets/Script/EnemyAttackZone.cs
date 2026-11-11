@@ -27,6 +27,8 @@ namespace Deadline4Sec
         [SerializeField, Min(0f)] private float afterAirKillClearAbove = 0.5f;
 
         private BoxCollider zoneCollider;
+
+        public AttackZoneType Type => zoneType;
         private PlayerController trackedPlayer;
         private CharacterController trackedCollider;
         private GameTimer gameTimer;
