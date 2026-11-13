@@ -32,6 +32,7 @@ namespace Deadline4Sec
         [Header("Run state")]
         public AudioClip timerWarning;
         public AudioClip gameOver;
+        public AudioClip revive;
         public AudioClip coin;
         public AudioClip powerUp;
 

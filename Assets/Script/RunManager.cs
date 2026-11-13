@@ -35,6 +35,10 @@ namespace Deadline4Sec
         [SerializeField, Min(0f)] private float baseForwardSpeed = 10.2f;
         [SerializeField, Min(0f)] private float maxForwardSpeed = 16f;
         [SerializeField, Min(0f)] private float speedIncreasePerSecond = 0.06f;
+        // Revive (2026-11-14): instead of snapping back to the run's target
+        // speed, it eases up from a slow start over this long.
+        [SerializeField, Min(0.1f)] private float reviveSpeedRampSeconds = 1.3f;
+        [SerializeField, Range(0f, 1f)] private float reviveSpeedRampStartFraction = 0.3f;
 
         private float startZ;
         private float lastSuccessTime = float.NegativeInfinity;
@@ -44,6 +48,7 @@ namespace Deadline4Sec
         private float practiceSpeed;
         private PowerUpManager powerUps;
         private RunInventory inventory;
+        private float reviveRampStart = float.NegativeInfinity;
 
         public event System.Action NearMissRecorded;
 
@@ -107,13 +112,29 @@ namespace Deadline4Sec
                     CurrentCombo = 0;
             }
 
-            CurrentForwardSpeed = practice ? practiceSpeed : Mathf.Min(maxForwardSpeed,
+            float targetSpeed = practice ? practiceSpeed : Mathf.Min(maxForwardSpeed,
                 baseForwardSpeed + CurrentRunTime * speedIncreasePerSecond) *
                 (powerUps != null ? powerUps.SpeedMultiplier : 1f) +
                 (inventory != null ? inventory.DashBonusSpeed : 0f);
+            if (!practice && !float.IsNegativeInfinity(reviveRampStart))
+            {
+                float rampT = Mathf.Clamp01((Time.time - reviveRampStart) / reviveSpeedRampSeconds);
+                CurrentForwardSpeed = Mathf.Lerp(targetSpeed * reviveSpeedRampStartFraction, targetSpeed,
+                    Mathf.SmoothStep(0f, 1f, rampT));
+                if (rampT >= 1f)
+                    reviveRampStart = float.NegativeInfinity;
+            }
+            else
+            {
+                CurrentForwardSpeed = targetSpeed;
+            }
             playerController.SetRunForwardSpeed(CurrentForwardSpeed);
             UpdateDebugUI();
         }
+
+        // After a revive: ease back up to the run's target speed instead of
+        // snapping to it (2026-11-14 request).
+        public void BeginReviveSpeedRamp() => reviveRampStart = Time.time;
 
         public void BeginRun()
         {
@@ -121,6 +142,7 @@ namespace Deadline4Sec
             startZ = playerController != null ? playerController.transform.position.z : 0f;
             CurrentRunTime = 0f;
             Distance = 0f;
+            reviveRampStart = float.NegativeInfinity;
             CurrentForwardSpeed = baseForwardSpeed;
             if (playerController != null)
                 playerController.SetRunForwardSpeed(CurrentForwardSpeed);

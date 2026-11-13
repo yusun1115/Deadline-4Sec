@@ -89,6 +89,13 @@ namespace Deadline4Sec
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void InitAtLaunch() => EnsureInitialized();
 
+        // After the save was wiped (exhibition admin).
+        public static void ReloadFromSave()
+        {
+            ResetStatics();
+            EnsureInitialized();
+        }
+
         public static void EnsureInitialized()
         {
             if (initialized)

@@ -234,6 +234,15 @@ namespace Deadline4Sec
             Burst(sparks, point, 34, 14f, new Vector2(0.08f, 0.2f), new Vector2(0.2f, 0.4f), Pink, HotWhite, 0.3f);
         }
 
+        // Revive (2026-11-14): a light burst spreading from the runner.
+        public void PlayRevive(Vector3 point)
+        {
+            Ring(dust, point + Vector3.down * 0.1f, 36, 5f, HotWhite, 0.55f);
+            Ring(sparks, point + Vector3.up * 0.15f, 28, 6.5f, Pink, 0.5f);
+            Burst(sparks, point, 30, 9f, new Vector2(0.07f, 0.17f), new Vector2(0.3f, 0.55f), Pink, HotWhite, 0.9f, true);
+            Burst(wisps, point + Vector3.up * 0.4f, 10, 2f, new Vector2(0.3f, 0.6f), new Vector2(0.5f, 0.9f), HotWhite, Pink, -0.2f);
+        }
+
         // Generic soul burst for power-up pickups.
         public void PlayBurst(Vector3 point, Color a, Color b, int count, float speed, float size)
         {

@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70d8c876e9d77624493e0fe5688dd987, type: 3}
+  m_Name: ExhibitionSettings
+  m_EditorClassIdentifier: Assembly-CSharp::Deadline4Sec.ExhibitionSettings
+  exhibitionMode: 1
+  keepEntries: 100
+  shownEntries: 10
+  nicknameMinLength: 2
+  nicknameMaxLength: 8
+  bannedWords: []
+  autoFinishIdleSeconds: 45
+  revivePromptSeconds: 10
+  powerUpLevel: 1
+  disableConsumables: 1
+  noMetaRewards: 1
+  adminTaps: 5

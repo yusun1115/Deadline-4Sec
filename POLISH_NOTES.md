@@ -231,6 +231,25 @@
 - **Near Miss = 마지막 순간 회피**: 기존 조건(장애물 주변 near 구역을 몸 전체가 지나가고 닿지 않음)에 더해, 장애물 앞 `lastMomentDistance`(기본 2.6m) 안에서 장애물과 정면으로 겹치는(좌우·높이) 충돌 코스에 있었어야 함(`Obstacle.HeadingInto`). 옆 레인으로 그냥 지나가거나(예: 전철 옆 레인 통과) 미리 피하면 Near Miss가 아님. 테스트 `ClosePassAwardsOneNearMiss`(막판 회피 = 인정), `StraightClosePassIsNotANearMiss`(옆 통과 = 불인정).
 - **Ground Slam 반동 제거**: 충격파 판정 후 튀어 오르지 않고 바로 착지해 계속 달림(`groundSlamBouncePower` 삭제, 씬에 남은 값은 무시됨). 공중 콤보 상태도 해제.
 
+## 부활 무적시간 연출 (2026-11-14, 플레이 피드백)
+
+- **문제**: 부활 직후 캐릭터가 바로 최고 속도로 튀어나가고, 무적시간(판정상 안 죽음, `RunInventory.CollisionProtected`) 동안 장애물 정면에 부딪히면 CharacterController가 물리적으로 막혀 제자리에 멈춰 섬 — 안 죽는데 멈춰 있어서 어색함.
+- **장애물 통과**: 무적시간 동안 `Obstacle.Phasing`이 모든 장애물의 콜라이더를 꺼서 실제로 통과함(적은 원래 콜라이더가 트리거라 문제없었음). 창이 끝나면 즉시 복구, 새로 스폰되는 장애물도 켜진 상태로 시작.
+- **빛 이펙트**: 부활 버튼을 누른 순간 `CameraFeedbackController.PlayRevive`(링+버스트 파티클, 약한 쉐이크/FOV 펀치, 효과음) 1회 재생.
+- **투명 깜빡임**: `ReviveInvincibility`가 무적시간 동안 캐릭터 모델 렌더러(몸·무기·후드)를 0.08초 간격으로 켬/끔. 그래이박스 폴백용으로 원래 꺼져 있는 렌더러는 건드리지 않음. 창이 끝나면 전부 다시 켜짐.
+- **타이머 잠금**: `GameTimer.IsHeldByRevive`를 Wall Run의 `IsHeldByWallRun`과 같은 자리에 추가(`IsTimerHeld = 둘 중 하나`) — 카운트다운 정지, 보라색, `MomentFx`의 PAUSE 태그까지 Wall Run과 완전히 동일하게 재사용.
+- **속도 서서히 복귀**: `RunManager.BeginReviveSpeedRamp()`가 목표 속도의 30%에서 시작해 1.3초에 걸쳐 원래 목표 속도(런 경과 시간 기준)로 자연스럽게 가속. 스냅 복귀 없음.
+- 지속시간은 전부 기존 `RunInventory.reviveProtectionSeconds`(1.5~2초) 하나를 그대로 따름. 실제 에디터 플레이 모드에서 장애물 통과·타이머 잠금·속도 램프를 직접 확인(수동 확인, 전용 자동 테스트는 아직 없음).
+
+## 전시 모드 / 로컬 랭킹 (2026-11-13, ExhibitionRanking.md)
+
+- **켜기**: `Deadline 4 Sec/Exhibition/Exhibition Mode`(체크) 또는 `Resources/Exhibition/ExhibitionSettings`의 `exhibitionMode`. 기본은 꺼짐(스토어 빌드 그대로). `Build Windows (Exhibition)`은 켠 채로 `Builds/WindowsExhibition`에 빌드하고 원래 값으로 되돌림.
+- **흐름**: 원래 타이틀(메뉴 그대로, 탭하면 관람객 세션 시작) → 관람객 튜토리얼(SKIP 있음, 기기의 튜토리얼 완료 저장은 쓰지도 바꾸지도 않음) → Deadline 런 → 첫 사망 ONE MORE CHANCE(무료 부활 1회, 기존 쿠폰 부활과 같은 `ResumeAfterRevive`) → 결과 → 첫 판 닉네임 입력 / 재도전은 같은 이름 자동 갱신 → EXHIBITION RANKING(TOP 10, 순위 밖이면 YOUR RANK) → RETRY / FINISH, 45초 뒤 자동 FINISH.
+- **데이터**: 랭킹은 `persistentDataPath/exhibition_ranking.json`(+ `_backup`), 닉네임당 한 줄·최고점, 동점은 먼저 등록한 사람, 100명 보관. 관람객 세션(`ExhibitionSession`)은 메모리에만 있어 앱 재시작은 항상 새 관람객. FINISH는 세션만 지움.
+- **원래 게임 그대로(2026-11-13 요청)**: 업그레이드 레벨, 소모 아이템, Soul·선물 상자, 무기 스킨은 일반 게임과 같음(공정성 처리 안 함). Google Play 점수 제출만 전시에서 건너뜀.
+- **관리자**: 언제든 `Ctrl + Shift + Delete` → 관리자 창. 1 스킨 재화 4종 +50, 2 Soul +10,000, 3 전시 랭킹 초기화, 4 전체 데이터 초기화(PlayerPrefs 전부 + 전시 랭킹, 씬 다시 시작). 3·4는 확인 창(Y/N), Esc 닫기. 에디터 메뉴 `Clear Exhibition Ranking...`(이 PC의 파일).
+- 테스트: `ExhibitionAcceptanceTests`(저장·최고점·동점·100명·손상 파일·닉네임 검증·초기화, 관람객 A→재도전→자동 종료→다음 관람객 실제 씬 흐름, 꺼짐 상태).
+
 ## 런 초반 도움말 (2026-11-11, 플레이 테스트 피드백)
 
 - **타겟 표시**: 매 판 처음 만나는 적 10마리에 표시. `PlayerController.TryGetKillWindow`가 실제 공격 판정 박스·속도·지속시간과 적의 공격 범위(옆/아래)로 "지금 스와이프하면 처치되는지"와 "몇 초 뒤 열리는지"를 계산. 옆 레인 공격의 실제 처치 구간이 0.2초 남짓이라, 열리기 0.75초 전부터 크고 흐리게 나타나 줄어들고, 처치 가능한 동안 작고 선명하게 깜빡임. 지원: 옆 레인 공격(지상 적), 점프 공격·호밍(공중 적), 급강하 스톰프·그라운드 슬램.

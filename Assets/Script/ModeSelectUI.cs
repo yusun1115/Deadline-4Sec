@@ -110,6 +110,20 @@ namespace Deadline4Sec
 
         public void Confirm()
         {
+            // Exhibition: Classic plays, but its runs don't go on the ranking.
+            ExhibitionUI exhibition = ExhibitionMode.IsActive && selected == GameMode.Classic
+                ? FindFirstObjectByType<ExhibitionUI>() : null;
+            if (exhibition != null)
+            {
+                Click();
+                exhibition.ShowNotice("Classic 모드는 랭킹에 등록되지 않습니다", "확인했어요", Apply);
+                return;
+            }
+            Apply();
+        }
+
+        private void Apply()
+        {
             GameModeState.Select(selected);
             Click();
             Close();

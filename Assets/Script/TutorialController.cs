@@ -24,6 +24,9 @@ namespace Deadline4Sec
         private TutorialCourseAssets assets;
         private Vector3 startPose;
         private GameObject floor, stageRoot, panel;
+        // Scene floors in the tutorial floor's plane (EndlessRun's Start Floor):
+        // two coplanar surfaces flickered under the runner (2026-11-13).
+        private readonly List<Renderer> hiddenFloors = new List<Renderer>();
         private TutorialUIController ui;
         private TutorialStep[] briefing, lessons;
         private bool briefingAdvance, followUpShown;
@@ -97,10 +100,28 @@ namespace Deadline4Sec
             floor.transform.position = new Vector3(startPose.x, -0.1f, startPose.z + 30f);
             floor.transform.localScale = new Vector3(8.6f, 0.2f, 90f);
             floor.GetComponent<Renderer>().sharedMaterial = assets.floorMaterial;
+            HideCoplanarFloors(floor.GetComponent<Renderer>().bounds);
             if (briefing.Length > 0)
                 StartCoroutine(RunBriefing());
             else
                 PrepareStep();
+        }
+
+        private void HideCoplanarFloors(Bounds tutorialFloor)
+        {
+            foreach (Renderer other in FindObjectsByType<Renderer>(FindObjectsSortMode.None))
+            {
+                if (!other.enabled || other.gameObject == floor)
+                    continue;
+                Bounds b = other.bounds;
+                bool samePlane = Mathf.Abs(b.max.y - tutorialFloor.max.y) < 0.02f && b.size.y < 1f;
+                bool overlaps = b.min.x < tutorialFloor.max.x && b.max.x > tutorialFloor.min.x &&
+                    b.min.z < tutorialFloor.max.z && b.max.z > tutorialFloor.min.z;
+                if (!samePlane || !overlaps)
+                    continue;
+                other.enabled = false;
+                hiddenFloors.Add(other);
+            }
         }
 
         // The rules first: the speaker explains the real (paused, full) timer
@@ -400,8 +421,8 @@ namespace Deadline4Sec
             LessonInput guide = CurrentStep.showSwipeGuide ? PromptInput : LessonInput.None;
             string keys = null;
 #if UNITY_EDITOR || UNITY_STANDALONE
-            keys = guide == LessonInput.Left ? "A / LEFT" : guide == LessonInput.Right ? "D / RIGHT" :
-                guide == LessonInput.Up ? "SPACE / UP" : guide == LessonInput.Down ? "S / DOWN" : null;
+            keys = guide == LessonInput.Left ? "A / ←" : guide == LessonInput.Right ? "D / →" :
+                guide == LessonInput.Up ? "W / ↑" : guide == LessonInput.Down ? "S / ↓" : null;
 #endif
             ui.SetGuide(guide, keys);
         }
@@ -506,8 +527,12 @@ namespace Deadline4Sec
                 ui.SetGuide(LessonInput.None, null);
                 ui.HideSkip();
                 ui.ShowDialogue("TUTORIAL COMPLETE", Look.completeText);
-                PlayerPrefs.SetInt("Deadline4Sec.TutorialCompleted", 1);
-                PlayerPrefs.Save();
+                // The exhibition keeps the visitor's tutorial in ExhibitionSession.
+                if (!ExhibitionMode.IsActive)
+                {
+                    PlayerPrefs.SetInt("Deadline4Sec.TutorialCompleted", 1);
+                    PlayerPrefs.Save();
+                }
                 StartCoroutine(EndAfterLastLine());
             }
         }
@@ -613,6 +638,10 @@ namespace Deadline4Sec
             ClearStage();
             if (floor != null)
                 Destroy(floor);
+            foreach (Renderer hidden in hiddenFloors)
+                if (hidden != null)
+                    hidden.enabled = true;
+            hiddenFloors.Clear();
             if (ui != null)
                 ui.Cleanup();
             if (panel != null)

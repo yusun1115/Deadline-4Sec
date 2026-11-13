@@ -61,6 +61,13 @@ namespace Deadline4Sec
             PlayerStats.Changed -= Evaluate;
         }
 
+        // After the save was wiped (exhibition admin).
+        public static void ReloadFromSave()
+        {
+            ResetStatics();
+            EnsureInitialized();
+        }
+
         public static void EnsureInitialized()
         {
             if (initialized)

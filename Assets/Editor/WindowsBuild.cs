@@ -13,7 +13,10 @@ namespace Deadline4Sec.Editor
     public static class WindowsBuild
     {
         [MenuItem("Deadline 4 Sec/Build Windows")]
-        public static void Build()
+        public static void Build() => BuildTo("Windows");
+
+        // folder: under Builds/ (the exhibition build goes to its own).
+        public static void BuildTo(string folder)
         {
             TutorialCourseAssets tutorial = Resources.Load<TutorialCourseAssets>("Tutorial/TutorialCourse");
             if (tutorial == null || !tutorial.IsValid)
@@ -21,7 +24,7 @@ namespace Deadline4Sec.Editor
             string root = Path.GetFullPath(Path.Combine(Application.dataPath, ".."));
             if (Path.GetFileName(root) == "ValidationProject")
                 root = Path.GetDirectoryName(root);
-            string output = Path.Combine(root, "Builds", "Windows", "Deadline4Sec.exe");
+            string output = Path.Combine(root, "Builds", folder, "Deadline4Sec.exe");
             Directory.CreateDirectory(Path.GetDirectoryName(output));
 
             // URP keeps the list of pipeline assets a build uses (CoreBuildData)

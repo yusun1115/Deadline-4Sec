@@ -8,6 +8,7 @@ namespace Deadline4Sec
     public sealed class GameTimer : MonoBehaviour
     {
         [SerializeField] private PlayerController playerController;
+        private RunInventory inventory;
         [SerializeField] private Text timeText;
         [SerializeField] private Text gameOverText;
 
@@ -17,7 +18,8 @@ namespace Deadline4Sec
         [SerializeField] private Color criticalTimeColor = new Color(1f, 0.16f, 0.31f);
         [SerializeField, Min(0f)] private float warningAtSeconds = 2.5f;
         [SerializeField, Min(0f)] private float criticalAtSeconds = 1f;
-        // Held on a wall (Wall Run): the number turns this colour while it waits.
+        // Held on a wall (Wall Run), or while a revive's invincibility runs: the
+        // number turns this colour while it waits.
         [SerializeField] private Color wallPausedTimeColor = new Color(0.72f, 0.62f, 1f);
 
         public const float BaseDuration = 4f;
@@ -36,6 +38,9 @@ namespace Deadline4Sec
         public bool IsRunning => isRunning && !isGameOver;
         // Deadline countdown held because the runner is on a wall (Wall Run).
         public bool IsHeldByWallRun => IsRunning && !untimed && playerController != null && playerController.IsWallRunning;
+        // Held during a revive's invincibility, the same way (2026-11-14).
+        public bool IsHeldByRevive => IsRunning && !untimed && inventory != null && inventory.CollisionProtected;
+        public bool IsTimerHeld => IsHeldByWallRun || IsHeldByRevive;
         public event Action<float> TimerReset;
         public enum DeathReason { TimerExpired, Collision, Fall }
 
@@ -68,6 +73,7 @@ namespace Deadline4Sec
         {
             remainingTime = BaseDuration;
             gameFlow = GetComponent<GameFlowManager>();
+            inventory = GetComponent<RunInventory>();
             cameraFeedback = FindFirstObjectByType<CameraFeedbackController>();
             GameFont.Apply(timeText);
             GameFont.Apply(gameOverText);
@@ -107,7 +113,7 @@ namespace Deadline4Sec
             // The countdown holds while Freeze Clock runs and while the runner is
             // on a wall (Wall Run, 2026-10-18); it resumes after the exit.
             PowerUpManager powerUps = GetComponent<PowerUpManager>();
-            if ((powerUps == null || !powerUps.TimerFrozen) && !IsHeldByWallRun)
+            if ((powerUps == null || !powerUps.TimerFrozen) && !IsTimerHeld)
                 remainingTime = Mathf.Max(0f, remainingTime - deltaTime);
             UpdateTimeText();
 
@@ -242,7 +248,7 @@ namespace Deadline4Sec
             if (timeText != null)
             {
                 timeText.text = remainingTime.ToString("F2", CultureInfo.InvariantCulture);
-                timeText.color = IsHeldByWallRun ? wallPausedTimeColor : remainingTime <= criticalAtSeconds
+                timeText.color = IsTimerHeld ? wallPausedTimeColor : remainingTime <= criticalAtSeconds
                     ? criticalTimeColor
                     : remainingTime <= warningAtSeconds
                         ? warningTimeColor

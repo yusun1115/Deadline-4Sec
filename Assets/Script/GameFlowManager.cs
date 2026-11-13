@@ -158,7 +158,8 @@ namespace Deadline4Sec
 
         private void Update()
         {
-            if ((State == GameState.GameOver || State == GameState.Result) && RetryKeyPressed())
+            if (!ExhibitionMode.IsActive &&
+                (State == GameState.GameOver || State == GameState.Result) && RetryKeyPressed())
                 Retry();
         }
 
@@ -197,6 +198,8 @@ namespace Deadline4Sec
             if (powerUps != null)
                 powerUps.ResetRunEffects();
             inventory?.BeginRun();
+            if (ExhibitionMode.IsActive)
+                ExhibitionSession.BeginRun();
             gameTimer.SetUntimed(GameModeState.IsClassicRun);
             gameTimer.BeginRun();
             PlayerStats.BeginRun(GameModeState.CurrentRunMode);
@@ -232,7 +235,12 @@ namespace Deadline4Sec
         {
             if (State != GameState.Title)
                 return;
-            if (PlayerPrefs.GetInt(TutorialCompletedKey, 0) == 0)
+            // Exhibition: each visitor's own tutorial, not this device's saved one.
+            bool tutorialDone = ExhibitionMode.IsActive ? ExhibitionSession.TutorialCompleted
+                : PlayerPrefs.GetInt(TutorialCompletedKey, 0) != 0;
+            if (ExhibitionMode.IsActive)
+                ExhibitionSession.Begin();
+            if (!tutorialDone)
                 StartTutorial();
             else
                 StartGame();
@@ -339,8 +347,12 @@ namespace Deadline4Sec
         {
             if (State != GameState.Tutorial || !skipConfirmationOpen)
                 return;
-            PlayerPrefs.SetInt(TutorialCompletedKey, 1);
-            PlayerPrefs.Save();
+            // Exhibition: the visitor's tutorial (FinishTutorial), not the device's.
+            if (!ExhibitionMode.IsActive)
+            {
+                PlayerPrefs.SetInt(TutorialCompletedKey, 1);
+                PlayerPrefs.Save();
+            }
             FinishTutorial(true);
         }
 
@@ -364,6 +376,12 @@ namespace Deadline4Sec
             if (tutorialSkipUI != null)
                 tutorialSkipUI.SetActive(false);
             tutorial.Stop();
+            // Exhibition: the tutorial leads straight into the visitor's run.
+            if (ExhibitionMode.IsActive)
+            {
+                ExhibitionSession.CompleteTutorial();
+                startRun = true;
+            }
             startImmediatelyAfterReload = startRun;
             SceneManager.LoadScene(SceneManager.GetActiveScene().path);
         }
@@ -432,6 +450,28 @@ namespace Deadline4Sec
             }
             if (!hudCleared)
                 SetUI(false, false, false);
+            // Exhibition: one free revive per run for everyone (no ads, no tickets).
+            if (ExhibitionMode.IsActive)
+            {
+                ExhibitionUI exhibition = GetComponent<ExhibitionUI>();
+                if (!ExhibitionSession.ReviveUsed && exhibition != null)
+                {
+                    State = GameState.RevivePrompt;
+                    float seconds = ExhibitionMode.Settings.revivePromptSeconds;
+                    exhibition.ShowRevive(seconds);
+                    while (State == GameState.RevivePrompt && seconds > 0f)
+                    {
+                        seconds -= Time.unscaledDeltaTime;
+                        exhibition.SetReviveCountdown(seconds);
+                        yield return null;
+                    }
+                    if (State != GameState.RevivePrompt)
+                        yield break;
+                    exhibition.HideRevive();
+                }
+                FinalizeRun();
+                yield break;
+            }
             if (inventory != null && !inventory.ReviveUsed)
             {
                 State = GameState.RevivePrompt;
@@ -455,7 +495,22 @@ namespace Deadline4Sec
             if (State != GameState.RevivePrompt || inventory == null || !inventory.TrySpendCoupon())
                 return;
             PlayerStats.RecordCouponRevive();
-            inventory.Revive();
+            ResumeAfterRevive();
+        }
+
+        // Exhibition: the free revive, through the same revive as a coupon.
+        public void UseExhibitionRevive()
+        {
+            if (State != GameState.RevivePrompt || !ExhibitionMode.IsActive || ExhibitionSession.ReviveUsed)
+                return;
+            ExhibitionSession.UseRevive();
+            GetComponent<ExhibitionUI>()?.HideRevive();
+            ResumeAfterRevive();
+        }
+
+        private void ResumeAfterRevive()
+        {
+            inventory?.Revive();
             extrasUI?.HideRevive();
             playerController?.RestoreDeathPose();
             // Wall Run: a fall or wall hit restarts before the section's entry.
@@ -466,6 +521,13 @@ namespace Deadline4Sec
             gameOverHandled = false;
             State = GameState.Playing;
             SetUI(true, false, false);
+            // Light spreads from the runner; the run eases back up to speed
+            // instead of snapping to it (2026-11-14 request). The flicker and
+            // passing through obstacles follow RunInventory.CollisionProtected
+            // on their own (ReviveInvincibility).
+            runManager?.BeginReviveSpeedRamp();
+            if (cameraFeedback != null && playerController != null)
+                cameraFeedback.PlayRevive(playerController.transform.position);
         }
 
         public void ClickRewardedAd()
@@ -479,6 +541,7 @@ namespace Deadline4Sec
             if (State != GameState.RevivePrompt)
                 return;
             extrasUI?.HideRevive();
+            GetComponent<ExhibitionUI>()?.HideRevive();
             FinalizeRun();
         }
 
@@ -498,6 +561,10 @@ namespace Deadline4Sec
             SetUI(false, false, true);
             if (resultPanel != null && resultPanel.TryGetComponent(out ResultPresenter presenter))
                 presenter.Play();
+            // Exhibition: nickname (first run) or the automatic update, then the ranking.
+            // Deadline runs only: Classic keeps the normal result.
+            if (ExhibitionMode.IsActive && GameModeState.CurrentRunMode == GameMode.Deadline)
+                GetComponent<ExhibitionUI>()?.ShowResult(runManager != null ? runManager.CurrentScore : 0);
         }
 
         private void SaveRecordsAndFillResult()
@@ -561,6 +628,9 @@ namespace Deadline4Sec
         {
             if (State != GameState.GameOver && State != GameState.Result)
                 return;
+            // Exhibition: back to the title is the next visitor (a Classic result too).
+            if (ExhibitionMode.IsActive)
+                ExhibitionSession.ResetExhibitionSession();
             ConfirmResult();
         }
 

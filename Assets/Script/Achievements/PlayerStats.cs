@@ -104,6 +104,9 @@ namespace Deadline4Sec
             Run.Clear(GameMode.Deadline);
         }
 
+        // After the save was wiped (exhibition admin): read it again from PlayerPrefs.
+        public static void ReloadFromSave() => ResetStatics();
+
         public static int Get(PlayerStat stat)
         {
             EnsureLoaded();

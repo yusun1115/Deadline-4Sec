@@ -188,7 +188,7 @@ namespace Deadline4Sec
 
         private void UpdateWallHold(float now, float dt)
         {
-            bool held = flow != null && flow.IsPlaying && timer != null && timer.IsHeldByWallRun;
+            bool held = flow != null && flow.IsPlaying && timer != null && timer.IsTimerHeld;
             wallHold = Mathf.MoveTowards(wallHold, held ? 1f : 0f, dt * 6f);
             float pulse = 0.85f + 0.15f * Mathf.Sin(now * 5f);
             if (wallGlow != null && timerFrame != null)

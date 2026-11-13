@@ -7,6 +7,31 @@ namespace Deadline4Sec
     public sealed class Obstacle : MonoBehaviour
     {
         public static readonly HashSet<Obstacle> Active = new HashSet<Obstacle>();
+
+        // Revive invincibility (2026-11-14): obstacles pass through instead of
+        // physically stopping the runner (RunInventory.CollisionProtected already
+        // forgives the death; without this the CharacterController still
+        // collided and the runner stood pressed against the obstacle). Toggled
+        // by ReviveInvincibility; a new obstacle spawned mid-window starts
+        // passable too.
+        private static bool phasing;
+
+        public static bool Phasing
+        {
+            get => phasing;
+            set
+            {
+                if (phasing == value)
+                    return;
+                phasing = value;
+                foreach (Obstacle obstacle in Active)
+                    if (obstacle != null && obstacle.hazard != null)
+                        obstacle.hazard.enabled = !value;
+            }
+        }
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void ResetPhasing() => phasing = false;
         // Labels for arranging test cubes. Avoidance is decided only by collision.
         // RampTrain: a tall train with a ramp in front; run up the ramp onto the roof.
         public enum ObstacleType { LaneBlocker, JumpObstacle, SlideObstacle, RampTrain }
@@ -40,6 +65,7 @@ namespace Deadline4Sec
         private void Awake()
         {
             hazard = GetComponent<BoxCollider>();
+            hazard.enabled = !phasing;
             FindSceneReferences();
         }
 

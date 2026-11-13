@@ -23,6 +23,12 @@ namespace Deadline4Sec
         [SerializeField, Range(0f, 0.1f)] private float homingKillHitStop = 0.045f;
         [SerializeField, Range(0f, 0.12f)] private float stompHitStop = 0.06f;
 
+        [Header("Revive")]
+        [SerializeField] private ShakeSettings reviveShake =
+            new ShakeSettings { intensity = 0.05f, duration = 0.18f };
+        [SerializeField, Min(0f)] private float reviveFovKick = -2f;
+        [SerializeField, Min(0.01f)] private float reviveFovDuration = 0.3f;
+
         [Header("Ground Slam Impact")]
         [SerializeField, Range(0f, 0.15f)] private float groundSlamHitStop = 0.075f;
         [SerializeField] private ShakeSettings groundSlamShake =
@@ -113,6 +119,7 @@ namespace Deadline4Sec
         private AudioClip nearMissClip;
         private AudioClip warningClip;
         private AudioClip gameOverClip;
+        private AudioClip reviveClip;
         private AudioClip uiClip;
         private AudioClip coinClip;
         // Soul pickups: back-to-back pickups climb a semitone each (2026-10-11),
@@ -442,6 +449,19 @@ namespace Deadline4Sec
             }
         }
 
+        // Light spreads from the runner: the revive itself (not gated on
+        // IsPlaying — it fires exactly while the state turns from Dying back
+        // to Playing).
+        public void PlayRevive(Vector3 point)
+        {
+            if (particles != null)
+                particles.PlayRevive(point);
+            PlayShake(reviveShake);
+            PlayFovPulse(reviveFovKick, reviveFovDuration);
+            PlaySound(reviveClip);
+            Vibrate(40, 130);
+        }
+
         public void PlayGameOver()
         {
             if (fallTimer != null && fallTimer.LastDeathReason == GameTimer.DeathReason.Fall)
@@ -486,6 +506,7 @@ namespace Deadline4Sec
             nearMissClip = Pick(l != null ? l.nearMiss : null, "Near Miss", 910f, 0.11f);
             warningClip = Pick(l != null ? l.timerWarning : null, "Timer Warning", 260f, 0.18f);
             gameOverClip = Pick(l != null ? l.gameOver : null, "Game Over", 135f, 0.34f);
+            reviveClip = Pick(l != null ? l.revive : null, "Revive", 523f, 0.3f);
             uiClip = Pick(l != null ? l.uiClick : null, "UI Click", 560f, 0.045f);
             coinClip = Pick(l != null ? l.coin : null, "Soul", 1320f, 0.06f);
             wallAttachClip = l != null && l.wallAttach != null ? l.wallAttach : movementClip;

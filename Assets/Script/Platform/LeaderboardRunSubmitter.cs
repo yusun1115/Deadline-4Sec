@@ -50,7 +50,8 @@ namespace Deadline4Sec
 
         private void OnRunFinished(RunRecord record)
         {
-            if (hasSubmittedLeaderboardScore)
+            // The exhibition has its own local ranking (ExhibitionLeaderboardService).
+            if (hasSubmittedLeaderboardScore || ExhibitionMode.IsActive)
                 return;
             hasSubmittedLeaderboardScore = true;
             GooglePlayService.SubmitScore(record.Mode, record.Score);
