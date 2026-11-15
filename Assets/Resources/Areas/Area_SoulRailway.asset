@@ -46,38 +46,19 @@ MonoBehaviour:
   pacingBlocks:
   - blockName: Steady
     weight: 3
-    targets:
-    - 2
-    - 3
-    - 2
-    - 4
+    targets: 02000000030000000200000004000000
   - blockName: BuildUp
     weight: 1
-    targets:
-    - 1
-    - 2
-    - 3
-    - 4
+    targets: 01000000020000000300000004000000
   - blockName: Recovery
     weight: 2
-    targets:
-    - 3
-    - 2
-    - 1
+    targets: 030000000200000001000000
   - blockName: Flow
     weight: 2
-    targets:
-    - 2
-    - 3
-    - 3
-    - 2
+    targets: 02000000030000000300000002000000
   - blockName: Spike
     weight: 1
-    targets:
-    - 2
-    - 4
-    - 5
-    - 2
+    targets: 02000000040000000500000002000000
   look:
     skyTop: {r: 0.049999967, g: 0.03, b: 0.08999997, a: 1}
     skyMid: {r: 0.15999994, g: 0.08999997, b: 0.21999994, a: 1}
@@ -92,6 +73,29 @@ MonoBehaviour:
     sun: {r: 0.92, g: 0.82, b: 1, a: 1}
     haze: {r: 0.2, g: 0.14, b: 0.27, a: 1}
     accent: {r: 1, g: 0.2, b: 0.55, a: 1}
+  visuals:
+    lowFogColor: {r: 0.32, g: 0.16, b: 0.4, a: 1}
+    lowFogGlowColor: {r: 0.85, g: 0.25, b: 0.65, a: 1}
+    lowFogAlpha: 0.7
+    lowFogBottom: -8.5
+    lowFogTop: 0.6
+    lowFogDrift: {x: 0.6, y: -1.2}
+    lowFogScale: 26
+    fogStart: 28
+    fogEnd: 270
+    hazeHeight: 9
+    midLayerTint: {r: 0.8, g: 0.78, b: 0.85, a: 1}
+    farLayerTint: {r: 0.75, g: 0.7, b: 0.85, a: 1}
+    farFogAmount: 0.82
+    landmarkFogAmount: 0.45
+    landmarkGlow: 3
+    particleStyle: 0
+    particleColor: {r: 1, g: 0.45, b: 0.85, a: 0.8}
+    particleColorAlt: {r: 0.6, g: 0.45, b: 1, a: 0.7}
+    particleRate: 30
+    sideLight: {r: 0.55, g: 0.18, b: 0.6, a: 1}
+    sideLightFrom: {x: 1, y: 0.6, z: -0.4}
+    backLight: {r: 0.4, g: 0.16, b: 0.45, a: 1}
   floorMaterial: {fileID: 0}
   deckEdgeMaterial: {fileID: 0}
   decorMaterial: {fileID: 0}

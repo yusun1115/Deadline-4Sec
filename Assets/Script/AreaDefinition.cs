@@ -85,6 +85,8 @@ namespace Deadline4Sec
 
         [Header("Visuals")]
         public AreaLook look = new AreaLook();
+        [Tooltip("Low fog, distance fog, background layers, landmark, particles, background light.")]
+        public AreaVisualProfile visuals = new AreaVisualProfile();
         [Tooltip("Floor, upper deck and wall panels. Empty: the spawner's own floor material.")]
         public Material floorMaterial;
         [Tooltip("Lit edges of the upper deck (air route). Empty: the patterns' own pink.")]

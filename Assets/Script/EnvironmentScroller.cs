@@ -10,6 +10,11 @@ namespace Deadline4Sec
     // Each area has its own backdrop (2026-11-06, themes in
     // EnvironmentScroller.Themes.cs): at most the current one and the next are
     // alive; the old one and its meshes are removed at the swap.
+    // Visual upgrade (2026-11-15): each backdrop also has a mid layer (recycled
+    // like the spires, between the pillars and the far towers, dimmer) and a
+    // far layer (one skyline riding with the camera, mostly sunk in the fog),
+    // with their own material copies, as does the landmark (less fog, more
+    // glow). The low fog, particles and background light are AreaAtmosphere.
     public sealed partial class EnvironmentScroller : MonoBehaviour
     {
         [SerializeField] private Material silhouetteMaterial;
@@ -29,6 +34,19 @@ namespace Deadline4Sec
         [Header("Landmarks")]
         [SerializeField] private Vector3 clockTowerOffset = new Vector3(34f, -8f, 230f);
         [SerializeField] private float cloudSeaY = -9f;
+
+        [Header("Mid / far layers (visual upgrade)")]
+        [SerializeField] private int midCount = 10;
+        [SerializeField] private Vector2 midDistanceX = new Vector2(14f, 24f);
+        [SerializeField] private float midSpan = 260f;
+        [Tooltip("Distance of the far skyline ahead of the camera.")]
+        [SerializeField] private float farDistance = 285f;
+
+        [Header("Atmosphere (visual upgrade)")]
+        [Tooltip("Stacked low fog sheets: more is softer, each one is screen overdraw.")]
+        [SerializeField, Range(1, 8)] private int lowFogSheets = 4;
+        [Tooltip("Half width of the strip over the track kept clear of low fog.")]
+        [SerializeField] private float lowFogClearHalfWidth = 4.6f;
 
         private static readonly Color Stone = new Color(0.075f, 0.055f, 0.1f, 0f);
         private static readonly Color StoneLight = new Color(0.13f, 0.1f, 0.17f, 0f);
@@ -55,6 +73,9 @@ namespace Deadline4Sec
             public Transform Landmark;
             public Vector3 LandmarkOffset;
             public Transform CloudSea;
+            public Transform Far;
+            public Material MidMaterial, FarMaterial, LandmarkMaterial;
+            public readonly List<Transform> Mids = new List<Transform>();
             public readonly List<Transform> Pillars = new List<Transform>();
             public readonly List<Transform> Spires = new List<Transform>();
             public readonly List<Spinner> Spinners = new List<Spinner>();
@@ -69,25 +90,64 @@ namespace Deadline4Sec
         // For tests: pieces alive under this object.
         public int BackdropCount => transform.childCount;
         public AreaType ShownArea { get; private set; }
+        public AreaAtmosphere Atmosphere { get; private set; }
+        // For tests: the shown backdrop's layers.
+        public int MidLayerCount => current != null ? current.Mids.Count : 0;
+        public bool HasFarLayer => current != null && current.Far != null;
 
         private void Awake()
         {
             if (followTarget == null && Camera.main != null)
                 followTarget = Camera.main.transform;
             trackX = transform.position.x;
-            current = CreateBackdrop(AreaType.SoulRailway, silhouetteMaterial, false);
+            Material material = new Material(silhouetteMaterial) { name = "Silhouette " + AreaType.SoulRailway };
+            current = CreateBackdrop(AreaType.SoulRailway, material, true);
+            ApplyVisuals(current, silhouetteMaterial.GetColor("_HazeColor"), new AreaVisualProfile());
+            Atmosphere = AreaAtmosphere.Create(followTarget, trackX, lowFogClearHalfWidth, lowFogSheets, gameObject.scene);
         }
 
         // Builds the next area's backdrop out of sight, ready for the swap.
-        public void PrepareArea(AreaType area, Color haze)
+        public void PrepareArea(AreaType area, Color haze, AreaVisualProfile visuals)
         {
             if (prepared != null)
                 DestroyBackdrop(prepared);
             Material material = new Material(silhouetteMaterial) { name = "Silhouette " + area };
-            material.SetColor("_HazeColor", haze);
             prepared = CreateBackdrop(area, material, true);
+            ApplyVisuals(prepared, haze, visuals ?? new AreaVisualProfile());
             prepared.Root.gameObject.SetActive(false);
             preparedArea = area;
+        }
+
+        // The area the run starts in (AreaDirector.Begin): its profile on the shown backdrop.
+        public void ApplyVisuals(Color haze, AreaVisualProfile visuals)
+        {
+            if (current != null && visuals != null)
+                ApplyVisuals(current, haze, visuals);
+        }
+
+        private static void ApplyVisuals(Backdrop backdrop, Color haze, AreaVisualProfile v)
+        {
+            foreach (Material m in new[] { backdrop.Material, backdrop.MidMaterial, backdrop.FarMaterial, backdrop.LandmarkMaterial })
+            {
+                if (m == null)
+                    continue;
+                m.SetColor("_HazeColor", haze);
+                m.SetFloat("_HazeHeight", v.hazeHeight);
+            }
+            if (backdrop.MidMaterial != null)
+                backdrop.MidMaterial.SetColor("_Tint", v.midLayerTint);
+            if (backdrop.FarMaterial != null)
+            {
+                backdrop.FarMaterial.SetColor("_Tint", v.farLayerTint);
+                backdrop.FarMaterial.SetFloat("_FogAmount", v.farFogAmount);
+                backdrop.FarMaterial.SetFloat("_Glow", 1.4f);
+                backdrop.FarMaterial.SetFloat("_LightAmount", 0.5f);
+            }
+            if (backdrop.LandmarkMaterial != null)
+            {
+                backdrop.LandmarkMaterial.SetFloat("_FogAmount", v.landmarkFogAmount);
+                backdrop.LandmarkMaterial.SetFloat("_Glow", v.landmarkGlow);
+            }
         }
 
         // Called with the camera inside a transition tunnel: nothing to see the change.
@@ -101,6 +161,8 @@ namespace Deadline4Sec
                 p.position += Vector3.forward * shift;
             foreach (Transform s in prepared.Spires)
                 s.position += Vector3.forward * shift;
+            foreach (Transform m in prepared.Mids)
+                m.position += Vector3.forward * shift;
             prepared.Root.gameObject.SetActive(true);
             DestroyBackdrop(current);
             current = prepared;
@@ -115,6 +177,9 @@ namespace Deadline4Sec
             GameObject root = new GameObject("Backdrop " + area);
             root.transform.SetParent(transform, false);
             building = new Backdrop { Root = root.transform, Material = material, OwnsMaterial = ownsMaterial };
+            building.MidMaterial = new Material(material) { name = material.name + " Mid" };
+            building.FarMaterial = new Material(material) { name = material.name + " Far" };
+            building.LandmarkMaterial = new Material(material) { name = material.name + " Landmark" };
             building.BuiltAtZ = followTarget != null ? followTarget.position.z : 0f;
             Random.State saved = Random.state;
             Random.InitState(seed + (int)area);
@@ -124,6 +189,7 @@ namespace Deadline4Sec
                 case AreaType.ClockworkAbyss: BuildClockwork(building.BuiltAtZ); break;
                 default: Build(building.BuiltAtZ); break;
             }
+            BuildLayers(area, building.BuiltAtZ);
             Random.state = saved;
             Backdrop built = building;
             building = null;
@@ -138,6 +204,21 @@ namespace Deadline4Sec
                 Destroy(mesh);
             if (backdrop.OwnsMaterial)
                 Destroy(backdrop.Material);
+            foreach (Material m in new[] { backdrop.MidMaterial, backdrop.FarMaterial, backdrop.LandmarkMaterial })
+                if (m != null)
+                    Destroy(m);
+        }
+
+        private void OnDisable()
+        {
+            if (Atmosphere != null)
+                Atmosphere.gameObject.SetActive(false);
+        }
+
+        private void OnEnable()
+        {
+            if (Atmosphere != null)
+                Atmosphere.gameObject.SetActive(true);
         }
 
         private void OnDestroy()
@@ -146,6 +227,8 @@ namespace Deadline4Sec
                 DestroyBackdrop(current);
             if (prepared != null)
                 DestroyBackdrop(prepared);
+            if (Atmosphere != null)
+                Destroy(Atmosphere.gameObject);
         }
 
         private void Build(float startZ)
@@ -176,9 +259,9 @@ namespace Deadline4Sec
                 building.Spires.Add(s);
             }
 
-            Transform clockTower = Spawn("ClockTower", BuildClockTowerMesh());
-            Transform clockHandHour = Spawn("ClockHourHand", BuildBox(new Vector3(-0.6f, 0f, -0.4f), new Vector3(0.6f, 7f, 0f), ClockFace));
-            Transform clockHandMinute = Spawn("ClockMinuteHand", BuildBox(new Vector3(-0.4f, 0f, -0.5f), new Vector3(0.4f, 10f, 0f), ClockFace));
+            Transform clockTower = Spawn("ClockTower", BuildClockTowerMesh(), building.LandmarkMaterial);
+            Transform clockHandHour = Spawn("ClockHourHand", BuildBox(new Vector3(-0.6f, 0f, -0.4f), new Vector3(0.6f, 7f, 0f), Iron), building.LandmarkMaterial);
+            Transform clockHandMinute = Spawn("ClockMinuteHand", BuildBox(new Vector3(-0.4f, 0f, -0.5f), new Vector3(0.4f, 10f, 0f), Iron), building.LandmarkMaterial);
             clockHandHour.SetParent(clockTower, false);
             clockHandMinute.SetParent(clockTower, false);
             clockHandHour.localPosition = clockHandMinute.localPosition = new Vector3(0f, 66f, -9.2f);
@@ -201,6 +284,10 @@ namespace Deadline4Sec
                 if (p.position.z < z - 14f)
                     p.position += Vector3.forward * pillarLoop;
 
+            foreach (Transform m in current.Mids)
+                if (m.position.z < z - 30f)
+                    m.position += Vector3.forward * (midSpan + 30f);
+
             foreach (Transform s in current.Spires)
                 if (s.position.z < z - 30f)
                 {
@@ -213,12 +300,14 @@ namespace Deadline4Sec
             // Landmarks ride with the camera so they always loom on the horizon.
             current.Landmark.position = new Vector3(trackX + current.LandmarkOffset.x, current.LandmarkOffset.y, z + current.LandmarkOffset.z);
             current.CloudSea.position = new Vector3(trackX, cloudSeaY, z + 150f);
+            if (current.Far != null)
+                current.Far.position = new Vector3(trackX, 0f, z + farDistance);
             float t = Time.time;
             foreach (Spinner spinner in current.Spinners)
                 spinner.Part.localRotation = Quaternion.Euler(0f, 0f, t * spinner.Speed + spinner.Phase);
         }
 
-        private Transform Spawn(string name, Mesh mesh)
+        private Transform Spawn(string name, Mesh mesh, Material material = null)
         {
             GameObject go = new GameObject(name);
             go.transform.SetParent(building.Root, false);
@@ -226,7 +315,7 @@ namespace Deadline4Sec
             if (!building.Meshes.Contains(mesh))
                 building.Meshes.Add(mesh);
             MeshRenderer r = go.AddComponent<MeshRenderer>();
-            r.sharedMaterial = building.Material;
+            r.sharedMaterial = material != null ? material : building.Material;
             r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             r.receiveShadows = false;
             return go.transform;
@@ -293,6 +382,8 @@ namespace Deadline4Sec
                 m.SetVertices(V);
                 m.SetColors(C);
                 m.SetTriangles(T, 0);
+                // Flat faces (four vertices a quad): normals for the area light.
+                m.RecalculateNormals();
                 m.RecalculateBounds();
                 return m;
             }
@@ -310,7 +401,8 @@ namespace Deadline4Sec
         private Mesh BuildPillarMesh()
         {
             MeshBuilder b = new MeshBuilder();
-            b.Box(new Vector3(-0.75f, -6f, -0.75f), new Vector3(0.75f, 0.6f, 0.75f), StoneLight);
+            // The base reaches down into the cloud sea: no floating bottom.
+            b.Box(new Vector3(-0.75f, -12f, -0.75f), new Vector3(0.75f, 0.6f, 0.75f), StoneLight);
             b.Box(new Vector3(-0.45f, 0.6f, -0.45f), new Vector3(0.45f, 7.5f, 0.45f), Stone);
             b.Box(new Vector3(-0.65f, 7.5f, -0.65f), new Vector3(0.65f, 8.0f, 0.65f), StoneLight);
             b.Pyramid(new Vector3(0f, 8f, 0f), 0.55f, 3.2f, Stone);
@@ -406,6 +498,20 @@ namespace Deadline4Sec
             }
             b.Quad(new Vector3(-0.4f, 20f, -9.05f), new Vector3(-0.4f, 54f, -9.05f),
                 new Vector3(0.6f, 54f, -9.05f), new Vector3(0.6f, 20f, -9.05f), Glow);
+            // Visual upgrade: a neon halo around the dial, lit lancets up the side
+            // towers and a beacon on the spire: the railway's one landmark reads
+            // from far away.
+            b.Ring(face + new Vector3(0, 0, 0.05f), 12.4f, 13.6f, 48, Glow);
+            b.Ring(face + new Vector3(0, 0, 0.1f), 13.6f, 15.2f, 48, new Color(0.35f, 0.05f, 0.22f, 1f));
+            for (int s = -1; s <= 1; s += 2)
+                for (int i = 0; i < 4; i++)
+                {
+                    float y0 = 20f + i * 17f;
+                    b.Quad(new Vector3(s * 9f - 0.7f, y0, -2.55f), new Vector3(s * 9f - 0.7f, y0 + 9f, -2.55f),
+                        new Vector3(s * 9f + 0.7f, y0 + 9f, -2.55f), new Vector3(s * 9f + 0.7f, y0, -2.55f),
+                        i % 2 == 0 ? Glow : new Color(0.55f, 0.1f, 0.35f, 1f));
+                }
+            b.Box(new Vector3(-0.7f, 116f, -0.7f), new Vector3(0.7f, 119f, 0.7f), Glow);
             return b.Build("ClockTower");
         }
 

@@ -31,6 +31,9 @@ namespace Deadline4Sec
         private AreaDefinition pendingArea;
         private bool awaitingExit;
         private AreaLook fromLook, toLook;
+        // Visual upgrade (2026-11-15): blended with the look, same timing.
+        private AreaVisualProfile fromVisuals, toVisuals;
+        private readonly AreaVisualProfile blendedVisuals = new AreaVisualProfile();
         private float lookBlend = 1f;
         private int targetPatterns;
         private int patternsSinceSpecial;
@@ -69,6 +72,13 @@ namespace Deadline4Sec
                     sun = light;
             CurrentArea = areas.areas[0];
             EnterSpawnArea(CurrentArea);
+            // The first area's whole look straight away (the scene is set up as
+            // the railway; the atmosphere starts from its defaults).
+            fromLook = toLook = CurrentArea.look;
+            fromVisuals = toVisuals = CurrentArea.visuals;
+            lookBlend = 0f;
+            if (environment != null)
+                environment.ApplyVisuals(CurrentArea.look.haze, CurrentArea.visuals);
         }
 
         private void EnterSpawnArea(AreaDefinition area)
@@ -113,7 +123,7 @@ namespace Deadline4Sec
             pendingSection = section;
             pendingArea = next;
             if (environment != null)
-                environment.PrepareArea(next.areaId, next.look.haze);
+                environment.PrepareArea(next.areaId, next.look.haze, next.visuals);
             EnterSpawnArea(next);
             if (section == null)
                 SwitchWorld();
@@ -156,6 +166,8 @@ namespace Deadline4Sec
                 Debug.Log($"Current Area: {CurrentArea.areaId} -> {pendingArea.areaId}");
             fromLook = CurrentArea.look;
             toLook = pendingArea.look;
+            fromVisuals = CurrentArea.visuals;
+            toVisuals = pendingArea.visuals;
             CurrentArea = pendingArea;
             pendingArea = null;
             awaitingExit = pendingSection != null;
@@ -177,6 +189,8 @@ namespace Deadline4Sec
             RenderSettings.ambientGroundColor = Color.Lerp(fromLook.ambientGround, toLook.ambientGround, t);
             if (sun != null)
                 sun.color = Color.Lerp(fromLook.sun, toLook.sun, t);
+            if (environment != null && environment.Atmosphere != null && fromVisuals != null && toVisuals != null)
+                environment.Atmosphere.Apply(AreaVisualProfile.Lerp(fromVisuals, toVisuals, t, blendedVisuals));
             // A runtime copy: changing the sky asset itself would stick in the editor.
             if (skyInstance == null && RenderSettings.skybox != null)
             {

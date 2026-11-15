@@ -49,7 +49,7 @@ namespace Deadline4Sec
                 building.Spires.Add(s);
             }
 
-            building.Landmark = Spawn("CathedralFacade", BuildCathedralFacadeMesh());
+            building.Landmark = Spawn("CathedralFacade", BuildCathedralFacadeMesh(), building.LandmarkMaterial);
             building.LandmarkOffset = new Vector3(-14f, -10f, 240f);
             building.CloudSea = Spawn("CloudSea", BuildCloudSeaMesh(new Color(0.27f, 0.1f, 0.17f, 0f)));
         }
@@ -89,7 +89,7 @@ namespace Deadline4Sec
         private static Mesh BuildBrokenColumnMesh(float height, bool glass)
         {
             MeshBuilder b = new MeshBuilder();
-            b.Box(new Vector3(-1f, -6f, -1f), new Vector3(1f, 0.8f, 1f), CathedralLight);
+            b.Box(new Vector3(-1f, -12f, -1f), new Vector3(1f, 0.8f, 1f), CathedralLight);
             b.Box(new Vector3(-0.72f, 0.8f, -0.72f), new Vector3(0.72f, height, 0.72f), CathedralStone);
             // The break: uneven stumps on top, a fallen block leaning at the base.
             b.Box(new Vector3(-0.72f, height, -0.72f), new Vector3(0.05f, height + 1.3f, 0.3f), CathedralStone);
@@ -180,6 +180,22 @@ namespace Deadline4Sec
             }
 
             RoseWindow(b, new Vector3(0f, 42f, front - 0.05f), 15f, CathedralLight);
+            // Visual upgrade: red dusk burning behind the cathedral (stepped
+            // rings as a halo), and red light leaking through the broken tower.
+            Vector3 halo = new Vector3(0f, 58f, 14f);
+            for (int i = 0; i < 7; i++)
+            {
+                float k = 1f - i / 7f;
+                b.Ring(halo + new Vector3(0f, 0f, i * 0.2f), 30f + i * 4.5f, 34.5f + i * 4.5f, 56,
+                    Color.Lerp(new Color(0.17f, 0.055f, 0.07f, 1f), new Color(0.5f, 0.06f, 0.07f, 1f), k * k)); // fades into the dusk sky
+            }
+            for (int i = 0; i < 4; i++)
+            {
+                float y0 = 30f + i * 11f, x0 = 26f + (i % 2) * 6f;
+                b.Quad(new Vector3(x0, y0, -9.06f), new Vector3(x0 + 2.2f, y0 + 6f, -9.06f),
+                    new Vector3(x0 + 2.8f, y0 + 5.6f, -9.06f), new Vector3(x0 + 0.6f, y0 - 0.4f, -9.06f),
+                    new Color(0.85f, 0.08f, 0.06f, 1f));
+            }
             for (int i = 0; i < 5; i++)
                 Lancet(b, -14f + i * 7f, 5f, front - 0.05f, 3f, 13f, i);
             foreach (float x in new[] { -32f, 32f })
@@ -238,21 +254,21 @@ namespace Deadline4Sec
             }
 
             // The great clock on the horizon: meshing wheels in a frame, one dial.
-            Transform core = Spawn("ClockworkCore", BuildClockworkFrameMesh());
+            Transform core = Spawn("ClockworkCore", BuildClockworkFrameMesh(), building.LandmarkMaterial);
             building.Landmark = core;
             building.LandmarkOffset = new Vector3(6f, 22f, 250f);
-            AddGear(core, BuildGearMesh(36f, 28, Brass, BrassDark), new Vector3(0f, 34f, -2f), 8f);
-            AddGear(core, BuildGearMesh(20f, 16, BrassLight, BrassDark), new Vector3(50f, 58f, -1f), -14f);
-            AddGear(core, BuildGearMesh(16f, 13, BrassLight, BrassDark), new Vector3(-46f, 14f, -1f), -17.2f);
-            Transform dial = Spawn("ClockworkDial", BuildDialMesh());
+            AddGear(core, BuildGearMesh(36f, 28, Brass, BrassDark), new Vector3(0f, 34f, -2f), 8f, building.LandmarkMaterial);
+            AddGear(core, BuildGearMesh(20f, 16, BrassLight, BrassDark), new Vector3(50f, 58f, -1f), -14f, building.LandmarkMaterial);
+            AddGear(core, BuildGearMesh(16f, 13, BrassLight, BrassDark), new Vector3(-46f, 14f, -1f), -17.2f, building.LandmarkMaterial);
+            Transform dial = Spawn("ClockworkDial", BuildDialMesh(), building.LandmarkMaterial);
             dial.SetParent(core, false);
             dial.localPosition = new Vector3(0f, 34f, -3f);
             building.CloudSea = Spawn("CloudSea", BuildCloudSeaMesh(new Color(0.1f, 0.055f, 0.03f, 0f)));
         }
 
-        private void AddGear(Transform parent, Mesh mesh, Vector3 localPosition, float speed)
+        private void AddGear(Transform parent, Mesh mesh, Vector3 localPosition, float speed, Material material = null)
         {
-            Transform gear = Spawn("Gear", mesh);
+            Transform gear = Spawn("Gear", mesh, material);
             gear.SetParent(parent, false);
             gear.localPosition = localPosition;
             building.Spinners.Add(new Spinner { Part = gear, Speed = speed });
@@ -285,7 +301,7 @@ namespace Deadline4Sec
         private static Mesh BuildGirderMesh()
         {
             MeshBuilder b = new MeshBuilder();
-            b.Box(new Vector3(-0.9f, -6f, -0.9f), new Vector3(0.9f, 0.5f, 0.9f), BrassDark);
+            b.Box(new Vector3(-0.9f, -12f, -0.9f), new Vector3(0.9f, 0.5f, 0.9f), BrassDark);
             foreach (float x in new[] { -0.45f, 0.45f })
                 b.Box(new Vector3(x - 0.14f, 0.5f, -0.14f), new Vector3(x + 0.14f, 10f, 0.14f), Brass);
             for (float y = 1.2f; y < 9.6f; y += 1.5f)
@@ -340,6 +356,10 @@ namespace Deadline4Sec
             MeshBuilder b = new MeshBuilder();
             b.Ring(Vector3.zero, 0f, 15f, 40, BrassDark);
             b.Ring(new Vector3(0f, 0f, -0.05f), 14f, 15f, 40, Amber);
+            // Visual upgrade: the furnace behind the dial, glowing through.
+            b.Ring(new Vector3(0f, 0f, -0.03f), 0f, 4f, 24, new Color(1f, 0.55f, 0.08f, 1f));
+            b.Ring(new Vector3(0f, 0f, -0.03f), 4f, 7f, 24, new Color(0.6f, 0.25f, 0.02f, 1f));
+            b.Ring(new Vector3(0f, 0f, 0.3f), 15f, 19f, 40, new Color(0.45f, 0.2f, 0.02f, 1f));
             for (int i = 0; i < 12; i++)
             {
                 float a = i * Mathf.PI / 6f;

@@ -11,7 +11,8 @@ Material:
   m_Shader: {fileID: 4800000, guid: 7fd199bb690eb47438a1ceadd171a91f, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
-  m_ValidKeywords: []
+  m_ValidKeywords:
+  - _PATTERN_CLOCKWORK
   m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -98,6 +99,7 @@ Material:
     - _DstBlendAlpha: 0
     - _EdgeGlow: 0.12
     - _EnvironmentReflections: 1
+    - _FlowSpeed: 0.8
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
@@ -106,6 +108,8 @@ Material:
     - _Metallic: 0.088
     - _OcclusionStrength: 1
     - _Parallax: 0.005
+    - _Pattern: 2
+    - _PatternStrength: 0.7
     - _QueueOffset: 0
     - _RailGauge: 0.55
     - _RailWidth: 0.07
@@ -121,10 +125,12 @@ Material:
     - _XRMotionVectorsPass: 1
     - _ZWrite: 1
     m_Colors:
+    - _Ambient: {r: 0.4, g: 0.32, b: 0.22, a: 1}
     - _BaseColor: {r: 0.11, g: 0.085, b: 0.06, a: 1}
     - _Color: {r: 0.5924529, g: 0.57064456, b: 0.5399146, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _GlowColor: {r: 1, g: 0.6, b: 0.1, a: 1}
+    - _PatternColor: {r: 1, g: 0.62, b: 0.15, a: 1}
     - _RailColor: {r: 0.78, g: 0.6, b: 0.28, a: 1}
     - _SleeperColor: {r: 0.07, g: 0.055, b: 0.04, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}

@@ -12,7 +12,8 @@ Material:
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
-  m_InvalidKeywords: []
+  m_InvalidKeywords:
+  - _PATTERN_RAILWAY
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -98,6 +99,7 @@ Material:
     - _DstBlendAlpha: 0
     - _EdgeGlow: 0.12
     - _EnvironmentReflections: 1
+    - _FlowSpeed: 0.9
     - _GlossMapScale: 0
     - _Glossiness: 0
     - _GlossyReflections: 0
@@ -106,6 +108,8 @@ Material:
     - _Metallic: 0.088
     - _OcclusionStrength: 1
     - _Parallax: 0.005
+    - _Pattern: 0
+    - _PatternStrength: 0.6
     - _QueueOffset: 0
     - _RailGauge: 0.55
     - _RailWidth: 0.07
@@ -121,10 +125,12 @@ Material:
     - _XRMotionVectorsPass: 1
     - _ZWrite: 1
     m_Colors:
+    - _Ambient: {r: 0.35, g: 0.28, b: 0.45, a: 1}
     - _BaseColor: {r: 0.13, g: 0.1, b: 0.17, a: 1}
     - _Color: {r: 0.5924529, g: 0.57064456, b: 0.5399146, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _GlowColor: {r: 1, g: 0.16, b: 0.5, a: 1}
+    - _PatternColor: {r: 0.7, g: 0.25, b: 1, a: 1}
     - _RailColor: {r: 0.75, g: 0.7, b: 0.85, a: 1}
     - _SleeperColor: {r: 0.09, g: 0.06, b: 0.1, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
