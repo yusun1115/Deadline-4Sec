@@ -37,6 +37,9 @@ namespace Deadline4Sec
         private GameObject revivePanel, nicknamePanel, rankingPanel, adminPanel, confirmPanel, noticePanel;
         private TMP_Text reviveCountdown, nicknameScore, nicknameError, autoFinishLabel, yourRankLabel, adminInfo, confirmQuestion;
         private System.Action confirmAction;
+        // Ranking screen buttons: RETRY / FINISH for a visitor's session, CLOSE
+        // when it is only being looked at from the title's LEADERBOARD.
+        private GameObject retryButton, finishButton, closeViewButton;
         private TMP_InputField nicknameInput;
         private readonly List<TMP_Text[]> rows = new List<TMP_Text[]>();
         private readonly List<Image> rowBacks = new List<Image>();
@@ -49,6 +52,7 @@ namespace Deadline4Sec
         public float AutoFinishRemaining => float.IsPositiveInfinity(autoFinishAt) ? -1f : Mathf.Max(0f, autoFinishAt - Time.unscaledTime);
         public string NicknameError => nicknameError != null ? nicknameError.text : "";
         public bool AdminOpen => adminPanel != null && adminPanel.activeSelf;
+        public bool RankingViewOpen => rankingPanel != null && rankingPanel.activeSelf && closeViewButton != null && closeViewButton.activeSelf;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Attach()
@@ -230,7 +234,47 @@ namespace Deadline4Sec
             HideAll();
             Current = Flow.Ranking;
             rankingPanel.SetActive(true);
+            SetRankingButtons(false);
             autoFinishAt = Time.unscaledTime + ExhibitionMode.Settings.autoFinishIdleSeconds;
+            FillRanking();
+        }
+
+        // From the title's LEADERBOARD (2026-11-15): the same board, just to look
+        // at — no session buttons, no automatic FINISH, a CLOSE back.
+        public void ShowRankingView()
+        {
+            if (rankingPanel == null || Current != Flow.WaitingForPlayer)
+                return;
+            rankingPanel.SetActive(true);
+            SetRankingButtons(true);
+            autoFinishAt = float.PositiveInfinity;
+            if (autoFinishLabel != null)
+                autoFinishLabel.text = "";
+            pendingScore = 0;
+            ExhibitionLeaderboardService.Reload(); // the file is the truth (another app may have written it)
+            FillRanking();
+        }
+
+        public void CloseRankingView()
+        {
+            if (!RankingViewOpen)
+                return;
+            rankingPanel.SetActive(false);
+            SetRankingButtons(false);
+        }
+
+        private void SetRankingButtons(bool viewOnly)
+        {
+            if (retryButton != null)
+                retryButton.SetActive(!viewOnly);
+            if (finishButton != null)
+                finishButton.SetActive(!viewOnly);
+            if (closeViewButton != null)
+                closeViewButton.SetActive(viewOnly);
+        }
+
+        private void FillRanking()
+        {
             IReadOnlyList<ExhibitionScoreEntry> entries = ExhibitionLeaderboardService.Entries;
             string you = ExhibitionSession.CurrentNickname;
             for (int i = 0; i < rows.Count; i++)
@@ -505,8 +549,10 @@ namespace Deadline4Sec
                 rows.Add(new[] { rank, name, score });
             }
             yourRankLabel = Label(card, "", new Vector2(0f, -250f), new Vector2(660f, 50f), 28f, Gold);
-            MakeButton(card, "RETRY", "같은 이름으로 다시 도전 · 순위를 더 올려보세요!", new Vector2(0f, -350f), new Vector2(620f, 120f), Pink, RetryAsSameVisitor);
-            MakeButton(card, "FINISH", "다음 관람객에게 넘기기", new Vector2(0f, -480f), new Vector2(620f, 100f), ButtonColor, FinishSession);
+            retryButton = MakeButton(card, "RETRY", "같은 이름으로 다시 도전 · 순위를 더 올려보세요!", new Vector2(0f, -350f), new Vector2(620f, 120f), Pink, RetryAsSameVisitor);
+            finishButton = MakeButton(card, "FINISH", "다음 관람객에게 넘기기", new Vector2(0f, -480f), new Vector2(620f, 100f), ButtonColor, FinishSession);
+            closeViewButton = MakeButton(card, "CLOSE", null, new Vector2(0f, -415f), new Vector2(460f, 100f), ButtonColor, CloseRankingView);
+            closeViewButton.SetActive(false);
             autoFinishLabel = Label(rankingPanel.transform, "", new Vector2(0f, 0f), new Vector2(760f, 40f), 22f, new Color(1f, 1f, 1f, 0.7f));
             RectTransform auto = autoFinishLabel.rectTransform;
             auto.anchorMin = auto.anchorMax = new Vector2(0.5f, 0f);
@@ -575,7 +621,7 @@ namespace Deadline4Sec
             return label;
         }
 
-        private static void MakeButton(Transform parent, string title, string subtitle, Vector2 position, Vector2 size, Color color,
+        private static GameObject MakeButton(Transform parent, string title, string subtitle, Vector2 position, Vector2 size, Color color,
             UnityEngine.Events.UnityAction onClick)
         {
             RectTransform rect = Box(parent, title + "Button", position, size, color);
@@ -590,6 +636,7 @@ namespace Deadline4Sec
             if (two)
                 Label(rect, subtitle, new Vector2(0f, -size.y * 0.25f), new Vector2(size.x - 30f, size.y * 0.3f), 22f,
                     new Color(1f, 1f, 1f, 0.85f));
+            return rect.gameObject;
         }
 
         private static TMP_InputField InputField(Transform parent, Vector2 position, Vector2 size)

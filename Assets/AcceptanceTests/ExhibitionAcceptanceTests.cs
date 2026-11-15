@@ -325,6 +325,42 @@ namespace Deadline4Sec.AcceptanceTests
             yield return new ExitPlayMode();
         }
 
+        // Title LEADERBOARD (2026-11-15): an EXHIBITION button under the Google
+        // Play ones opens the local board to look at, and closes again.
+        [UnityTest]
+        public IEnumerator TheLeaderboardChooserOpensTheExhibitionRanking()
+        {
+            EditorSceneManager.OpenScene("Assets/Scenes/EndlessRun.unity");
+            yield return new EnterPlayMode();
+            S(Mode, "OverrideForTests", true);
+            S(Service, "UseFolderForTests", folder);
+            S(Session, "ResetExhibitionSession");
+            T("ExhibitionUI").GetMethod("OnSceneLoaded", BindingFlags.NonPublic | BindingFlags.Static)
+                .Invoke(null, new object[] { default(UnityEngine.SceneManagement.Scene), default(UnityEngine.SceneManagement.LoadSceneMode) });
+            yield return Until(() => Flow() == "WaitingForPlayer", "the title");
+            S(Service, "Register", "NUNI", 1234);
+            Component panel = (Component)UnityEngine.Object.FindFirstObjectByType(T("LeaderboardPanel"), FindObjectsInactive.Include);
+            Call(panel, "Open");
+            Transform button = panel.transform.Find("Dialog/ExhibitionButton");
+            Assert.IsNotNull(button, "The EXHIBITION button.");
+            Assert.IsNotNull(panel.transform.Find("Dialog/DeadlineButton"));
+            Assert.IsNotNull(panel.transform.Find("Dialog/ClassicButton"));
+            var click = button.GetComponent<UnityEngine.UI.Button>();
+            Assert.AreEqual(0, click.onClick.GetPersistentEventCount(), "Not the copied Classic (Google Play) action.");
+            click.onClick.Invoke();
+            Assert.IsTrue((bool)Read(Ui(), "RankingViewOpen"));
+            Assert.AreEqual("WaitingForPlayer", Flow(), "Only a look: no visitor session starts.");
+            Assert.Less((float)Read(Ui(), "AutoFinishRemaining"), 0f, "No automatic FINISH while looking.");
+            Assert.IsNull(GameObject.Find("RETRYButton"));
+            Call(Ui(), "CloseRankingView");
+            Assert.IsFalse((bool)Read(Ui(), "RankingViewOpen"));
+            Call(panel, "Close");
+            Call(panel, "Open");
+            Assert.AreEqual(1, panel.transform.Find("Dialog").Cast<Transform>().Count(t => t.name == "ExhibitionButton"),
+                "Opening again doesn't add another.");
+            yield return new ExitPlayMode();
+        }
+
         // Off: none of it exists, the game is as before.
         [UnityTest]
         public IEnumerator WithTheModeOffNothingChanges()

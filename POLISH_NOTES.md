@@ -248,6 +248,7 @@
 - **데이터**: 랭킹은 `persistentDataPath/exhibition_ranking.json`(+ `_backup`), 닉네임당 한 줄·최고점, 동점은 먼저 등록한 사람, 100명 보관. 관람객 세션(`ExhibitionSession`)은 메모리에만 있어 앱 재시작은 항상 새 관람객. FINISH는 세션만 지움.
 - **원래 게임 그대로(2026-11-13 요청)**: 업그레이드 레벨, 소모 아이템, Soul·선물 상자, 무기 스킨은 일반 게임과 같음(공정성 처리 안 함). Google Play 점수 제출만 전시에서 건너뜀.
 - **관리자**: 언제든 `Ctrl + Shift + Delete` → 관리자 창. 1 스킨 재화 4종 +50, 2 Soul +10,000, 3 전시 랭킹 초기화, 4 전체 데이터 초기화(PlayerPrefs 전부 + 전시 랭킹, 씬 다시 시작). 3·4는 확인 창(Y/N), Esc 닫기. 에디터 메뉴 `Clear Exhibition Ranking...`(이 PC의 파일).
+- **타이틀 LEADERBOARD(2026-11-15)**: 전시 모드일 때만 DEADLINE / CLASSIC(Google Play, 그대로) 아래에 EXHIBITION 버튼이 런타임에 추가됨(씬은 안 바꿈, 창 높이만 늘어남). 누르면 전시 랭킹 TOP 10을 보기 전용으로 띄움(RETRY/FINISH 대신 CLOSE, 자동 종료 없음, 관람객 세션 시작 안 함).
 - 테스트: `ExhibitionAcceptanceTests`(저장·최고점·동점·100명·손상 파일·닉네임 검증·초기화, 관람객 A→재도전→자동 종료→다음 관람객 실제 씬 흐름, 꺼짐 상태).
 
 ## 런 초반 도움말 (2026-11-11, 플레이 테스트 피드백)
