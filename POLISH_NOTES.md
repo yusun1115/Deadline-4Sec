@@ -229,6 +229,7 @@
 ## Near Miss 판정 / Ground Slam 착지 (2026-11-01)
 
 - **Near Miss = 마지막 순간 회피**: 기존 조건(장애물 주변 near 구역을 몸 전체가 지나가고 닿지 않음)에 더해, 장애물 앞 `lastMomentDistance`(기본 2.6m) 안에서 장애물과 정면으로 겹치는(좌우·높이) 충돌 코스에 있었어야 함(`Obstacle.HeadingInto`). 옆 레인으로 그냥 지나가거나(예: 전철 옆 레인 통과) 미리 피하면 Near Miss가 아님. 테스트 `ClosePassAwardsOneNearMiss`(막판 회피 = 인정), `StraightClosePassIsNotANearMiss`(옆 통과 = 불인정).
+- **Slide Obstacle 직전 슬라이드 Near Miss(2026-11-22)**: 직전에 슬라이드로 빠져나가도 발동하지 않던 문제. 원인 2가지 — ① 슬라이드는 누르는 순간 판정 높이가 2m→약 0.5m로 줄어 빔(1.3m 위) 아래로 내려가므로, 장애물 2.6m 안에서 "서서 부딪힐 코스"였던 순간이 거의 없음(최고 속도 0.16초). ② 낮게 미끄러지는 판정이 빔 아래 Near 구역(빔 하단 −0.65m)보다 더 아래를 지나감. 수정: Slide 장애물만 "부딪힐 코스" 거리 `slideLastMomentDistance`(5m, 프리팹에 저장), Near 구역은 빔 아래 바닥까지. 5m보다 일찍 미끄러지면 여전히 Near Miss 아님. 테스트 `SlideNearMissAcceptanceTests`(실제 씬: 1.5m·4m 직전 슬라이드 = Near Miss, 9m = 아님).
 - **Ground Slam 반동 제거**: 충격파 판정 후 튀어 오르지 않고 바로 착지해 계속 달림(`groundSlamBouncePower` 삭제, 씬에 남은 값은 무시됨). 공중 콤보 상태도 해제.
 
 ## 장애물 패턴 재작업 (2026-11-21, Obstacle Pattern Rework.md)
@@ -257,6 +258,7 @@
 - **스킨 교체**: 이전 스킨 무기는 즉시 비활성화 후 삭제(파티클 포함), 기본 낫용 `Skin Idle VFX`는 Stop+Clear 후 삭제, 트레일은 손 노드에 하나만 두고 Clear 후 새 끝점·재질로 재설정. 공격 중 교체 시 진행 중인 참격은 자기 색으로 끝나고 다음 공격부터 새 스킨.
 - **앵커**: 스킨 프리팹에 `VFX_IdleAnchor`(날 중심), `VFX_BladeEnd`(트레일 끝) 추가(메뉴 `Skins/Add Weapon VFX Anchors`, `Apply Weapon Skins`도 추가함). 기본 낫은 메시에서 계산.
 - **스킨별**: NEON 핑크 에너지 불꽃이 날을 따라 흐름 / 넓은 초승달 + 부드러운 핑크 트레일. STARLIGHT 4각 별 반짝임 상승 / 가는 금빛 아크 + 경로에 남는 별 + 끝 별 버스트, 별 무늬 트레일. FROST BITE 눈송이 결정 낙하·냉기·얼음 글린트 / 톱니 얼음 아크 + 얼음 파편 + 냉기, 깨진 가장자리 트레일. BLOOD MOON 붉은 방울 낙하·붉은 펄스 링·어두운 아우라 / 두껍고 짧은 대각 아크(어두운 코어, 1.9배 길게) + 붉은 잔상 + 떨어지는 파편, 두꺼운 트레일. CYBER DEATH 0/1 숫자 낙하·깜빡이는 픽셀·스캔라인 / 끊어진 계단식 분절 아크 + 글리치 사본 + 픽셀·0/1 잔류, 분절 스캔라인 트레일. ECLIPSE 어두운 구체·빨려 드는 연기·보라 입자 / 넓은 어두운 아크 + 보라 테두리 + 공간 균열(0.4초) + 중심으로 빨려 드는 조각, 테두리만 밝은 트레일.
+- **왼쪽 공격 참격 방향 수정(2026-11-22)**: 왼쪽 레인 공격 참격이 오른쪽으로 나가던 문제. `CombatParticles`가 왼쪽 참격을 195° 회전하고 메시도 좌우 반전(scale x)해서 두 번 뒤집혀 오른쪽을 향했음(원래 Neon부터, Blood Moon·Eclipse의 크고 비대칭인 아크에서 눈에 띔). 이제 좌우 반전 + 반대 기울기(±15°)로 정확한 좌우 대칭. Cyber 글리치 사본 오프셋도 반전. 테스트 `SwingsGoToTheSideOfTheAttack`(Neon·Blood Moon·Eclipse 좌/우).
 - **에셋 없음**: 모양(별·결정·파편·0/1·픽셀·방울·연기·링·트레일 6종)은 `WeaponVfxSprites`가 코드로 그린 텍스처, 셰이더 `Resources/Feedback/FxSprite`(가산/알파). 재질은 모양당 1개 캐시, 참격 재질 2개 — 공격마다 재질·오브젝트 생성 없음(참격 8개 풀, 모양별 파티클 시스템 최초 사용 시 1회 생성).
 - **성능**: Idle 레이어당 최대 30개(스킨당 2~4레이어), 공격 1회 파티클 10~25개, 트레일 끝 파편 초당 28개(트레일 켜진 동안만). TMP·화면 왜곡 없음.
 - 테스트: `WeaponSkinVfxAcceptanceTests`(스킨별 스타일·색·앵커, Neon→Cyber→Frost→Eclipse→Starlight→Blood→Neon 교체 시 Idle 1개·잔여 이펙트 없음·트레일 1개·Swing/Hit 스타일, 실제 레인 공격·처치·호밍 처치가 장착 스킨 사용, 씬 재로드 후 복구). 전체 회귀 152개 중 151 통과, 1 건너뜀, 실패 0. 스킨별 캡처는 `.utmp/skin{0-5}-idle.png`, `skin{0-5}-swing.png`.

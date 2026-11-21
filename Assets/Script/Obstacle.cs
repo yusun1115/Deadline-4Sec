@@ -46,6 +46,13 @@ namespace Deadline4Sec
         // Just running past in another lane, or dodging early, never counts.
         [Tooltip("How close (m, runner front to obstacle front) the runner must still be on a collision course.")]
         [SerializeField, Min(0f)] private float lastMomentDistance = 2.6f;
+        // Slide Obstacle (2026-11-22): a slide drops the runner under the beam
+        // the moment it starts, and it has to start before the beam arrives —
+        // within lastMomentDistance the runner was almost never still standing,
+        // so a last-moment slide earned nothing. For a slide beam, still
+        // standing in its lane this close counts as heading into it.
+        [Tooltip("Slide Obstacle only: how close (m) the runner may still be standing in line with the beam, then slide under it, for a Near Miss.")]
+        [SerializeField, Min(0f)] private float slideLastMomentDistance = 5f;
 
         private BoxCollider hazard;
         private CharacterController playerCollider;
@@ -148,7 +155,9 @@ namespace Deadline4Sec
         private bool HeadingInto(Bounds player, Bounds obstacleBounds)
         {
             float gap = obstacleBounds.min.z - player.max.z;
-            return gap <= lastMomentDistance && player.min.z <= obstacleBounds.min.z &&
+            float window = obstacleType == ObstacleType.SlideObstacle
+                ? Mathf.Max(lastMomentDistance, slideLastMomentDistance) : lastMomentDistance;
+            return gap <= window && player.min.z <= obstacleBounds.min.z &&
                 player.min.x < obstacleBounds.max.x && player.max.x > obstacleBounds.min.x &&
                 player.min.y < obstacleBounds.max.y && player.max.y > obstacleBounds.min.y;
         }
@@ -172,7 +181,10 @@ namespace Deadline4Sec
                        obstacleBounds.max.x + nearMissMargin.x + playerExtents.x,
                        ref enter, ref exit) &&
                    ClipAxis(start.y, movement.y,
-                       obstacleBounds.min.y - nearMissMargin.y - playerExtents.y,
+                       // Under a slide beam is close whatever the slide's height
+                       // (a low slide passed below the margin, 2026-11-22).
+                       obstacleBounds.min.y - nearMissMargin.y - playerExtents.y -
+                           (obstacleType == ObstacleType.SlideObstacle ? obstacleBounds.min.y + 1f : 0f),
                        obstacleBounds.max.y + nearMissMargin.y + playerExtents.y,
                        ref enter, ref exit);
         }

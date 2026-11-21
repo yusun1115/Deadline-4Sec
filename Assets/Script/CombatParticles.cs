@@ -262,8 +262,12 @@ namespace Deadline4Sec
                 {
                     float side = action == PlayerController.PlayerAction.Right ? 1f : -1f;
                     Vector3 chest = player.transform.position + new Vector3(side * 1.1f, 0.25f, 0.9f);
+                    // The left swing is the mirror image of the right one: the
+                    // slash is mirrored (scale x) and tilted the other way. It
+                    // used to be turned 195° as well, which flipped it back to
+                    // the right (2026-11-22).
                     Quaternion rot = Quaternion.LookRotation(Vector3.forward, Vector3.up) *
-                        Quaternion.Euler(0f, 0f, side > 0 ? -15f : 195f);
+                        Quaternion.Euler(0f, 0f, side > 0 ? -15f : 15f);
                     // The equipped skin's swing (never the default pink one by itself).
                     if (Weapon != null)
                         Weapon.PlaySwing(chest, rot, side < 0);

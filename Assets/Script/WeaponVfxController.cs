@@ -288,7 +288,7 @@ namespace Deadline4Sec
                 case WeaponSkinFx.Effect.CyberDeath:
                     // Digital: a segmented arc, a glitch copy a beat later, pixels and 0/1 left behind.
                     PlaySlash(DigitalArc, false, position, rotation, scale, a, duration, mirror, tail: 0.5f);
-                    PlaySlash(DigitalArc, false, position + rotation * new Vector3(0.08f, -0.05f, 0f), rotation * Quaternion.Euler(0f, 0f, mirror ? -7f : 7f),
+                    PlaySlash(DigitalArc, false, position + rotation * new Vector3(mirror ? -0.08f : 0.08f, -0.05f, 0f), rotation * Quaternion.Euler(0f, 0f, mirror ? -7f : 7f),
                         scale * 0.93f, b, duration * 0.9f, mirror, tail: 0.35f, delay: 0.04f);
                     Along(position, rotation, scale, mirror, 165f, 1.25f, 10, WeaponVfxSprites.Shape.Pixel, false, 2.5f, new Vector2(0.05f, 0.09f), new Vector2(0.18f, 0.3f), a, Color.white);
                     Along(position, rotation, scale, mirror, 165f, 1.0f, 3, WeaponVfxSprites.Shape.Zero, false, 0.4f, new Vector2(0.1f, 0.14f), new Vector2(0.28f, 0.4f), a, b, drift: Vector3.down * 0.8f);

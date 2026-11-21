@@ -52,6 +52,67 @@ namespace Deadline4Sec.AcceptanceTests
             }
         }
 
+        // A left lane attack swings to the left, a right one to the right
+        // (2026-11-22: the left swing was turned 195° and mirrored, which put
+        // it back on the right — obvious with the heavy BLOOD MOON / ECLIPSE arcs).
+        [UnityTest]
+        public IEnumerator SwingsGoToTheSideOfTheAttack()
+        {
+            EditorSceneManager.OpenScene("Assets/Scenes/EndlessRun.unity");
+            yield return new EnterPlayMode();
+            yield return null;
+            int saved = PlayerPrefs.GetInt("EquippedWeaponSkin", 0);
+            int tutorial = PlayerPrefs.GetInt("Deadline4Sec.TutorialCompleted", -1);
+            try
+            {
+                PlayerPrefs.SetInt("Deadline4Sec.TutorialCompleted", 1);
+                Component inventory = Get("RunInventory");
+                MethodInfo apply = inventory.GetType().GetMethod("ApplySkinVisual", Hidden);
+                Component flow = Get("GameFlowManager");
+                flow.GetType().GetMethod("StartGame").Invoke(flow, null);
+                float giveUp = Time.realtimeSinceStartup + 10f;
+                while (Read(flow, "State").ToString() != "Playing" && Time.realtimeSinceStartup < giveUp)
+                    yield return null;
+                Component player = Get("PlayerController");
+                Component particles = Get("CombatParticles");
+                Component vfx = Get("WeaponVfxController");
+                MethodInfo act = particles.GetType().GetMethod("OnPlayerAction", Hidden);
+                Type action = T("PlayerController").GetNestedType("PlayerAction");
+                foreach (int skin in new[] { 0, 3, 5 })
+                {
+                    PlayerPrefs.SetInt("EquippedWeaponSkin", skin);
+                    apply.Invoke(inventory, null);
+                    foreach (string side in new[] { "Left", "Right" })
+                    {
+                        vfx.GetType().GetMethod("ClearEffects").Invoke(vfx, null);
+                        float x = player.transform.position.x;
+                        act.Invoke(particles, new[] { Enum.Parse(action, side) });
+                        var shown = UnityEngine.Object.FindObjectsByType<MeshRenderer>(FindObjectsSortMode.None)
+                            .Where(r => r.enabled && r.name.StartsWith("Weapon Slash")).ToList();
+                        Assert.Greater(shown.Count, 0, Styles[skin] + " " + side + ": a slash shows.");
+                        foreach (MeshRenderer slash in shown)
+                        {
+                            float centre = slash.bounds.center.x - x;
+                            if (side == "Left")
+                                Assert.Less(centre, -0.8f, $"{Styles[skin]}: the left swing goes left ({slash.name} at {centre:F2}).");
+                            else
+                                Assert.Greater(centre, 0.8f, $"{Styles[skin]}: the right swing goes right ({slash.name} at {centre:F2}).");
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                PlayerPrefs.SetInt("EquippedWeaponSkin", saved);
+                if (tutorial < 0)
+                    PlayerPrefs.DeleteKey("Deadline4Sec.TutorialCompleted");
+                else
+                    PlayerPrefs.SetInt("Deadline4Sec.TutorialCompleted", tutorial);
+                PlayerPrefs.Save();
+            }
+            yield return new ExitPlayMode();
+        }
+
         [UnityTest]
         public IEnumerator EffectsFollowTheEquippedSkinAndLeaveNothingBehind()
         {
