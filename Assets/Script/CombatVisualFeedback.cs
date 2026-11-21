@@ -76,15 +76,18 @@ namespace Deadline4Sec
 
         public void PlayKill(Vector3 point, bool stomp, bool homing)
         {
-            Color color = stomp ? new Color(1f, 0.65f, 0.12f) :
-                homing ? new Color(0.5f, 0.9f, 1f) : new Color(1f, 0.2f, 0.4f);
+            // Weapon kills ring in the equipped skin's colour (2026-11-21).
+            WeaponVfxController weapon = WeaponVfxController.Current;
+            Color skin = weapon != null ? weapon.Primary : new Color(1f, 0.2f, 0.4f);
+            Color color = stomp ? new Color(1f, 0.65f, 0.12f) : skin;
             Ring(point, stomp ? 1.25f : 0.8f, stomp ? 0.32f : 0.22f,
                 color, stomp, 0.08f);
         }
 
         public void PlayHoming(Vector3 start, Vector3 end)
         {
-            Effect effect = Acquire(0.15f, new Color(0.4f, 0.85f, 1f), 0.055f);
+            WeaponVfxController weapon = WeaponVfxController.Current;
+            Effect effect = Acquire(0.15f, weapon != null ? Color.Lerp(weapon.Primary, Color.white, 0.25f) : new Color(0.4f, 0.85f, 1f), 0.055f);
             if (effect == null)
                 return;
             effect.IsTrail = true;

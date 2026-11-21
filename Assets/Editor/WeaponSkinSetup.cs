@@ -43,17 +43,17 @@ namespace Deadline4Sec.Editor
         private static readonly SkinArt[] Art =
         {
             new SkinArt { Model = "NEONREAPER", Texture = null, DisplayName = "NEON REAPER", GripHeight = 0.335f,
-                Effect = WeaponSkinFx.Effect.None, Accent = new Color(1f, 0.22f, 0.55f), Secondary = Color.white },
+                Effect = WeaponSkinFx.Effect.NeonReaper, Accent = new Color(1f, 0.22f, 0.55f), Secondary = new Color(0.62f, 0.3f, 1f) },
             new SkinArt { Model = "STARLIGHT", Texture = "STAR_LIGHT", DisplayName = "STARLIGHT", GripHeight = 0.335f,
                 Effect = WeaponSkinFx.Effect.Starlight, Accent = new Color(1f, 0.82f, 0.3f), Secondary = new Color(1f, 0.97f, 0.8f) },
             new SkinArt { Model = "FROSTBITE", Texture = "FROST_BITE", DisplayName = "FROST BITE", GripHeight = 0.335f,
                 Effect = WeaponSkinFx.Effect.FrostBite, Accent = new Color(0.45f, 0.85f, 1f), Secondary = new Color(0.85f, 0.97f, 1f) },
             new SkinArt { Model = "BLOODMOON", Texture = "BLOOD_MOON", DisplayName = "BLOOD MOON", GripHeight = 0.13f, FlipBlade = true,
-                Effect = WeaponSkinFx.Effect.BloodMoon, Accent = new Color(1f, 0.1f, 0.18f), Secondary = new Color(1f, 0.42f, 0.2f) },
+                Effect = WeaponSkinFx.Effect.BloodMoon, Accent = new Color(1f, 0.1f, 0.18f), Secondary = new Color(0.55f, 0.02f, 0.06f) },
             new SkinArt { Model = "CYBERDEATH", Texture = "CYBER_DEATH", DisplayName = "CYBER DEATH", GripHeight = 0.335f,
-                Effect = WeaponSkinFx.Effect.CyberDeath, Accent = new Color(0.3f, 1f, 0.35f), Secondary = new Color(0.55f, 1f, 0.9f) },
+                Effect = WeaponSkinFx.Effect.CyberDeath, Accent = new Color(0.3f, 1f, 0.35f), Secondary = new Color(0.75f, 0.95f, 0.85f) },
             new SkinArt { Model = "ECLIPSE", Texture = "ECLIPSE", DisplayName = "ECLIPSE", GripHeight = 0.335f,
-                Effect = WeaponSkinFx.Effect.Eclipse, Accent = new Color(0.66f, 0.3f, 1f), Secondary = new Color(1f, 0.8f, 0.35f) },
+                Effect = WeaponSkinFx.Effect.Eclipse, Accent = new Color(0.66f, 0.3f, 1f), Secondary = new Color(0.3f, 0.05f, 0.5f) },
         };
 
         [MenuItem("Deadline 4 Sec/Skins/Apply Weapon Skins")]
@@ -88,6 +88,10 @@ namespace Deadline4Sec.Editor
                 skin.FindPropertyRelative("displayName").stringValue = Art[i].DisplayName;
                 skin.FindPropertyRelative("weaponPrefab").objectReferenceValue = prefabs[i];
                 skin.FindPropertyRelative("accentColor").colorValue = Art[i].Accent;
+                // Effects (2026-11-21): style and colours; the other VFX values stay as tuned.
+                skin.FindPropertyRelative("vfx.style").enumValueIndex = (int)Art[i].Effect;
+                skin.FindPropertyRelative("vfx.primaryColor").colorValue = Art[i].Accent;
+                skin.FindPropertyRelative("vfx.secondaryColor").colorValue = Art[i].Secondary;
                 skin.FindPropertyRelative("icon").objectReferenceValue = icons[i];
             }
             data.ApplyModifiedPropertiesWithoutUndo();
@@ -168,11 +172,60 @@ namespace Deadline4Sec.Editor
             blade.center = turn * blade.center; // a half turn keeps the extents
             WeaponSkinFx fx = root.AddComponent<WeaponSkinFx>();
             fx.Configure(art.Effect, art.Accent, art.Secondary, blade);
+            AddVfxAnchors(root.transform, blade);
 
             string path = PrefabFolder + root.name + ".prefab";
             GameObject prefab = PrefabUtility.SaveAsPrefabAsset(root, path);
             Object.DestroyImmediate(root);
             return prefab;
+        }
+
+        // VFX anchors (2026-11-21): the idle effect's centre and the blade's tip
+        // (the trail), so effects never depend on a model's mesh size.
+        public static void AddVfxAnchors(Transform root, Bounds blade)
+        {
+            Transform idle = root.Find(WeaponVfxController.IdleAnchorName) ?? new GameObject(WeaponVfxController.IdleAnchorName).transform;
+            idle.SetParent(root, false);
+            idle.localPosition = blade.center;
+            Transform tip = root.Find(WeaponVfxController.BladeEndName) ?? new GameObject(WeaponVfxController.BladeEndName).transform;
+            tip.SetParent(root, false);
+            // The box corner farthest from the grip (the root), a little inside.
+            Vector3 best = blade.center;
+            float far = -1f;
+            for (int i = 0; i < 8; i++)
+            {
+                Vector3 corner = blade.center + Vector3.Scale(blade.extents,
+                    new Vector3((i & 1) == 0 ? -1 : 1, (i & 2) == 0 ? -1 : 1, (i & 4) == 0 ? -1 : 1)) * 0.9f;
+                corner.z = blade.center.z;
+                if (corner.sqrMagnitude > far)
+                {
+                    far = corner.sqrMagnitude;
+                    best = corner;
+                }
+            }
+            tip.localPosition = best;
+        }
+
+        [MenuItem("Deadline 4 Sec/Skins/Add Weapon VFX Anchors")]
+        public static void AddAnchorsToPrefabs()
+        {
+            foreach (string guid in AssetDatabase.FindAssets("t:Prefab", new[] { PrefabFolder.TrimEnd('/') }))
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+                GameObject contents = PrefabUtility.LoadPrefabContents(path);
+                try
+                {
+                    if (contents.TryGetComponent(out WeaponSkinFx fx))
+                    {
+                        AddVfxAnchors(contents.transform, fx.Blade);
+                        PrefabUtility.SaveAsPrefabAsset(contents, path);
+                    }
+                }
+                finally
+                {
+                    PrefabUtility.UnloadPrefabContents(contents);
+                }
+            }
         }
 
         // Shop icon: the model alone on a transparent background, tilted like a

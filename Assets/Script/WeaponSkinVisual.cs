@@ -9,6 +9,9 @@ namespace Deadline4Sec
     // the built-in renderer is only hidden, so anything attached to it (the
     // swing trail) keeps following the hand. A skin without a prefab shows the
     // built-in scythe, tinted by its material as before.
+    // Effects (2026-11-21): idle, swing, trail and hit effects follow the skin
+    // through WeaponVfxController (on this object), from the skin's
+    // WeaponVfxProfile — the previous skin's idle effects are removed first.
     public sealed class WeaponSkinVisual : MonoBehaviour
     {
         private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
@@ -21,6 +24,21 @@ namespace Deadline4Sec
 
         private MaterialPropertyBlock block;
         private GameObject skinWeapon;
+        private WeaponVfxController vfx;
+
+        public WeaponVfxController Vfx
+        {
+            get
+            {
+                if (vfx == null && !TryGetComponent(out vfx))
+                    vfx = gameObject.AddComponent<WeaponVfxController>();
+                return vfx;
+            }
+        }
+        // For tests: the skin model in the hand (null: the built-in scythe).
+        public GameObject SkinWeapon => skinWeapon;
+
+        private void Awake() => _ = Vfx;
 
         // The equipped skin's colour (swing trail, kill sparks) and its changes.
         public static Color CurrentAccent { get; private set; } = DefaultAccent;
@@ -33,6 +51,9 @@ namespace Deadline4Sec
             Renderer hand = HandWeapon();
             if (skinWeapon != null)
             {
+                // Off at once (Destroy waits for the frame's end): its idle
+                // particles must not show next to the new skin's.
+                skinWeapon.SetActive(false);
                 Destroy(skinWeapon);
                 skinWeapon = null;
             }
@@ -57,7 +78,9 @@ namespace Deadline4Sec
                     hand.enabled = true;
                 Apply(skin.weaponMaterial);
             }
-            Color accent = skin.accentColor.a > 0f ? skin.accentColor : DefaultAccent;
+            if (hand != null)
+                Vfx.Apply(skin, hand.transform, skinWeapon);
+            Color accent = skin.vfx != null ? skin.vfx.primaryColor : skin.accentColor.a > 0f ? skin.accentColor : DefaultAccent;
             if (accent != CurrentAccent)
             {
                 CurrentAccent = accent;

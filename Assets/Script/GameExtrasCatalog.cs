@@ -7,6 +7,33 @@ namespace Deadline4Sec
     public enum ConsumableKind { None, Shield, Dash }
     public enum GiftRewardKind { Coin, SkinCurrency, ReviveCoupon, Shield, Dash }
 
+    // A weapon skin's own effects (2026-11-21, Weapon Skin Unique VFX.md). The
+    // style picks the built-in procedural set (idle layers, swing shape, trail
+    // texture, hit burst); the optional prefabs replace a part of it.
+    [Serializable]
+    public sealed class WeaponVfxProfile
+    {
+        public WeaponSkinFx.Effect style = WeaponSkinFx.Effect.NeonReaper;
+        public Color primaryColor = new Color(1f, 0.22f, 0.55f);
+        public Color secondaryColor = new Color(0.62f, 0.3f, 1f);
+        [Tooltip("Idle effect strength (rate): idle stays subtle.")]
+        [Range(0f, 2f)] public float idleIntensity = 1f;
+        [Tooltip("Idle particle size multiplier.")]
+        [Range(0.25f, 3f)] public float idleVfxScale = 1f;
+        [Tooltip("Swing effect size multiplier.")]
+        [Range(0.25f, 3f)] public float attackVfxScale = 1f;
+        [Tooltip("How long the swing effect stays (visual only, the attack itself is unchanged).")]
+        [Range(0.1f, 0.6f)] public float attackDuration = 0.16f;
+        [Tooltip("Optional: replaces the style's trail material.")]
+        public Material trailMaterial;
+        [Tooltip("Optional: shown at the idle anchor instead of the style's idle layers.")]
+        public GameObject idleVfxPrefab;
+        [Tooltip("Optional: spawned (pooled) with each swing, besides the style's slash.")]
+        public GameObject attackVfxPrefab;
+        [Tooltip("Optional: spawned (pooled) on a kill, besides the style's hit burst.")]
+        public GameObject hitVfxPrefab;
+    }
+
     [CreateAssetMenu(menuName = "Deadline 4 Sec/Game Extras Catalog")]
     public sealed class GameExtrasCatalog : ScriptableObject
     {
@@ -25,6 +52,9 @@ namespace Deadline4Sec
             public GameObject weaponPrefab;
             public Color accentColor = new Color(1f, 0.22f, 0.55f);
             public Sprite icon;
+            // Weapon Skin Unique VFX (2026-11-21): idle, swing, trail and hit
+            // effects, all from here (WeaponVfxController).
+            public WeaponVfxProfile vfx = new WeaponVfxProfile();
         }
 
         [Serializable]

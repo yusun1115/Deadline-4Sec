@@ -22,6 +22,18 @@ MonoBehaviour:
     weaponPrefab: {fileID: 0}
     accentColor: {r: 1, g: 0.22, b: 0.55, a: 1}
     icon: {fileID: 21300000, guid: 311278920a2b19547804e73fcfe65a0d, type: 3}
+    vfx:
+      style: 6
+      primaryColor: {r: 1, g: 0.22, b: 0.55, a: 1}
+      secondaryColor: {r: 0.62, g: 0.3, b: 1, a: 1}
+      idleIntensity: 1
+      idleVfxScale: 1
+      attackVfxScale: 1
+      attackDuration: 0.16
+      trailMaterial: {fileID: 0}
+      idleVfxPrefab: {fileID: 0}
+      attackVfxPrefab: {fileID: 0}
+      hitVfxPrefab: {fileID: 0}
   - id: NeonReaper
     displayName: STARLIGHT
     coinCost: 8000
@@ -31,6 +43,18 @@ MonoBehaviour:
     weaponPrefab: {fileID: 3221109424169006097, guid: 425ad11613f4aeb42b4f5200e27c5c39, type: 3}
     accentColor: {r: 1, g: 0.82, b: 0.3, a: 1}
     icon: {fileID: 21300000, guid: 978c6c4abc9cf5e4a9f1b10897d81bf2, type: 3}
+    vfx:
+      style: 1
+      primaryColor: {r: 1, g: 0.82, b: 0.3, a: 1}
+      secondaryColor: {r: 1, g: 0.97, b: 0.8, a: 1}
+      idleIntensity: 1
+      idleVfxScale: 1
+      attackVfxScale: 1
+      attackDuration: 0.18
+      trailMaterial: {fileID: 0}
+      idleVfxPrefab: {fileID: 0}
+      attackVfxPrefab: {fileID: 0}
+      hitVfxPrefab: {fileID: 0}
   - id: FrostMoon
     displayName: FROST BITE
     coinCost: 0
@@ -40,6 +64,18 @@ MonoBehaviour:
     weaponPrefab: {fileID: 6966046127725743489, guid: 1c680f36bcda79640b1dc001451b24e2, type: 3}
     accentColor: {r: 0.45, g: 0.85, b: 1, a: 1}
     icon: {fileID: 21300000, guid: 602e55cf2e6e1424297c7998a6aacab7, type: 3}
+    vfx:
+      style: 2
+      primaryColor: {r: 0.45, g: 0.85, b: 1, a: 1}
+      secondaryColor: {r: 0.85, g: 0.97, b: 1, a: 1}
+      idleIntensity: 1
+      idleVfxScale: 1
+      attackVfxScale: 1
+      attackDuration: 0.16
+      trailMaterial: {fileID: 0}
+      idleVfxPrefab: {fileID: 0}
+      attackVfxPrefab: {fileID: 0}
+      hitVfxPrefab: {fileID: 0}
   - id: BloodMoon
     displayName: BLOOD MOON
     coinCost: 0
@@ -49,6 +85,18 @@ MonoBehaviour:
     weaponPrefab: {fileID: 6181723079349194160, guid: 830cc41f6fc1672468718f8290a04180, type: 3}
     accentColor: {r: 1, g: 0.1, b: 0.18, a: 1}
     icon: {fileID: 21300000, guid: 0f5df82bafba225418284c3f342a7c2e, type: 3}
+    vfx:
+      style: 3
+      primaryColor: {r: 1, g: 0.1, b: 0.18, a: 1}
+      secondaryColor: {r: 0.55, g: 0.02, b: 0.06, a: 1}
+      idleIntensity: 1
+      idleVfxScale: 1
+      attackVfxScale: 1
+      attackDuration: 0.16
+      trailMaterial: {fileID: 0}
+      idleVfxPrefab: {fileID: 0}
+      attackVfxPrefab: {fileID: 0}
+      hitVfxPrefab: {fileID: 0}
   - id: CyberDeath
     displayName: CYBER DEATH
     coinCost: 0
@@ -58,6 +106,18 @@ MonoBehaviour:
     weaponPrefab: {fileID: 440986010529471326, guid: 494df015e70ed8946b3aa9cc704ee7b8, type: 3}
     accentColor: {r: 0.3, g: 1, b: 0.35, a: 1}
     icon: {fileID: 21300000, guid: 06f05b7b0bc61c94882f228c5f14798d, type: 3}
+    vfx:
+      style: 4
+      primaryColor: {r: 0.3, g: 1, b: 0.35, a: 1}
+      secondaryColor: {r: 0.75, g: 0.95, b: 0.85, a: 1}
+      idleIntensity: 1
+      idleVfxScale: 1
+      attackVfxScale: 1
+      attackDuration: 0.16
+      trailMaterial: {fileID: 0}
+      idleVfxPrefab: {fileID: 0}
+      attackVfxPrefab: {fileID: 0}
+      hitVfxPrefab: {fileID: 0}
   - id: Eclipse
     displayName: ECLIPSE
     coinCost: 15000
@@ -67,6 +127,18 @@ MonoBehaviour:
     weaponPrefab: {fileID: 2335274906990273726, guid: cec044c14e597e34e8444c67932e5c80, type: 3}
     accentColor: {r: 0.66, g: 0.3, b: 1, a: 1}
     icon: {fileID: 21300000, guid: 08c24963fe27b3c4ead860a40ae717b1, type: 3}
+    vfx:
+      style: 5
+      primaryColor: {r: 0.66, g: 0.3, b: 1, a: 1}
+      secondaryColor: {r: 0.3, g: 0.05, b: 0.5, a: 1}
+      idleIntensity: 1
+      idleVfxScale: 1
+      attackVfxScale: 1
+      attackDuration: 0.17
+      trailMaterial: {fileID: 0}
+      idleVfxPrefab: {fileID: 0}
+      attackVfxPrefab: {fileID: 0}
+      hitVfxPrefab: {fileID: 0}
   rewards:
   - kind: 0
     amount: 300

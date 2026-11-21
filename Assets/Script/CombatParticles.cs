@@ -7,6 +7,9 @@ namespace Deadline4Sec
     // sparks, soul wisps, dust, scythe slashes, a scythe trail and speed lines.
     // Everything is pooled and created once; effects run on unscaled time so they
     // keep moving through hit stop and never touch gameplay state.
+    // Weapon effects (2026-11-21): the swing slash, kill slash, homing path
+    // and swing trail belong to the equipped skin and are drawn by
+    // WeaponVfxController; this used to draw them all in NEON REAPER pink.
     [RequireComponent(typeof(Camera))]
     public sealed class CombatParticles : MonoBehaviour
     {
@@ -47,8 +50,11 @@ namespace Deadline4Sec
         private ParticleSystem speedLines;
         private readonly Slash[] slashes = new Slash[SlashPoolSize];
         private int nextSlash;
-        private TrailRenderer scytheTrail;
         private float trailUntil;
+
+        private static WeaponVfxController Weapon => WeaponVfxController.Current;
+        private static Color SkinPrimary => Weapon != null ? Weapon.Primary : Pink;
+        private static Color SkinSecondary => Weapon != null ? Weapon.Secondary : Violet;
 
         private void Awake()
         {
@@ -98,28 +104,11 @@ namespace Deadline4Sec
             gameFlow = FindFirstObjectByType<GameFlowManager>();
             runManager = FindFirstObjectByType<RunManager>();
             if (player != null)
-            {
                 player.ActionPerformed += OnPlayerAction;
-                AttachScytheTrail();
-            }
-            WeaponSkinVisual.AccentChanged += OnSkinAccent;
-        }
-
-        // Weapon skins (2026-10-30): the swing trail takes the equipped skin's colour.
-        private void OnSkinAccent(Color accent)
-        {
-            if (scytheTrail == null)
-                return;
-            Gradient g = new Gradient();
-            g.SetKeys(new[] { new GradientColorKey(HotWhite, 0f), new GradientColorKey(accent, 0.35f),
-                    new GradientColorKey(Color.Lerp(accent, Violet, accent == Pink ? 1f : 0.45f), 1f) },
-                new[] { new GradientAlphaKey(1f, 0f), new GradientAlphaKey(0f, 1f) });
-            scytheTrail.colorGradient = g;
         }
 
         private void OnDestroy()
         {
-            WeaponSkinVisual.AccentChanged -= OnSkinAccent;
             if (player != null)
                 player.ActionPerformed -= OnPlayerAction;
             if (root != null)
@@ -137,28 +126,28 @@ namespace Deadline4Sec
         {
             bool stomp = attackName == "Stomp Attack";
             bool homing = attackName == "Homing Dash Attack";
-            Color main = stomp ? Amber : homing ? Cyan : Pink;
-            Burst(sparks, point, stomp ? 26 : 20, stomp ? 11f : 9f, new Vector2(0.06f, 0.16f), new Vector2(0.18f, 0.34f), main, HotWhite, 0.4f);
-            Burst(wisps, point, 7, 1.6f, new Vector2(0.25f, 0.5f), new Vector2(0.5f, 0.85f), Pink, Violet, -0.6f);
+            // The neutral part of a kill: a white flash and the soul leaving, in the skin's colours.
+            Burst(sparks, point, stomp ? 26 : 10, stomp ? 11f : 8f, new Vector2(0.06f, 0.16f), new Vector2(0.18f, 0.34f),
+                stomp ? Amber : HotWhite, HotWhite, 0.4f);
+            Burst(wisps, point, 7, 1.6f, new Vector2(0.25f, 0.5f), new Vector2(0.5f, 0.85f), SkinPrimary, SkinSecondary, -0.6f);
             Burst(wisps, point, 1, 0f, new Vector2(1.6f, 1.6f), new Vector2(0.12f, 0.12f), HotWhite, HotWhite, 0f);
-            // A skin's own colour joins the kill spray (the default skin is already pink).
-            Color skin = WeaponSkinVisual.CurrentAccent;
-            if (!stomp && !homing && (Mathf.Abs(skin.r - Pink.r) + Mathf.Abs(skin.g - Pink.g) + Mathf.Abs(skin.b - Pink.b)) > 0.1f)
-                Burst(sparks, point, 12, 8f, new Vector2(0.05f, 0.13f), new Vector2(0.2f, 0.32f), skin, HotWhite, 0.3f);
-            float roll = Random.Range(-35f, 35f);
             Quaternion facing = Quaternion.LookRotation(view.transform.forward, Vector3.up);
-            PlaySlash(point, facing * Quaternion.Euler(0f, 0f, roll + 30f), 1.1f, main, 0.16f);
-            if (homing)
-                PlaySlash(point, facing * Quaternion.Euler(0f, 0f, roll - 70f), 1.1f, Cyan, 0.16f);
             if (stomp)
+            {
+                // The stomp keeps its own amber impact (not a weapon swing).
+                float roll = Random.Range(-35f, 35f);
+                PlaySlash(point, facing * Quaternion.Euler(0f, 0f, roll + 30f), 1.1f, Amber, 0.16f);
                 Ring(dust, point + Vector3.down * 0.4f, 18, 6f, Dust, 0.45f);
+            }
+            else if (Weapon != null)
+                Weapon.PlayHit(point, facing, homing);
         }
 
         public void PlaySlam(Vector3 point, float radius)
         {
             Ring(dust, point + Vector3.up * 0.1f, 40, radius * 3.2f, Dust, 0.6f);
             Ring(sparks, point + Vector3.up * 0.15f, 32, radius * 4.5f, Violet, 0.35f);
-            Burst(sparks, point, 24, 10f, new Vector2(0.08f, 0.2f), new Vector2(0.25f, 0.45f), Pink, HotWhite, 1.2f, true);
+            Burst(sparks, point, 24, 10f, new Vector2(0.08f, 0.2f), new Vector2(0.25f, 0.45f), SkinPrimary, HotWhite, 1.2f, true);
             Burst(wisps, point + Vector3.up * 0.3f, 1, 0f, new Vector2(radius * 1.6f, radius * 1.6f), new Vector2(0.14f, 0.14f), Violet, Violet, 0f);
         }
 
@@ -180,19 +169,8 @@ namespace Deadline4Sec
 
         public void PlayHoming(Vector3 start, Vector3 end)
         {
-            Vector3 dir = end - start;
-            for (int i = 0; i < 12; i++)
-            {
-                var p = new ParticleSystem.EmitParams
-                {
-                    position = Vector3.Lerp(start, end, i / 12f) + Random.insideUnitSphere * 0.25f,
-                    velocity = -dir.normalized * Random.Range(2f, 6f),
-                    startSize = Random.Range(0.06f, 0.12f),
-                    startLifetime = Random.Range(0.15f, 0.3f),
-                    startColor = Color.Lerp(Cyan, HotWhite, Random.value),
-                };
-                sparks.Emit(p, 1);
-            }
+            if (Weapon != null)
+                Weapon.PlayHomingPath(start, end);
             trailUntil = Time.unscaledTime + 0.25f;
         }
 
@@ -230,8 +208,8 @@ namespace Deadline4Sec
             Quaternion facing = Quaternion.LookRotation(view.transform.forward, Vector3.up);
             float roll = Random.Range(-20f, 20f);
             PlaySlash(point, facing * Quaternion.Euler(0f, 0f, roll + 35f), 1.9f, HotWhite, 0.2f);
-            PlaySlash(point, facing * Quaternion.Euler(0f, 0f, roll - 55f), 1.7f, Pink, 0.22f, true);
-            Burst(sparks, point, 34, 14f, new Vector2(0.08f, 0.2f), new Vector2(0.2f, 0.4f), Pink, HotWhite, 0.3f);
+            PlaySlash(point, facing * Quaternion.Euler(0f, 0f, roll - 55f), 1.7f, SkinPrimary, 0.22f, true);
+            Burst(sparks, point, 34, 14f, new Vector2(0.08f, 0.2f), new Vector2(0.2f, 0.4f), SkinPrimary, HotWhite, 0.3f);
         }
 
         // Revive (2026-11-14): a light burst spreading from the runner.
@@ -286,7 +264,9 @@ namespace Deadline4Sec
                     Vector3 chest = player.transform.position + new Vector3(side * 1.1f, 0.25f, 0.9f);
                     Quaternion rot = Quaternion.LookRotation(Vector3.forward, Vector3.up) *
                         Quaternion.Euler(0f, 0f, side > 0 ? -15f : 195f);
-                    PlaySlash(chest, rot, 1.15f, Pink, 0.14f, side < 0);
+                    // The equipped skin's swing (never the default pink one by itself).
+                    if (Weapon != null)
+                        Weapon.PlaySwing(chest, rot, side < 0);
                     trailUntil = Time.unscaledTime + 0.22f;
                     break;
                 }
@@ -317,8 +297,8 @@ namespace Deadline4Sec
                 s.Renderer.SetPropertyBlock(s.Block);
             }
 
-            if (scytheTrail != null)
-                scytheTrail.emitting = Playing && (now < trailUntil || RushBoost > 0.05f ||
+            if (Weapon != null)
+                Weapon.TrailEmitting = Playing && (now < trailUntil || RushBoost > 0.05f ||
                                                    (player != null && player.IsHoming));
 
             UpdateSpeedLines();
@@ -442,65 +422,6 @@ namespace Deadline4Sec
             return ps;
         }
 
-        private void AttachScytheTrail()
-        {
-            Transform socket = FindDeep(player.transform, "WeaponSocket");
-            Renderer blade = null;
-            if (socket != null)
-                blade = socket.GetComponentInChildren<MeshRenderer>();
-            if (blade == null)
-                return;
-            // The tip sits at the far end of the blade mesh from the socket.
-            MeshFilter filter = blade.GetComponent<MeshFilter>();
-            Vector3 tipLocal = Vector3.zero;
-            if (filter != null && filter.sharedMesh != null)
-            {
-                Bounds b = filter.sharedMesh.bounds;
-                Vector3 socketLocal = blade.transform.InverseTransformPoint(socket.position);
-                float best = -1f;
-                for (int i = 0; i < 8; i++)
-                {
-                    Vector3 corner = b.center + Vector3.Scale(b.extents,
-                        new Vector3((i & 1) == 0 ? -1 : 1, (i & 2) == 0 ? -1 : 1, (i & 4) == 0 ? -1 : 1)) * 0.8f;
-                    float d = (corner - socketLocal).sqrMagnitude;
-                    if (d > best)
-                    {
-                        best = d;
-                        tipLocal = corner;
-                    }
-                }
-            }
-            GameObject tip = new GameObject("ScytheTrail");
-            tip.transform.SetParent(blade.transform, false);
-            tip.transform.localPosition = tipLocal;
-            scytheTrail = tip.AddComponent<TrailRenderer>();
-            scytheTrail.sharedMaterial = ribbon;
-            scytheTrail.time = 0.14f;
-            scytheTrail.minVertexDistance = 0.05f;
-            scytheTrail.widthCurve = new AnimationCurve(new Keyframe(0f, 0.32f), new Keyframe(1f, 0f));
-            Gradient g = new Gradient();
-            g.SetKeys(new[] { new GradientColorKey(HotWhite, 0f), new GradientColorKey(Pink, 0.35f), new GradientColorKey(Violet, 1f) },
-                new[] { new GradientAlphaKey(1f, 0f), new GradientAlphaKey(0f, 1f) });
-            scytheTrail.colorGradient = g;
-            OnSkinAccent(WeaponSkinVisual.CurrentAccent);
-            scytheTrail.shadowCastingMode = ShadowCastingMode.Off;
-            scytheTrail.receiveShadows = false;
-            scytheTrail.emitting = false;
-        }
-
-        private static Transform FindDeep(Transform t, string name)
-        {
-            if (t.name == name)
-                return t;
-            foreach (Transform c in t)
-            {
-                Transform f = FindDeep(c, name);
-                if (f != null)
-                    return f;
-            }
-            return null;
-        }
-
         // Crescent in the local XY plane; UV.x along the arc, UV.y inner(0)->outer(1).
         private static Mesh BuildCrescent(int segments, float inner, float outer, float degrees)
         {
@@ -549,8 +470,8 @@ namespace Deadline4Sec
                 dust.Clear();
                 speedLines.Clear();
             }
-            if (scytheTrail != null)
-                scytheTrail.Clear();
+            if (Weapon != null)
+                Weapon.ClearEffects();
         }
     }
 }

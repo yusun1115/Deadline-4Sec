@@ -231,6 +231,18 @@
 - **Near Miss = 마지막 순간 회피**: 기존 조건(장애물 주변 near 구역을 몸 전체가 지나가고 닿지 않음)에 더해, 장애물 앞 `lastMomentDistance`(기본 2.6m) 안에서 장애물과 정면으로 겹치는(좌우·높이) 충돌 코스에 있었어야 함(`Obstacle.HeadingInto`). 옆 레인으로 그냥 지나가거나(예: 전철 옆 레인 통과) 미리 피하면 Near Miss가 아님. 테스트 `ClosePassAwardsOneNearMiss`(막판 회피 = 인정), `StraightClosePassIsNotANearMiss`(옆 통과 = 불인정).
 - **Ground Slam 반동 제거**: 충격파 판정 후 튀어 오르지 않고 바로 착지해 계속 달림(`groundSlamBouncePower` 삭제, 씬에 남은 값은 무시됨). 공중 콤보 상태도 해제.
 
+## 무기 스킨 고유 VFX (2026-11-21, Weapon Skin Unique VFX.md)
+
+- **원인(기본 핑크 이펙트 버그)**: 레인 공격 참격(`CombatParticles.OnPlayerAction`)과 처치 참격·불꽃·영혼(`PlayKill`)이 `Pink` 상수로 하드코딩되어 있었음. 스킨 색은 트레일 색과 처치 시 추가 불꽃 12개에만 반영 → 어떤 스킨이든 공격은 NEON REAPER 핑크 참격. 호밍 경로·처치 링도 시안 고정. 트레일은 기본 낫 메시의 끝에 붙어 있어 다른 무기 형태와 어긋났음.
+- **데이터**: `GameExtrasCatalog.Skin.vfx`(`WeaponVfxProfile`) — style, primary/secondary 색, idle 강도·크기, 공격 크기·지속시간(시각만), 트레일 재질(선택), idle/attack/hit 프리팹(선택, 풀링). 스타일 enum은 기존 `WeaponSkinFx.Effect`에 `NeonReaper` 추가(뒤에 붙여 저장값 유지).
+- **구조**: `WeaponVfxController`(무기 오브젝트 `WeaponVisual`에 `WeaponSkinVisual`이 추가) 하나가 Idle 시작/정리, 트레일, Swing(`PlaySwing`), Hit(`PlayHit`), 호밍 경로(`PlayHomingPath`)를 담당. `CombatParticles`는 공격 타이밍만 알리고 색·형태는 모름. 처치 링(`CombatVisualFeedback`)과 Ground Slam 불꽃, Reaper Rush 참격도 스킨 색. Stomp는 기존 호박색 충격 유지(무기 휘두르기 아님).
+- **스킨 교체**: 이전 스킨 무기는 즉시 비활성화 후 삭제(파티클 포함), 기본 낫용 `Skin Idle VFX`는 Stop+Clear 후 삭제, 트레일은 손 노드에 하나만 두고 Clear 후 새 끝점·재질로 재설정. 공격 중 교체 시 진행 중인 참격은 자기 색으로 끝나고 다음 공격부터 새 스킨.
+- **앵커**: 스킨 프리팹에 `VFX_IdleAnchor`(날 중심), `VFX_BladeEnd`(트레일 끝) 추가(메뉴 `Skins/Add Weapon VFX Anchors`, `Apply Weapon Skins`도 추가함). 기본 낫은 메시에서 계산.
+- **스킨별**: NEON 핑크 에너지 불꽃이 날을 따라 흐름 / 넓은 초승달 + 부드러운 핑크 트레일. STARLIGHT 4각 별 반짝임 상승 / 가는 금빛 아크 + 경로에 남는 별 + 끝 별 버스트, 별 무늬 트레일. FROST BITE 눈송이 결정 낙하·냉기·얼음 글린트 / 톱니 얼음 아크 + 얼음 파편 + 냉기, 깨진 가장자리 트레일. BLOOD MOON 붉은 방울 낙하·붉은 펄스 링·어두운 아우라 / 두껍고 짧은 대각 아크(어두운 코어, 1.9배 길게) + 붉은 잔상 + 떨어지는 파편, 두꺼운 트레일. CYBER DEATH 0/1 숫자 낙하·깜빡이는 픽셀·스캔라인 / 끊어진 계단식 분절 아크 + 글리치 사본 + 픽셀·0/1 잔류, 분절 스캔라인 트레일. ECLIPSE 어두운 구체·빨려 드는 연기·보라 입자 / 넓은 어두운 아크 + 보라 테두리 + 공간 균열(0.4초) + 중심으로 빨려 드는 조각, 테두리만 밝은 트레일.
+- **에셋 없음**: 모양(별·결정·파편·0/1·픽셀·방울·연기·링·트레일 6종)은 `WeaponVfxSprites`가 코드로 그린 텍스처, 셰이더 `Resources/Feedback/FxSprite`(가산/알파). 재질은 모양당 1개 캐시, 참격 재질 2개 — 공격마다 재질·오브젝트 생성 없음(참격 8개 풀, 모양별 파티클 시스템 최초 사용 시 1회 생성).
+- **성능**: Idle 레이어당 최대 30개(스킨당 2~4레이어), 공격 1회 파티클 10~25개, 트레일 끝 파편 초당 28개(트레일 켜진 동안만). TMP·화면 왜곡 없음.
+- 테스트: `WeaponSkinVfxAcceptanceTests`(스킨별 스타일·색·앵커, Neon→Cyber→Frost→Eclipse→Starlight→Blood→Neon 교체 시 Idle 1개·잔여 이펙트 없음·트레일 1개·Swing/Hit 스타일, 실제 레인 공격·처치·호밍 처치가 장착 스킨 사용, 씬 재로드 후 복구). 전체 회귀 152개 중 151 통과, 1 건너뜀, 실패 0. 스킨별 캡처는 `.utmp/skin{0-5}-idle.png`, `skin{0-5}-swing.png`.
+
 ## 인게임 비주얼 업그레이드 (2026-11-15, VisualUpgrade.md)
 
 - **데이터**: `AreaDefinition.visuals`(`AreaVisualProfile`) — 저층 안개(색·글로우색·알파·하단/상단 높이·흐름·크기), 거리 안개(`fogStart/fogEnd`, 선형), 배경 하단 헤이즈 높이, 중경/원경 틴트·원경 안개 비율, 랜드마크 안개 비율·발광, 파티클(스타일·색 2개·초당 개수), 배경 조명(측광 색·방향, 역광 색). Area 3개 에셋에 값 저장. 바닥 패턴은 각 Area의 `floorMaterial`(RailTrack `_Pattern`·`_PatternColor`·`_PatternStrength`·`_FlowSpeed`·`_Ambient`).
