@@ -6404,14 +6404,11 @@ MonoBehaviour:
   - {fileID: 919160313555712500, guid: f04ab9f59f7c9b24eb978cb8defcc6bd, type: 3}
   - {fileID: 1405739106273453165, guid: 6de8d143370e3ea4887ee4af710d63ef, type: 3}
   - {fileID: 5688978718464318079, guid: f2c0b5354c31bb5439a86dbca8843003, type: 3}
-  - {fileID: 3164173881058815412, guid: 0329dcdfbbaab6041bf85f7ccd3044ab, type: 3}
   - {fileID: 389579872091985628, guid: 59910a66c4c64694eb328443ba616d63, type: 3}
   - {fileID: 2749556614660312204, guid: e8583af93f4f15646b31b5d864258c51, type: 3}
-  - {fileID: 4714010298021824912, guid: f3fbf654547ecfa46923511dcd40dd40, type: 3}
   - {fileID: 6254722436317516375, guid: 38b82b2f2539d114c98f78f8c63461d5, type: 3}
   - {fileID: 6413989192080567328, guid: 2cf91d9ee87300d4c881deb09ae77375, type: 3}
   - {fileID: 6649115267649377778, guid: 3ab2c5ec83bb3fd4db8ccea197cacc72, type: 3}
-  - {fileID: 3253217184399432531, guid: 0b2dbbcc6479cb547ac0da245e7a173f, type: 3}
   - {fileID: 8713329268765008961, guid: 293dce307e005db4086fca2348830531, type: 3}
   - {fileID: 6005553758282169145, guid: 11c6ae8ccf483194db92612e3c055b84, type: 3}
   - {fileID: 7589185495105231990, guid: 10aaa37d2c28fb54385d6543498d8e78, type: 3}
@@ -6424,6 +6421,17 @@ MonoBehaviour:
   - {fileID: 1959397201484208405, guid: ee2eb2d6eb10e2e49bcaec9360d381e9, type: 3}
   - {fileID: 3415934185234289527, guid: 5e247a2360bf7184d93e4921a1ac2d10, type: 3}
   - {fileID: 6298969846490746479, guid: 7edc0e6afdfa403429abece9da6cf797, type: 3}
+  - {fileID: 2337649024104865414, guid: a69e5448879169446bf56068012aedfb, type: 3}
+  - {fileID: 5138080636246227030, guid: 0017efd0256e61b4288fdd17861fd794, type: 3}
+  - {fileID: 1272051311758447706, guid: db973c027cd52674caafd8ee76789264, type: 3}
+  - {fileID: 6707104115904814881, guid: 9230f3f6d1e5f0a44a57b6d1a0591e69, type: 3}
+  - {fileID: 523676878063892774, guid: 5544d663531b13a4baefe5a5a28fc1b1, type: 3}
+  - {fileID: 6708139681068201120, guid: cee2255c65a6cd742946b192a0635d80, type: 3}
+  - {fileID: 1465820581168194282, guid: f10f08c7443db8c4b9fa385807d4e20d, type: 3}
+  - {fileID: 8607630287189816283, guid: 0d925531e254b14479fcd81d1689d0c2, type: 3}
+  - {fileID: 2824374258203109891, guid: e43f27678bc62d4408b5788b8f11aa73, type: 3}
+  - {fileID: 6893164202526748434, guid: b3dcba4573397084fbb806467fd97667, type: 3}
+  - {fileID: 7109425058899283181, guid: 5d449165dd9da3b44963862bb17fd894, type: 3}
   patternsAhead: 4
   cleanupDistance: 25
   maxOpportunityGapSeconds: 3.5
@@ -6432,6 +6440,7 @@ MonoBehaviour:
   useFixedSeed: 0
   fixedSeed: 12345
   showDebugLogs: 1
+  areaCatalog: {fileID: 0}
   airRouteStartsAtSeconds: 25
   groundPatternsBetweenAirRoutesMin: 5
   groundPatternsBetweenAirRoutesMax: 8
@@ -6440,7 +6449,14 @@ MonoBehaviour:
   wallRunStartsAtSeconds: 45
   patternsBetweenWallRunsMin: 6
   patternsBetweenWallRunsMax: 10
-  normalPatternsAfterSpecial: 3
+  minNormalPatternsBetweenSpecial: 3
+  recentPatternMemory: 3
+  highIntensityFrom: 4
+  maxHighIntensityInARow: 2
+  specialFromTargetIntensity: 3
+  debugRepeatPattern: {fileID: 0}
+  readableThreatSpacing: 6
+  readableSpacingAfterSlide: 14
   powerUpChance: 0.3
   giftBoxChance: 0.18
   maxPowerUpsPerPattern: 1
@@ -7635,6 +7651,11 @@ MonoBehaviour:
   normalKillHitStop: 0.0655
   homingKillHitStop: 0.0718
   stompHitStop: 0.0929
+  reviveShake:
+    intensity: 0.05
+    duration: 0.18
+  reviveFovKick: -2
+  reviveFovDuration: 0.3
   groundSlamHitStop: 0.075
   groundSlamShake:
     intensity: 0.2
@@ -14448,6 +14469,8 @@ MonoBehaviour:
   baseForwardSpeed: 12
   maxForwardSpeed: 16
   speedIncreasePerSecond: 0.06
+  reviveSpeedRampSeconds: 1.3
+  reviveSpeedRampStartFraction: 0.3
 --- !u!114 &576882185
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24686,6 +24709,12 @@ MonoBehaviour:
   spireSpan: 320
   clockTowerOffset: {x: 34, y: -8, z: 230}
   cloudSeaY: -9
+  midCount: 10
+  midDistanceX: {x: 14, y: 24}
+  midSpan: 260
+  farDistance: 285
+  lowFogSheets: 4
+  lowFogClearHalfWidth: 4.6
 --- !u!1 &946225680
 GameObject:
   m_ObjectHideFlags: 0

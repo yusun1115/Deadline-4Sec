@@ -14,6 +14,11 @@ namespace Deadline4Sec.Editor
     // patterns A–E (ground enemies in adjacent lanes ≥5m apart, obstacles ≥6m).
     // Set pieces are decoration only: no colliders except the train wagons,
     // which are ordinary Jump obstacles (front = hit, roof = safe to run on).
+    // Obstacle Pattern Rework (2026-11-21): the full-width Train Wagon read as
+    // neither a step nor a wall to new players. Its patterns (H_TrainHop,
+    // K_TrainRun, O_TrainCombo) are no longer built or spawned; the wagon
+    // prefabs stay (deprecated, unreferenced). Hurdles / Obstacle Rush follow
+    // the readability rules of PatternLibraryBuilder.Rework.cs.
     public static partial class PatternLibraryBuilder
     {
         private const string PatternFolder = "Assets/Prefab/Pattern/";
@@ -372,7 +377,6 @@ namespace Deadline4Sec.Editor
             var H = CoursePattern.DifficultyLevel.Hard;
             var ground = CoursePattern.PatternCategory.GroundCombat;
             var air = CoursePattern.PatternCategory.AirCombat;
-            var obstacle = CoursePattern.PatternCategory.Obstacle;
             var stomp = CoursePattern.PatternCategory.Stomp;
             var mixed = CoursePattern.PatternCategory.Mixed;
             var G = CoursePattern.TravelState.Ground;
@@ -385,14 +389,8 @@ namespace Deadline4Sec.Editor
                 P("Pattern_F_Crossfire", 24, E, ground)
                     .Enemy(-1, 5).Enemy(0, 10).Enemy(1, 15).Enemy(0, 20)
                     .Coins(1, 1f, 6, 3).Coins(-1, 1f, 16, 3).Power("FreezeClock", 1, 12).Gift(-1, 21),
-                // A jump airtime covers ~8m, so never chain two jumps; alternate with slides.
-                P("Pattern_G_Hurdles", 30, E, obstacle)
-                    .Jump(0, 4).Slide(0, 12).Jump(0, 21).Slide(0, 28)
-                    .Coins(0, 1.9f, 3.4f, 2).Coins(0, 0.7f, 11, 3, 1f).Coins(0, 1.9f, 20.4f, 2).Power("SoulMagnet", -1, 8),
-                P("Pattern_H_TrainHop", 26, E, mixed)
-                    .Wagon(5).Enemy(1, 11, RoofY).Enemy(0, 21)
-                    .Coins(0, RoofY + 1f, 6.5f, 6).Power("ComboSeal", 0, 18).Gift(-1, 23),
-                P("Pattern_I_ArchWalk", 26, E, ground)
+                HurdlesSpec(),
+                P("Pattern_I_ArchWalk", 28, E, ground)
                     .Set("Arch", 2).Set("Arch", 12).Set("Arch", 22)
                     .Enemy(1, 6).Enemy(0, 12).Enemy(-1, 18).Enemy(0, 24)
                     .Coins(0, 1f, 7, 3).Coins(1, 1f, 19, 3).Power("SoulAmplifier", -1, 9),
@@ -406,9 +404,6 @@ namespace Deadline4Sec.Editor
                     .Set("ClockGate", 14)
                     .Enemy(0, 4).Jump(0, 9).Air(0, 2.5f, 14).Air(1, 3.4f, 18).Air(0, 4.2f, 22)
                     .Coins(-1, 1f, 5, 3).Coins(0, 3.6f, 14.5f, 3).Power("TimeHeart", -1, 11).Gift(1, 20, 4f),
-                P("Pattern_K_TrainRun", 34, M, mixed)
-                    .Wagon(4, true).Enemy(-1, 10, RoofY).Enemy(0, 16, RoofY).Enemy(1, 22, RoofY).Enemy(0, 31)
-                    .Coins(0, RoofY + 1f, 7, 4).Coins(1, RoofY + 1f, 17, 3).Power("ReaperRush", -1, 19, RoofY + 1f).Gift(1, 12, RoofY + 1f),
                 P("Pattern_L_AirLadder", 18, M, air, Any, A)
                     .Air(1, 2.4f, 3).Air(0, 3f, 7).Air(-1, 3.6f, 11).Air(0, 4.2f, 15)
                     .Coins(1, 3.4f, 4.5f, 1).Coins(0, 4f, 8.5f, 1).Coins(-1, 4.6f, 12.5f, 1).Power("SoulAmplifier", 1, 6, 1.2f),
@@ -417,21 +412,12 @@ namespace Deadline4Sec.Editor
                     .Coins(0, 1.1f, 4, 2).Coins(-1, 1.1f, 12, 2).Power("FreezeClock", 0, 6),
 
                 // ---- Hard ----
-                P("Pattern_N_Gauntlet", 32, H, mixed, G, G)
-                    .Set("Arch", 3).Set("Arch", 15).Set("Arch", 27)
-                    .Enemy(0, 4).Slide(0, 10).Enemy(1, 15).Jump(0, 20).Block(0, 27)
-                    .Coins(0, 0.7f, 9, 3, 1f).Coins(0, 1.9f, 19.4f, 2).Power("ComboSeal", -1, 23).Gift(1, 29),
-                P("Pattern_O_TrainCombo", 30, H, mixed, G, A)
-                    .Wagon(4).Air(0, RoofY + 2.4f, 10).Air(1, RoofY + 3f, 14).Air(0, RoofY + 3.6f, 18).Air(-1, RoofY + 4.2f, 22)
-                    .Coins(0, RoofY + 1f, 5, 4).Coins(1, RoofY + 4f, 14.8f, 1).Power("TimeHeart", 0, 26, 1.4f),
+                GauntletSpec(),
                 P("Pattern_P_ClockAirStorm", 22, H, air, Any, A)
                     .Set("ClockGate", 10)
                     .Air(-1, 2.4f, 3).Air(0, 3.2f, 7).Air(1, 4f, 11).Air(0, 4.6f, 15).Air(-1, 5f, 19)
                     .Coins(0, 4f, 7.8f, 1).Coins(1, 4.8f, 11.8f, 1).Gift(0, 16, 5.4f),
-                // Hard runs are fast; leave ~8m between obstacles so landings settle.
-                P("Pattern_Q_ObstacleRush", 40, H, obstacle)
-                    .Jump(0, 4).Slide(0, 12).Jump(0, 20).Block(0, 28).Slide(1, 36)
-                    .Coins(0, 1.9f, 3.4f, 2).Coins(0, 0.7f, 11, 3, 1f).Coins(1, 1f, 29, 3).Power("ReaperRush", -1, 16),
+                ObstacleRushSpec(),
             };
 
             List<GameObject> built = new List<GameObject>();

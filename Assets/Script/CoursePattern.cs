@@ -17,7 +17,9 @@ namespace Deadline4Sec
         public const float UpperDeckHeight = 8f;
 
         public enum DifficultyLevel { Easy, Medium, Hard }
-        public enum PatternCategory { GroundCombat, AirCombat, Obstacle, Stomp, Mixed, AirRoute, WallRun, AreaTransition }
+        // Train (2026-11-21): train / ramp-train sections, so the category limit
+        // keeps them from running three in a row. Appended: saved as numbers.
+        public enum PatternCategory { GroundCombat, AirCombat, Obstacle, Stomp, Mixed, AirRoute, WallRun, AreaTransition, Train }
         public enum TravelState { Ground, Air, Any, Upper }
 
         [SerializeField, Min(1f)] private float patternLength = 20f;
@@ -81,6 +83,37 @@ namespace Deadline4Sec
                 positions.Add(farEdge + 0.5f); // Approximate player rear clearance.
             }
             positions.Sort();
+        }
+
+        // Readability (2026-11-21): where the first and last threats stand
+        // (enemy / obstacle positions, not reward edges), and whether the last
+        // one is a slide beam, which hides anything low behind it in its lane.
+        public bool TryGetThreatEnds(out float firstZ, out float lastZ, out bool endsOnSlideBeam)
+        {
+            firstZ = float.PositiveInfinity;
+            lastZ = float.NegativeInfinity;
+            endsOnSlideBeam = false;
+            foreach (Enemy enemy in GetComponentsInChildren<Enemy>(true))
+            {
+                float z = transform.InverseTransformPoint(enemy.transform.position).z;
+                firstZ = Mathf.Min(firstZ, z);
+                if (z > lastZ)
+                {
+                    lastZ = z;
+                    endsOnSlideBeam = false;
+                }
+            }
+            foreach (Obstacle obstacle in GetComponentsInChildren<Obstacle>(true))
+            {
+                float z = transform.InverseTransformPoint(obstacle.transform.position).z;
+                firstZ = Mathf.Min(firstZ, z);
+                if (z > lastZ)
+                {
+                    lastZ = z;
+                    endsOnSlideBeam = obstacle.Type == Obstacle.ObstacleType.SlideObstacle;
+                }
+            }
+            return lastZ > float.NegativeInfinity;
         }
 
         public bool TryGetOpportunityRange(out float firstZ, out float lastZ)

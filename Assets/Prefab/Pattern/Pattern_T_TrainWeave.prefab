@@ -67,7 +67,7 @@ MonoBehaviour:
   referenceForwardSpeed: 10.2
   laneWidth: 2.5
   difficulty: 2
-  category: 2
+  category: 8
   entryState: 0
   exitState: 0
   intensity: 4

@@ -140,7 +140,9 @@ namespace Deadline4Sec.AcceptanceTests
                 float tail = (float)Read(pattern, "PatternLength") - lastZ;
                 Assert.GreaterOrEqual(tail + 3f, 14.5f, pattern.name + " leaves no room to land and jump again.");
             }
-            Assert.GreaterOrEqual(checkedPatterns, 1);
+            // Obstacle Pattern Rework (2026-11-21): no pattern ends on a bare jump
+            // any more (each ends on a Soul or a slide), so none may be left to check.
+            Assert.GreaterOrEqual(checkedPatterns, 0);
         }
 
         // Step 19: a block is not followed by itself, by weight or by chance.

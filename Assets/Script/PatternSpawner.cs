@@ -66,6 +66,16 @@ namespace Deadline4Sec
         [Tooltip("A signature section waits for a beat of the curve at least this strong.")]
         [SerializeField, Range(1, 5)] private int specialFromTargetIntensity = 3;
 
+        // Obstacle Pattern Rework (2026-11-21): a pattern-by-pattern play check,
+        // and a log of joins that leave too little room to read the next threat.
+        [Header("Debug (leave empty in builds)")]
+        [Tooltip("Spawn only this pattern, again and again (pattern-by-pattern play check). Empty: normal course.")]
+        [SerializeField] private CoursePattern debugRepeatPattern;
+        [Tooltip("With the area debug logs on: warn when the next pattern's first threat is closer than this (m) to the previous one's last.")]
+        [SerializeField, Min(0f)] private float readableThreatSpacing = 6f;
+        [Tooltip("The same after a slide beam (it hides what is low behind it).")]
+        [SerializeField, Min(0f)] private float readableSpacingAfterSlide = 14f;
+
         [Header("Pickup rarity (coins always appear)")]
         [SerializeField, Range(0f, 1f)] private float powerUpChance = 0.3f;
         [SerializeField, Range(0f, 1f)] private float giftBoxChance = 0.18f;
@@ -108,6 +118,9 @@ namespace Deadline4Sec
         private readonly List<CoursePattern> recentPatterns = new List<CoursePattern>();
 
         private bool AreasActive => areas != null && areaCatalog != null && areaCatalog.IsUsable;
+        // Picks where nothing met the tier / category / recent rules and they
+        // were let go for once (fixed-seed checks, debugging).
+        public int RelaxedPicks { get; private set; }
         private CoursePattern[] Pool => AreasActive ? areas.ActivePool : patternPrefabs;
 
         private struct SpawnedPattern
@@ -236,6 +249,9 @@ namespace Deadline4Sec
             int maximumDifficulty = currentTime >= hardStartsAtSeconds ? 2 :
                 currentTime >= mediumStartsAtSeconds ? 1 : 0;
 
+            if (debugRepeatPattern != null)
+                return debugRepeatPattern;
+
             // On the deck: only upper runs or the return, whatever the tier.
             if (previousPrefab != null && previousPrefab.ExitState == CoursePattern.TravelState.Upper)
                 return ChooseUpperPattern();
@@ -291,6 +307,7 @@ namespace Deadline4Sec
             // the course, let the tier and category limits go for this one pick.
             if (candidates.Count == 0 && AreasActive)
             {
+                RelaxedPicks++;
                 CollectCandidates(0, 2, false);
                 candidates.RemoveAll(p => p.IsAirRouteEntry || p.IsWallRun);
             }
@@ -431,6 +448,7 @@ namespace Deadline4Sec
 
         private void SpawnPattern(CoursePattern prefab)
         {
+            LogTightJoin(prefab);
             float startZ = nextStartZ;
             AreaDefinition area = AreasActive ? areas.SpawnArea : null;
             // Obstacles pick their model while they wake up, during Instantiate.
@@ -502,6 +520,25 @@ namespace Deadline4Sec
 
             if (showDebugLogs)
                 Debug.Log("Spawn Pattern: " + prefab.name + " | " + prefab.Difficulty);
+        }
+
+        // Pattern by itself is fine, the join is not: the last threat of one and
+        // the first of the next too close to read (debug only).
+        private void LogTightJoin(CoursePattern next)
+        {
+            if (previousPrefab == null || !(showDebugLogs || (AreasActive && areaCatalog.showPatternDebugLogs)))
+                return;
+            // Air combo chains (air exit → next air / stomp beat) are close on purpose.
+            if (previousPrefab.ExitState == CoursePattern.TravelState.Air)
+                return;
+            if (!previousPrefab.TryGetThreatEnds(out _, out float last, out bool beam) ||
+                !next.TryGetThreatEnds(out float first, out _, out _))
+                return;
+            float gap = previousPrefab.PatternLength - last + first;
+            float needed = beam ? readableSpacingAfterSlide : readableThreatSpacing;
+            if (gap < needed)
+                Debug.LogWarning($"Readability: {previousPrefab.name} -> {next.name}: next threat {gap:F1} m after the last" +
+                    (beam ? " (behind a slide beam)" : "") + $", wanted {needed:F0} m.");
         }
 
         // What the pattern prefabs carry themselves, in the area's own colours.

@@ -55,10 +55,11 @@ namespace Deadline4Sec.AcceptanceTests
         [UnityTest]
         public IEnumerator EffectsFollowTheEquippedSkinAndLeaveNothingBehind()
         {
-            int saved = PlayerPrefs.GetInt("EquippedWeaponSkin", 0);
-            int tutorial = PlayerPrefs.GetInt("Deadline4Sec.TutorialCompleted", -1);
             EditorSceneManager.OpenScene("Assets/Scenes/EndlessRun.unity");
             yield return new EnterPlayMode();
+            // Read in play mode: entering it reloads the domain and drops earlier locals.
+            int saved = PlayerPrefs.GetInt("EquippedWeaponSkin", 0);
+            int tutorial = PlayerPrefs.GetInt("Deadline4Sec.TutorialCompleted", -1);
             yield return null;
             try
             {

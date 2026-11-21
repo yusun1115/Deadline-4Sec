@@ -61,10 +61,10 @@ MonoBehaviour:
   referenceForwardSpeed: 10.2
   laneWidth: 2.5
   difficulty: 0
-  category: 2
+  category: 8
   entryState: 0
   exitState: 0
-  intensity: 3
+  intensity: 2
 --- !u!1001 &594811460791452
 PrefabInstance:
   m_ObjectHideFlags: 0

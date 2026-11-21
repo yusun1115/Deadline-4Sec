@@ -53,10 +53,13 @@ namespace Deadline4Sec.AcceptanceTests
         [UnityTest]
         public IEnumerator AtmosphereAndLayersFollowTheAreaThroughTheTunnel()
         {
-            int tutorial = PlayerPrefs.GetInt("Deadline4Sec.TutorialCompleted", -1);
+            // Entering play mode reloads the domain and drops locals: the
+            // original value waits in the editor session.
+            UnityEditor.SessionState.SetInt("VisualUpgradeTest.Tutorial", PlayerPrefs.GetInt("Deadline4Sec.TutorialCompleted", -1));
             PlayerPrefs.SetInt("Deadline4Sec.TutorialCompleted", 1);
             EditorSceneManager.OpenScene(ScenePath);
             yield return new EnterPlayMode();
+            int tutorial = UnityEditor.SessionState.GetInt("VisualUpgradeTest.Tutorial", -1);
             yield return null;
             yield return null;
             Component spawner = Get("PatternSpawner");

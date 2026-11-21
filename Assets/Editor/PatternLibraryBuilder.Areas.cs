@@ -19,13 +19,18 @@ namespace Deadline4Sec.Editor
 
         // Soul Railway keeps everything that exists today except the sections
         // that now belong to other areas.
+        // Obstacle Pattern Rework (2026-11-21): no Train Wagon patterns (H, K, O);
+        // the lane blocker set in every area, more trains here.
         private static readonly string[] RailwayPatterns =
         {
             "A_LaneAttack", "B_JumpSlide", "C_AirCombo", "D_Stomp", "E_MixedRisk", "F_Crossfire", "G_Hurdles",
-            "H_TrainHop", "I_ArchWalk", "J_ClockGate", "K_TrainRun", "L_AirLadder", "M_StompStairs", "N_Gauntlet",
-            "O_TrainCombo", "P_ClockAirStorm", "Q_ObstacleRush", "R_TrainCorridor", "S_RampRun", "T_TrainWeave",
+            "I_ArchWalk", "J_ClockGate", "L_AirLadder", "M_StompStairs", "N_Gauntlet",
+            "P_ClockAirStorm", "Q_ObstacleRush", "R_TrainCorridor", "S_RampRun", "T_TrainWeave",
             "V1_Landing", "V2_SoulWalk",
+            "LaneBlocker_Single_Left", "LaneBlocker_Single_Center", "LaneBlocker_Double", "LaneBlocker_Jump", "LaneBlocker_Enemy",
+            "TrainRamp_Simple", "TrainRamp_DoubleTrain", "TrainRoof_Jump", "TrainRamp_Triple",
         };
+
 
         // No trains in a cathedral; the same beats otherwise, in its own stone.
         private static readonly string[] CathedralPatterns =
@@ -33,6 +38,7 @@ namespace Deadline4Sec.Editor
             "A_LaneAttack", "B_JumpSlide", "C_AirCombo", "D_Stomp", "E_MixedRisk", "F_Crossfire", "G_Hurdles",
             "I_ArchWalk", "L_AirLadder", "M_StompStairs", "N_Gauntlet", "P_ClockAirStorm", "Q_ObstacleRush",
             "V1_Landing", "V2_SoulWalk",
+            "LaneBlocker_Single_Left", "LaneBlocker_Single_Center", "LaneBlocker_Double", "LaneBlocker_Jump", "LaneBlocker_Enemy",
         };
 
         private static readonly string[] CathedralSpecials = { "W1_WallRun_Left", "W2_WallRun_Right" };
@@ -43,6 +49,7 @@ namespace Deadline4Sec.Editor
             "A_LaneAttack", "B_JumpSlide", "C_AirCombo", "D_Stomp", "E_MixedRisk", "F_Crossfire", "G_Hurdles",
             "J_ClockGate", "L_AirLadder", "M_StompStairs", "N_Gauntlet", "P_ClockAirStorm", "Q_ObstacleRush",
             "V1_Landing", "V2_SoulWalk",
+            "LaneBlocker_Single_Left", "LaneBlocker_Single_Center", "LaneBlocker_Double", "LaneBlocker_Jump", "LaneBlocker_Enemy",
         };
 
         private static readonly string[] ClockworkSpecials =
@@ -54,9 +61,13 @@ namespace Deadline4Sec.Editor
         private static readonly Dictionary<string, int> PatternIntensities = new Dictionary<string, int>
         {
             { "A_LaneAttack", 2 }, { "B_JumpSlide", 2 }, { "C_AirCombo", 3 }, { "D_Stomp", 3 }, { "E_MixedRisk", 5 },
-            { "F_Crossfire", 3 }, { "G_Hurdles", 2 }, { "H_TrainHop", 3 }, { "I_ArchWalk", 2 }, { "J_ClockGate", 3 },
-            { "K_TrainRun", 3 }, { "L_AirLadder", 4 }, { "M_StompStairs", 4 }, { "N_Gauntlet", 5 }, { "O_TrainCombo", 4 },
-            { "P_ClockAirStorm", 5 }, { "Q_ObstacleRush", 4 }, { "R_TrainCorridor", 3 }, { "S_RampRun", 3 }, { "T_TrainWeave", 4 },
+            { "F_Crossfire", 3 }, { "G_Hurdles", 2 }, { "I_ArchWalk", 2 }, { "J_ClockGate", 3 },
+            { "L_AirLadder", 4 }, { "M_StompStairs", 4 }, { "N_Gauntlet", 5 },
+            { "P_ClockAirStorm", 5 }, { "Q_ObstacleRush", 4 }, { "R_TrainCorridor", 2 }, { "S_RampRun", 3 }, { "T_TrainWeave", 4 },
+            // Obstacle Pattern Rework (2026-11-21).
+            { "LaneBlocker_Single_Left", 1 }, { "LaneBlocker_Single_Center", 2 }, { "LaneBlocker_Double", 2 },
+            { "LaneBlocker_Jump", 3 }, { "LaneBlocker_Enemy", 3 },
+            { "TrainRamp_Simple", 2 }, { "TrainRamp_DoubleTrain", 3 }, { "TrainRoof_Jump", 3 }, { "TrainRamp_Triple", 4 },
             { "V1_Landing", 1 }, { "V2_SoulWalk", 1 }, { "W1_WallRun_Left", 4 }, { "W2_WallRun_Right", 4 },
             { "U1_AirRouteEntry", 3 }, { "U5_AirRouteEntry_Weave", 4 }, { "U2_UpperRun_Combat", 3 }, { "U3_UpperRun_Hurdles", 3 },
             { "U4_UpperReturn", 2 }, { "AreaTransition_Tunnel", 1 },
@@ -191,9 +202,9 @@ namespace Deadline4Sec.Editor
             // Easy, so a rest is possible from the first seconds of a run.
             var easy = CoursePattern.DifficultyLevel.Easy;
             var ground = CoursePattern.PatternCategory.GroundCombat;
-            SavePattern(P("Pattern_V1_Landing", 38f, easy, ground, CoursePattern.TravelState.Any, CoursePattern.TravelState.Ground)
+            SavePattern(P("Pattern_V1_Landing", 42f, easy, ground, CoursePattern.TravelState.Any, CoursePattern.TravelState.Ground)
                 .Coins(0, 1f, 8f, 8, 1.6f).Enemy(-1, 28f).Enemy(1, 35f));
-            SavePattern(P("Pattern_V2_SoulWalk", 40f, easy, ground, CoursePattern.TravelState.Any, CoursePattern.TravelState.Ground)
+            SavePattern(P("Pattern_V2_SoulWalk", 44f, easy, ground, CoursePattern.TravelState.Any, CoursePattern.TravelState.Ground)
                 .Coins(-1, 1f, 8f, 5, 1.4f).Coins(1, 1f, 17f, 5, 1.4f).Enemy(0, 29f).Enemy(-1, 37f));
         }
 

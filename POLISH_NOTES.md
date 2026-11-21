@@ -231,6 +231,24 @@
 - **Near Miss = 마지막 순간 회피**: 기존 조건(장애물 주변 near 구역을 몸 전체가 지나가고 닿지 않음)에 더해, 장애물 앞 `lastMomentDistance`(기본 2.6m) 안에서 장애물과 정면으로 겹치는(좌우·높이) 충돌 코스에 있었어야 함(`Obstacle.HeadingInto`). 옆 레인으로 그냥 지나가거나(예: 전철 옆 레인 통과) 미리 피하면 Near Miss가 아님. 테스트 `ClosePassAwardsOneNearMiss`(막판 회피 = 인정), `StraightClosePassIsNotANearMiss`(옆 통과 = 불인정).
 - **Ground Slam 반동 제거**: 충격파 판정 후 튀어 오르지 않고 바로 착지해 계속 달림(`groundSlamBouncePower` 삭제, 씬에 남은 값은 무시됨). 공중 콤보 상태도 해제.
 
+## 장애물 패턴 재작업 (2026-11-21, Obstacle Pattern Rework.md)
+
+- **적용 방법**: 메뉴 `Deadline 4 Sec/Course/Apply Obstacle Pattern Rework`(`PatternLibraryBuilder.Rework.cs`). 새 패턴 생성, 수정 패턴 재생성, B 수정, Area 풀·강도 적용, 열려 있는 저장된 EndlessRun의 대체 목록 갱신. 다시 실행해도 안전.
+- **Train Wagon 제거**: 세 레인을 덮는 낮은 화차는 `H_TrainHop`, `K_TrainRun`(2량), `O_TrainCombo`에서만 쓰였고 Soul Railway 풀과 EndlessRun 대체 목록에만 있었음 → 둘 다에서 빼고 빌더에서도 생성하지 않음. 프리팹(`Train Wagon`, `Train Wagon Double`, 패턴 3개)은 참조 없이 남겨 둠(Deprecated).
+- **Slide 빔 뒤 가림 규칙**: Slide 장애물 빔(높이 1.3~3.8m)은 같은 레인 뒤의 낮은 것을 지나갈 때까지 가림 → 같은 레인에서 Slide 뒤 다음 위협은 14m 이상(최고 속도 약 0.9초), 아니면 다른 레인. 패턴 사이 이음새도 같은 규칙(일반 6m 이상). 테스트로 모든 풀에 강제.
+  - `B_JumpSlide`(Jump→Slide→Jump, 6m 간격, 문제 패턴): 두 번째 Jump 삭제, Jump 5m → Slide 17m(12m 회복).
+  - `G_Hurdles`(J→S→J→S 같은 레인): 1열 Jump(왼)/빈칸/Slide(오) 선택 → 2열 가운데 Jump → 적. 
+  - `Q_ObstacleRush`: Jump→Slide→Lane Blocker(빔 뒤 16m)→적, 길이 44.
+  - `N_Gauntlet`: Slide 뒤 10m에 숨어 있던 Jump를 14m로, 길이 42.
+  - `E_MixedRisk` 30→32m, `I_ArchWalk` 26→28m(끝 위협 → 다음 공중 콤보 5m였음).
+- **Lane Blocker**: 기존엔 Hard 패턴(E, N, Q, 강도 4~5)에만 있어 45초 뒤에야 등장. 이제 모든 Area 풀에: `LaneBlocker_Single_Left`(I1, Easy), `LaneBlocker_Single_Center`(I2, Easy), `LaneBlocker_Double`(I2, Easy, 가운데만 안전), `LaneBlocker_Jump`(I3, Medium, 왼 Blocker + 가운데 Jump 5m 뒤), `LaneBlocker_Enemy`(I3, Medium, 가운데 Blocker + 오른쪽 적). 처음엔 단순한 형태, 조합형은 20초 뒤.
+- **Train**: 새 카테고리 `Train`(카테고리 반복 규칙: 3연속 금지). `R_TrainCorridor` 강도 3→2(초반 후보), R/S/T는 Train 카테고리. 새 패턴(Soul Railway만): `TrainRamp_Simple`(I2, Easy: 경사로→지붕→지상), `TrainRamp_DoubleTrain`(I3, Medium), `TrainRoof_Jump`(I3, Medium: 첫 지붕에 Jump 1개), `TrainRamp_Triple`(I4, Hard). 연속 기차는 다음 차량의 경사로가 앞 지붕 끝에서 바로 시작 → 점프 없이 떨어져도 경사로에 착지해 다시 올라감(숨은 낭떠러지 없음), 점프해도 안전. 옆 레인은 비워 둠(지상으로 가도 됨). `TrainRoof_LaneMove`는 지붕 사이 좌우 이동이 판정상 위험하고 읽기 어려워 생략.
+- **가독성 확인으로 바꾼 것**: 경사로 위 영혼 줄이 지붕 위 Jump 장애물을 가려서 그 경사로의 코인 제거(TrainRoof_Jump, Triple 2번째).
+- **디버그**: `PatternSpawner`의 `debugRepeatPattern`(그 패턴만 반복 스폰), `readableThreatSpacing`/`readableSpacingAfterSlide`(Area 디버그 로그가 켜져 있으면 좁은 이음새를 경고), `RelaxedPicks`(규칙 완화 선택 수). `CoursePattern.TryGetThreatEnds`.
+- 테스트: `ObstaclePatternReworkAcceptanceTests`(Wagon 없음, 빔 뒤 가림·이음새, 초반 Lane Blocker/Train 후보, 14개 패턴을 최고 속도 16m/s에서 리플레이 봇이 각 3회 이상 통과). 회귀 158개 중 157 통과·1 건너뜀·실패 0, 고정 시드 리플레이 5개(60초 3개, 180초 2개) 모두 완주.
+- **수치(40시드 × 60패턴, 실행 시간 반영)**: Train Wagon 0회, 규칙 완화 선택(fallback) 0회. 첫 Lane Blocker 평균 11.8초(최대 49초, 40/40 런), 첫 Train 평균 11.4초. 처음 60초 동안 Lane Blocker 패턴 평균 5.7개, Train 패턴 2.1개. Soul Railway 패턴의 21%가 Train.
+- **같이 바꾼 것**: `V1_Landing` 38→42m, `V2_SoulWalk` 40→44m(마지막 적이 끝 3m 앞이라 다음 패턴 첫 적과 8m, 다른 레인이라 장거리 리플레이에서 사망). 테스트 도우미의 플레이 모드 진입 전 PlayerPrefs 읽기를 진입 후로 옮김(도메인 리로드로 원래 값이 0이 되어 튜토리얼 완료값을 덮어쓸 수 있었음).
+
 ## 무기 스킨 고유 VFX (2026-11-21, Weapon Skin Unique VFX.md)
 
 - **원인(기본 핑크 이펙트 버그)**: 레인 공격 참격(`CombatParticles.OnPlayerAction`)과 처치 참격·불꽃·영혼(`PlayKill`)이 `Pink` 상수로 하드코딩되어 있었음. 스킨 색은 트레일 색과 처치 시 추가 불꽃 12개에만 반영 → 어떤 스킨이든 공격은 NEON REAPER 핑크 참격. 호밍 경로·처치 링도 시안 고정. 트레일은 기본 낫 메시의 끝에 붙어 있어 다른 무기 형태와 어긋났음.

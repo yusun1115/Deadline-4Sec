@@ -239,7 +239,7 @@ namespace Deadline4Sec.AcceptanceTests
             return false;
         }
 
-        private static void Drive(Component player, float centerX, float time,
+        internal static void Drive(Component player, float centerX, float time,
             Dictionary<int, float> actions, HashSet<int> bypassedEnemies, StringBuilder trace)
         {
             // Wall Run (2026-10-18): swipe toward the open wall in the entry

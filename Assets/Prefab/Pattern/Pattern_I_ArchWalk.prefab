@@ -58,7 +58,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 319e993150a54bdd995d5f93921b7ae4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Deadline4Sec.CoursePattern
-  patternLength: 26
+  patternLength: 28
   referenceForwardSpeed: 10.2
   laneWidth: 2.5
   difficulty: 0
