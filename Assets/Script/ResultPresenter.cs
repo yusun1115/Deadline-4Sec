@@ -19,6 +19,14 @@ namespace Deadline4Sec
     // Two buttons side by side, MAIN MENU | RETRY, whether or not boxes were
     // earned (both already open the earned boxes first via GameFlowManager).
     // A tap anywhere skips straight to the end state.
+    // NEW BEST (2026-11-22): the score's record only; a distance-only record
+    // reads NEW DISTANCE BEST (it used to say NEW BEST for either).
+    // Exhibition (2026-11-22, Exhibition Result-Ranking Flow.md): the result is
+    // a short summary, no buttons (MAIN / RETRY / CONFIRM off: the nickname
+    // entry and the ranking come next, and nothing may skip them), a bigger
+    // score, one small best-score line instead of the personal-best block,
+    // MAX COMBO, the run reward counting up, and "랭킹 등록 준비 중..." at the
+    // bottom. The normal result is unchanged.
     [RequireComponent(typeof(CanvasGroup))]
     public sealed class ResultPresenter : MonoBehaviour
     {
@@ -34,6 +42,10 @@ namespace Deadline4Sec
         [Header("Sequence")]
         [SerializeField, Min(0.1f)] private float scoreCountDuration = 0.65f;
         [SerializeField, Min(0f)] private float stepDelay = 0.08f;
+        [Tooltip("Exhibition: the run reward counts up this long.")]
+        [SerializeField, Min(0.05f)] private float rewardCountDuration = 0.4f;
+        [Tooltip("Exhibition: score size on the summary (bigger than the normal result's).")]
+        [SerializeField, Min(10f)] private float exhibitionScoreSize = 104f;
 
         [Header("Parts (each has a CanvasGroup)")]
         [SerializeField] private CanvasGroup gameOver;
@@ -58,22 +70,111 @@ namespace Deadline4Sec
         private AudioSource audioSource;
         private int finalScore;
         private bool isNewBest;
+        private bool isNewDistanceBest;
+        private int bestScore;
+        private bool exhibition;
+        private TMP_Text preparingLabel, bestScoreLine;
+        private float preparingStarted;
         private int runCoins;
         private int runGiftBoxes;
         private bool playing;
         private bool skipRequested;
         private float fitScale = 1f;
 
-        public void Prepare(int score, bool newBestRecord, int coins, int giftBoxes, GameMode mode = GameMode.Deadline)
+        // True while the exhibition summary is on (tests).
+        public bool ExhibitionLayout => exhibition;
+        public bool NewBestShown => newBest != null && newBest.gameObject.activeSelf;
+        public string NewBestCaption => newBest != null && newBest.TryGetComponent(out TMP_Text t) ? t.text : "";
+
+        public void Prepare(int score, bool newBestRecord, int coins, int giftBoxes, GameMode mode = GameMode.Deadline) =>
+            Prepare(score, newBestRecord, false, score, coins, giftBoxes, mode);
+
+        // newBestScore: this run beat the saved score; newBestDistance: the
+        // distance; best: the best score after this run.
+        public void Prepare(int score, bool newBestScore, bool newBestDistance, int best, int coins, int giftBoxes,
+            GameMode mode = GameMode.Deadline)
         {
             finalScore = Mathf.Max(0, score);
-            isNewBest = newBestRecord;
+            isNewBest = newBestScore;
+            isNewDistanceBest = newBestDistance && !newBestScore;
+            bestScore = Mathf.Max(0, best);
             runCoins = Mathf.Max(0, coins);
             runGiftBoxes = Mathf.Max(0, giftBoxes);
             // The mode names the score and the personal bests it is compared with.
             string name = GameModeState.DisplayName(mode);
             SetCaption("ScoreLabel", name + " SCORE");
             SetCaption("PersonalBestLabel", name + " BEST");
+            if (newBest != null && newBest.TryGetComponent(out TMP_Text caption))
+                caption.text = isNewDistanceBest ? "NEW DISTANCE BEST!" : "★ NEW BEST! ★";
+        }
+
+        // The exhibition summary (on) or the normal result (off), before Play.
+        public void UseExhibitionLayout(bool on)
+        {
+            exhibition = on;
+            foreach (CanvasGroup button in new[] { mainMenuButton, retryButton })
+                if (button != null)
+                    button.gameObject.SetActive(!on);
+            Transform confirm = transform.Find("ConfirmButton");
+            if (confirm != null && on)
+                confirm.gameObject.SetActive(false);
+            if (personalBest != null)
+                foreach (CanvasGroup part in personalBest)
+                    if (part != null)
+                        part.gameObject.SetActive(!on);
+            if (!on)
+            {
+                if (preparingLabel != null)
+                    preparingLabel.gameObject.SetActive(false);
+                if (bestScoreLine != null)
+                    bestScoreLine.gameObject.SetActive(false);
+                return;
+            }
+            SetCaption("ComboLabel", "MAX COMBO");
+            // The score above all: bigger digits, a quieter GAME OVER.
+            if (scoreText != null)
+            {
+                scoreText.enableAutoSizing = false;
+                scoreText.fontSize = exhibitionScoreSize;
+                scoreText.rectTransform.sizeDelta = new Vector2(scoreText.rectTransform.sizeDelta.x, exhibitionScoreSize * 1.25f);
+            }
+            if (gameOver != null && gameOver.TryGetComponent(out TMP_Text title))
+            {
+                title.enableAutoSizing = false;
+                title.fontSize = 38f;
+                title.color = new Color(title.color.r, title.color.g, title.color.b, 0.8f);
+            }
+            if (rewardCoinText != null)
+            {
+                rewardCoinText.enableAutoSizing = false;
+                rewardCoinText.fontSize = 38f;
+            }
+            foreach (string icon in new[] { "RewardCoinIcon", "RewardGiftIcon" })
+            {
+                Transform t = transform.Find(icon);
+                if (t != null)
+                    t.localScale = Vector3.one * 1.25f;
+            }
+            // Not a record: one small line with the best score, where NEW BEST stands.
+            if (bestScoreLine == null && newBest != null)
+            {
+                bestScoreLine = GameFlowManager.CreateMenuText(transform, "", ((RectTransform)newBest.transform).anchoredPosition,
+                    new Vector2(600f, 40f), 26f);
+                bestScoreLine.name = "ExhibitionBestScoreLine";
+                bestScoreLine.color = new Color(1f, 0.85f, 0.95f, 0.75f);
+            }
+            if (bestScoreLine != null)
+            {
+                bestScoreLine.text = "BEST SCORE  " + bestScore.ToString("N0", CultureInfo.InvariantCulture);
+                bestScoreLine.gameObject.SetActive(false);
+            }
+            if (preparingLabel == null)
+            {
+                preparingLabel = GameFlowManager.CreateMenuText(transform, "랭킹 등록 준비 중", new Vector2(0f, -340f), new Vector2(620f, 50f), 30f);
+                preparingLabel.name = "ExhibitionPreparingLabel";
+                preparingLabel.color = new Color(1f, 0.8f, 0.92f, 0.9f);
+            }
+            preparingLabel.gameObject.SetActive(false);
         }
 
         private void SetCaption(string child, string text)
@@ -114,7 +215,15 @@ namespace Deadline4Sec
         {
             if (playing && PointerPressed())
                 skipRequested = true;
+            // "랭킹 등록 준비 중" with dots counting 1 -> 3.
+            if (preparingLabel != null && preparingLabel.gameObject.activeSelf)
+            {
+                int dots = 1 + (int)((Time.unscaledTime - preparingStarted) / 0.35f) % 3;
+                preparingLabel.text = PreparingText + new string('.', dots);
+            }
         }
+
+        private const string PreparingText = "랭킹 등록 준비 중";
 
         // ---------------- sequence ----------------
 
@@ -180,16 +289,32 @@ namespace Deadline4Sec
             // Records: NEW BEST only after the count, personal bests stay quiet.
             if (newBest != null)
             {
-                newBest.gameObject.SetActive(isNewBest);
-                if (isNewBest)
+                newBest.gameObject.SetActive(NewBestVisible);
+                if (NewBestVisible)
                 {
-                    StartCoroutine(Pop(newBest, 1.7f, 0.22f));
-                    Sound(newBestSound, "NearChime", 0.8f, 1.1f);
+                    StartCoroutine(Pop(newBest, isNewBest ? 1.7f : 1.3f, 0.22f));
+                    Sound(newBestSound, "NearChime", isNewBest ? 0.8f : 0.5f, 1.1f);
                 }
             }
+            if (exhibition && bestScoreLine != null && !isNewBest)
+                bestScoreLine.gameObject.SetActive(true);
             StartCoroutine(Stagger(personalBest, 0.12f, 0.03f));
             yield return Wait(stepDelay);
             StartCoroutine(Stagger(reward, 0.12f, 0.03f));
+            if (exhibition)
+            {
+                // The Souls earned count up, then a little punch.
+                for (float t = 0f; t < rewardCountDuration && !skipRequested; t += Time.unscaledDeltaTime)
+                {
+                    if (rewardCoinText != null)
+                        rewardCoinText.text = "+" + Mathf.RoundToInt(runCoins * EaseOut(t / rewardCountDuration)).ToString("N0", CultureInfo.InvariantCulture);
+                    yield return null;
+                }
+                ApplyRewardsAndButtons();
+                if (rewardCoinText != null)
+                    StartCoroutine(Punch(rewardCoinText.rectTransform, 1.18f, 0.16f));
+                ShowPreparing();
+            }
             yield return Wait(stepDelay);
 
             // Buttons last, then they take taps.
@@ -218,7 +343,25 @@ namespace Deadline4Sec
                 scoreText.rectTransform.localScale = Vector3.one;
             }
             if (newBest != null)
-                newBest.gameObject.SetActive(isNewBest);
+                newBest.gameObject.SetActive(NewBestVisible);
+            if (exhibition)
+            {
+                ApplyRewardsAndButtons();
+                if (bestScoreLine != null)
+                    bestScoreLine.gameObject.SetActive(!isNewBest);
+                ShowPreparing();
+            }
+        }
+
+        // The exhibition shows the score's record only (the distance one is the normal result's).
+        private bool NewBestVisible => isNewBest || (isNewDistanceBest && !exhibition);
+
+        private void ShowPreparing()
+        {
+            if (preparingLabel == null || preparingLabel.gameObject.activeSelf)
+                return;
+            preparingLabel.gameObject.SetActive(true);
+            preparingStarted = Time.unscaledTime;
         }
 
         private IEnumerator Wait(float seconds)

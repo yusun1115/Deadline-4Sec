@@ -232,6 +232,13 @@
 - **Slide Obstacle 직전 슬라이드 Near Miss(2026-11-22)**: 직전에 슬라이드로 빠져나가도 발동하지 않던 문제. 원인 2가지 — ① 슬라이드는 누르는 순간 판정 높이가 2m→약 0.5m로 줄어 빔(1.3m 위) 아래로 내려가므로, 장애물 2.6m 안에서 "서서 부딪힐 코스"였던 순간이 거의 없음(최고 속도 0.16초). ② 낮게 미끄러지는 판정이 빔 아래 Near 구역(빔 하단 −0.65m)보다 더 아래를 지나감. 수정: Slide 장애물만 "부딪힐 코스" 거리 `slideLastMomentDistance`(5m, 프리팹에 저장), Near 구역은 빔 아래 바닥까지. 5m보다 일찍 미끄러지면 여전히 Near Miss 아님. 테스트 `SlideNearMissAcceptanceTests`(실제 씬: 1.5m·4m 직전 슬라이드 = Near Miss, 9m = 아님).
 - **Ground Slam 반동 제거**: 충격파 판정 후 튀어 오르지 않고 바로 착지해 계속 달림(`groundSlamBouncePower` 삭제, 씬에 남은 값은 무시됨). 공중 콤보 상태도 해제.
 
+## 장애물 모양 구별 / 경사로 옆 적 (2026-11-22, 플레이 피드백)
+
+- **Monolith 방향**: Lane Blocker 프리팹의 `ObstacleVisual.modelEuler`가 (0,180,0)이라 묘비의 앞면(십자가)이 왼쪽을 향했음 → (0,−90,0). 모델은 `ObstacleVisual`이 회전을 `modelEuler`로 덮어쓰므로 `Obstacle_Monolith` 프리팹 루트 회전은 인게임에 영향 없음.
+- **지역 장애물 모양 규칙**(철도와 같은 언어): Lane Blocker = 바닥에 선 세로 기둥, Jump = 낮고 넓은 가로, Slide = 위에 매달린 가로 빔(가시 아래, 체인·막대 위). Cathedral Slide를 액자 같은 판(BrokenArch) → 체인에 매달린 상인방 + 종유석(`HangingLintel`), Clockwork Lane Blocker를 기어 판(Gear) → 피스톤 기둥(`Piston`), Clockwork Slide를 기어 판(Frame) → 막대·기어에 매달린 톱니 빔(`GearRack`). 판정 박스는 그대로. 메뉴 `Course/Rebuild Area Obstacle Models`(`PatternLibraryBuilder.ObstacleLooks.cs`), 옛 모델 3개는 삭제.
+- **지역 장애물 발광**: 철도 장애물은 넓고 밝은 HDR 림(파워 1.8, 1.6배)·약한 발광·밝은 틴트로 멀리서도 보이는데, Cathedral/Clockwork는 림이 얇고 어둡고(4.5, 0.7) 발광이 없어 배경에 묻혔음. `CathedralStone`(붉은 림 1.8×, 파워 2, 발광, 틴트 1.25), `ClockworkBrass`(금색 림 1.6×, 파워 2.2, 발광, 틴트 1.12) — 너무 밝으면 형태가 사라져 철도보다 약간 낮게. 모델에 발광 포인트 추가: 천사상 후광·받침 테두리·옷주름, 잔해 균열·윗단, 상인방 룬·윗단, 피스톤 가운데 띠·캡·받침, 축 칼라·받침, 톱니 빔 룬·윗단.
+- **경사로 옆 적 제거**: TrainRamp_Simple/DoubleTrain/TrainRoof_Jump/Triple의 경사로 입구 옆(왼쪽 레인 6~7m) 지상 적이 측면 공격으로 경사로를 오르는 플레이어를 죽였음 → 삭제, 첫 적은 지붕 위 공중 적. 테스트 `NoGroundSoulStandsBesideARamp`.
+
 ## 장애물 패턴 재작업 (2026-11-21, Obstacle Pattern Rework.md)
 
 - **적용 방법**: 메뉴 `Deadline 4 Sec/Course/Apply Obstacle Pattern Rework`(`PatternLibraryBuilder.Rework.cs`). 새 패턴 생성, 수정 패턴 재생성, B 수정, Area 풀·강도 적용, 열려 있는 저장된 EndlessRun의 대체 목록 갱신. 다시 실행해도 안전.
@@ -293,6 +300,9 @@
 - **데이터**: 랭킹은 `persistentDataPath/exhibition_ranking.json`(+ `_backup`), 닉네임당 한 줄·최고점, 동점은 먼저 등록한 사람, 100명 보관. 관람객 세션(`ExhibitionSession`)은 메모리에만 있어 앱 재시작은 항상 새 관람객. FINISH는 세션만 지움.
 - **원래 게임 그대로(2026-11-13 요청)**: 업그레이드 레벨, 소모 아이템, Soul·선물 상자, 무기 스킨은 일반 게임과 같음(공정성 처리 안 함). Google Play 점수 제출만 전시에서 건너뜀.
 - **관리자**: 언제든 `Ctrl + Shift + Delete` → 관리자 창. 1 스킨 재화 4종 +50, 2 Soul +10,000, 3 전시 랭킹 초기화, 4 전체 데이터 초기화(PlayerPrefs 전부 + 전시 랭킹, 씬 다시 시작). 3·4는 확인 창(Y/N), Esc 닫기. 에디터 메뉴 `Clear Exhibition Ranking...`(이 PC의 파일).
+- **결과 → 등록 → 랭킹 강제(2026-11-22, Exhibition Result-Ranking Flow.md)**: 전에는 결과 연출 직후 MAIN / RETRY / CONFIRM이 눌리고 닉네임 입력은 1.6초 뒤라, 그 사이에 누르면 등록이 통째로 건너뛰어졌음. 이제 Deadline 런의 최종 사망부터 랭킹의 RETRY / FINISH까지 `GameFlowManager.ExhibitionResultLocked` — `Retry` / `MainMenu` / `ConfirmResult` 무시, `ExhibitionUI.FinishSession`도 랭킹에서만. 결과는 버튼 없는 요약: 점수 크게(104), GAME OVER 작게, MAX COMBO, 개인 최고 블록 대신 신기록 아니면 "BEST SCORE 61,400" 한 줄, 보상 카운트업 + 펀치, 하단 "랭킹 등록 준비 중..."(점 애니메이션). `resultToNicknameSeconds`(1.8초, ExhibitionSettings) 뒤 닉네임(첫 판, 제목 REGISTER YOUR SCORE) 또는 자동 갱신(재도전) → 랭킹(결과 패널은 닫힘). 일반 모드와 전시 Classic은 기존 결과 그대로.
+- **NEW BEST 판정**: 점수·거리 중 하나라도 갱신되면 NEW BEST였음(점수는 낮고 거리만 기록일 때도) → NEW BEST는 점수 기록만, 거리만 기록이면 일반 결과에 "NEW DISTANCE BEST!", 전시 결과엔 표시 안 함. 비교는 저장 전 값으로(순서 문제 없음).
+- 테스트: `ExhibitionResultFlowAcceptanceTests`(결과 중 버튼·메서드 연타로 못 나감, 1.4초 전엔 닉네임 안 뜸, 등록 → 랭킹, RETRY는 닉네임 생략·한 줄 유지, FINISH 후 튜토리얼, 일반 결과는 MAIN/RETRY와 NEW DISTANCE BEST).
 - **타이틀 LEADERBOARD(2026-11-15)**: 전시 모드일 때만 DEADLINE / CLASSIC(Google Play, 그대로) 아래에 EXHIBITION 버튼이 런타임에 추가됨(씬은 안 바꿈, 창 높이만 늘어남). 누르면 전시 랭킹 TOP 10을 보기 전용으로 띄움(RETRY/FINISH 대신 CLOSE, 자동 종료 없음, 관람객 세션 시작 안 함).
 - 테스트: `ExhibitionAcceptanceTests`(저장·최고점·동점·100명·손상 파일·닉네임 검증·초기화, 관람객 A→재도전→자동 종료→다음 관람객 실제 씬 흐름, 꺼짐 상태).
 

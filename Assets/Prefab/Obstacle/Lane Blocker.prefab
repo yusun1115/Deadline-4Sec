@@ -128,6 +128,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Deadline4Sec.Obstacle
   obstacleType: 0
   nearMissMargin: {x: 0.96, y: 0.47, z: 0.43}
+  lastMomentDistance: 2.6
+  slideLastMomentDistance: 5
 --- !u!114 &6415787552046693587
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -141,6 +143,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Deadline4Sec.ObstacleVisual
   modelPrefab: {fileID: 98593400841437173, guid: 19bb2258fccce6548afbf6a72fd65fb4, type: 3}
-  modelEuler: {x: 0, y: 180, z: 0}
+  modelEuler: {x: 0, y: -90, z: 0}
   fallbackMaterial: {fileID: 2100000, guid: 685fc420b624590469c2b5874816771e, type: 2}
   fill: 1

@@ -160,6 +160,28 @@ namespace Deadline4Sec.AcceptanceTests
                 }
         }
 
+        // A ramp invites the runner up: no ground Soul stands beside it (its
+        // side attack reaches the ramp's lane, 2026-11-22 playtest).
+        [Test]
+        public void NoGroundSoulStandsBesideARamp()
+        {
+            foreach (object area in Areas())
+                foreach (Component pattern in Pool(area, true))
+                    foreach (Component ramp in pattern.GetComponentsInChildren(T("Obstacle"), true)
+                                 .Where(o => Read(o, "Type").ToString() == "RampTrain"))
+                    {
+                        Vector3 front = pattern.transform.InverseTransformPoint(ramp.transform.position);
+                        foreach (Component enemy in pattern.GetComponentsInChildren(T("Enemy"), true))
+                        {
+                            Vector3 p = pattern.transform.InverseTransformPoint(enemy.transform.position);
+                            bool ground = p.y < 1.5f;
+                            bool beside = Mathf.Abs(Mathf.Abs(p.x - front.x) - 2.5f) < 0.5f;
+                            if (ground && beside && p.z > front.z - 7.5f - 4f && p.z < front.z + 1f)
+                                Assert.Fail($"{pattern.name}: {enemy.name} stands beside the ramp of {ramp.name}.");
+                        }
+                    }
+        }
+
         // A run's first seconds (Easy tier, low pacing targets) can bring a lane
         // blocker in every area, and a train in the railway.
         [Test]

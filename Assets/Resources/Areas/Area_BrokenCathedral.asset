@@ -101,11 +101,11 @@ MonoBehaviour:
   decorMaterial: {fileID: 2100000, guid: 215d422b2bb92ee48a48a9e67060e937, type: 2}
   obstacleSkins:
     laneBlocker:
-      model: {fileID: 7630405222507086053, guid: 2ec5131efd88c404fa08df6e67b67c66, type: 3}
+      model: {fileID: 4229371762196278254, guid: 2ec5131efd88c404fa08df6e67b67c66, type: 3}
       euler: {x: 0, y: 0, z: 0}
     jumpObstacle:
-      model: {fileID: 8496904807811197185, guid: 7eea5c3489071934f8657e98cc5f270d, type: 3}
+      model: {fileID: 7857511230217047032, guid: 7eea5c3489071934f8657e98cc5f270d, type: 3}
       euler: {x: 0, y: 0, z: 0}
     slideObstacle:
-      model: {fileID: 5549927430913066985, guid: f48423724442aac4995f5c778c06ccce, type: 3}
+      model: {fileID: 4782622890605433412, guid: af02d0dc1d8689c46b85172340fd0b44, type: 3}
       euler: {x: 0, y: 0, z: 0}

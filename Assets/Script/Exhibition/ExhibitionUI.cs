@@ -25,7 +25,6 @@ namespace Deadline4Sec
     {
         public enum Flow { WaitingForPlayer, Tutorial, Playing, RevivePrompt, Result, NicknameEntry, Ranking, SessionEnding }
 
-        private const float ResultHoldSeconds = 1.6f;
         private static readonly Color Pink = new Color(1f, 0.32f, 0.62f);
         private static readonly Color LightPink = new Color(1f, 0.72f, 0.86f);
         private static readonly Color PanelColor = new Color(0.11f, 0.05f, 0.15f, 0.96f);
@@ -185,10 +184,12 @@ namespace Deadline4Sec
             StartCoroutine(AfterResult());
         }
 
-        // The score counts up on the normal result first.
+        // The result summary plays first (score, NEW BEST, reward), then the
+        // registration: nothing on the result can skip it (GameFlowManager
+        // keeps the result locked until RETRY / FINISH on the ranking).
         private IEnumerator AfterResult()
         {
-            yield return new WaitForSecondsRealtime(ResultHoldSeconds);
+            yield return new WaitForSecondsRealtime(ExhibitionMode.Settings.resultToNicknameSeconds);
             if (ExhibitionSession.HasNickname)
             {
                 // A retry: the same name, updated without asking again.
@@ -232,6 +233,7 @@ namespace Deadline4Sec
         private void ShowRanking()
         {
             HideAll();
+            flow?.HideResultPanel(); // the result and the nickname entry close
             Current = Flow.Ranking;
             rankingPanel.SetActive(true);
             SetRankingButtons(false);
@@ -306,17 +308,19 @@ namespace Deadline4Sec
             HideAll();
             Current = Flow.SessionEnding;
             ExhibitionSession.NextRun();
+            flow.ReleaseExhibitionResult();
             flow.Retry(); // gift boxes of the run open first, as in the normal game
         }
 
         // Manual FINISH and the automatic one: the same reset.
         public void FinishSession()
         {
-            if ((Current != Flow.Ranking && Current != Flow.Result) || flow == null)
+            if (Current != Flow.Ranking || flow == null) // only after the score is registered
                 return;
             HideAll();
             Current = Flow.SessionEnding;
             ExhibitionSession.ResetExhibitionSession();
+            flow.ReleaseExhibitionResult();
             flow.MainMenu();
         }
 
@@ -516,7 +520,7 @@ namespace Deadline4Sec
         {
             nicknamePanel = Layer("NicknameEntry", new Color(0f, 0f, 0f, 0.7f));
             RectTransform card = Card(nicknamePanel.transform, new Vector2(660f, 640f));
-            Label(card, "FINAL SCORE", new Vector2(0f, 245f), new Vector2(560f, 50f), 32f, LightPink);
+            Label(card, "REGISTER YOUR SCORE", new Vector2(0f, 245f), new Vector2(600f, 50f), 32f, LightPink);
             nicknameScore = Label(card, "0", new Vector2(0f, 175f), new Vector2(600f, 90f), 76f, Gold);
             nicknameScore.font = GameFont.NumberAsset;
             Label(card, "NICKNAME", new Vector2(0f, 90f), new Vector2(560f, 50f), 34f, Color.white);

@@ -24839,6 +24839,8 @@ MonoBehaviour:
   resultOvershootScale: 1.03
   scoreCountDuration: 0.65
   stepDelay: 0.08
+  rewardCountDuration: 0.4
+  exhibitionScoreSize: 104
   gameOver: {fileID: 1072048948}
   scoreBlock:
   - {fileID: 1839941911}

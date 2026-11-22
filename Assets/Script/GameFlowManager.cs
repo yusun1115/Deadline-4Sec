@@ -545,9 +545,19 @@ namespace Deadline4Sec
             FinalizeRun();
         }
 
+        // Exhibition (2026-11-22, Exhibition Result-Ranking Flow.md): from the
+        // final death of a Deadline run until the ranking's RETRY / FINISH, the
+        // result can't be left (no MAIN / RETRY / CONFIRM, no shortcut): the
+        // score is always registered first. ExhibitionUI releases it.
+        public bool ExhibitionResultLocked { get; private set; }
+
+        public void ReleaseExhibitionResult() => ExhibitionResultLocked = false;
+
         private void FinalizeRun()
         {
             State = GameState.GameOver;
+            ExhibitionResultLocked = ExhibitionMode.IsActive && GameModeState.CurrentRunMode == GameMode.Deadline &&
+                GetComponent<ExhibitionUI>() != null; // nothing to release it otherwise
             wallet?.BankRunCoins();
             SaveRecordsAndFillResult();
             StartCoroutine(ShowResultAfterDelay());
@@ -560,7 +570,10 @@ namespace Deadline4Sec
             State = GameState.Result;
             SetUI(false, false, true);
             if (resultPanel != null && resultPanel.TryGetComponent(out ResultPresenter presenter))
+            {
+                presenter.UseExhibitionLayout(ExhibitionResultLocked);
                 presenter.Play();
+            }
             // Exhibition: nickname (first run) or the automatic update, then the ranking.
             // Deadline runs only: Classic keeps the normal result.
             if (ExhibitionMode.IsActive && GameModeState.CurrentRunMode == GameMode.Deadline)
@@ -601,11 +614,13 @@ namespace Deadline4Sec
             SetText(resultSurvivalTimeText, FormatTime(runTime));
             SetText(bestScoreText, bestScore.ToString("N0", CultureInfo.InvariantCulture));
             SetText(bestDistanceText, Mathf.FloorToInt(bestDistance).ToString("N0", CultureInfo.InvariantCulture) + "m");
+            // NEW BEST is the score's record (2026-11-22): it used to show for a
+            // distance record too, next to a lower score and a higher best.
             if (newBestText != null)
                 newBestText.gameObject.SetActive(newBestScore || newBestDistance);
             // The presenter (if present) counts the score up and reveals NEW BEST afterwards.
             if (resultPanel != null && resultPanel.TryGetComponent(out ResultPresenter presenter))
-                presenter.Prepare(score, newBestScore || newBestDistance,
+                presenter.Prepare(score, newBestScore, newBestDistance, bestScore,
                     wallet != null ? wallet.CurrentRunCoins : 0, inventory != null ? inventory.CurrentRunGiftBoxes : 0, mode);
             RunFinished?.Invoke(new RunRecord(mode, score, distance, bestCombo, runTime, newBestScore, newBestDistance));
         }
@@ -614,6 +629,8 @@ namespace Deadline4Sec
         {
             if (State != GameState.GameOver && State != GameState.Result)
                 return;
+            if (ExhibitionResultLocked)
+                return; // the exhibition ranking's RETRY releases it first
             if (inventory != null && inventory.CurrentRunGiftBoxes > 0)
             {
                 retryAfterBoxes = true;
@@ -628,6 +645,8 @@ namespace Deadline4Sec
         {
             if (State != GameState.GameOver && State != GameState.Result)
                 return;
+            if (ExhibitionResultLocked)
+                return; // the exhibition ranking's FINISH releases it first
             // Exhibition: back to the title is the next visitor (a Classic result too).
             if (ExhibitionMode.IsActive)
                 ExhibitionSession.ResetExhibitionSession();
@@ -637,6 +656,8 @@ namespace Deadline4Sec
         public void ConfirmResult()
         {
             if (State != GameState.Result && State != GameState.GameOver)
+                return;
+            if (ExhibitionResultLocked)
                 return;
             giftBoxTotal = inventory != null ? inventory.CurrentRunGiftBoxes : 0;
             if (giftBoxTotal <= 0)
@@ -777,6 +798,13 @@ namespace Deadline4Sec
                 soundSettingText.text = "SOUND   " + (GamePreferences.SoundEnabled ? "ON" : "OFF");
             if (vibrationSettingText != null)
                 vibrationSettingText.text = "VIBRATION   " + (GamePreferences.VibrationEnabled ? "ON" : "OFF");
+        }
+
+        // Exhibition: the ranking replaces the result summary.
+        public void HideResultPanel()
+        {
+            if (resultPanel != null)
+                resultPanel.SetActive(false);
         }
 
         private void SetUI(bool gameplay, bool countdown, bool result)

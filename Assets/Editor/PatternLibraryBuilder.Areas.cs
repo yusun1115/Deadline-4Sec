@@ -468,12 +468,16 @@ namespace Deadline4Sec.Editor
 
         private static ObstacleSkinSet ClockworkSkins()
         {
-            Material brass = Material("ClockworkBrass", Color.white, new Color(0.9f, 0.5f, 0.1f), 4.5f);
+            // Lit like the railway's obstacles (2026-11-22): a wide, bright HDR
+            // rim, a little emission and a lifted tint, so they stand out from
+            // the background instead of sinking into it.
+            Material brass = Material("ClockworkBrass", new Color(1.12f, 1.05f, 0.95f), new Color(1.6f, 0.8f, 0.2f, 1.6f), 2.2f);
+            brass.SetColor("_EmissionColor", new Color(0.08f, 0.04f, 0.005f));
             return new ObstacleSkinSet
             {
-                laneBlocker = new ObstacleSkin { model = SavePiece("Obstacle_Clockwork_Gear", GearBlockMesh(), brass, ModelFolder) },
+                laneBlocker = new ObstacleSkin { model = SavePiece("Obstacle_Clockwork_Piston", PistonColumnMesh(), brass, ModelFolder) },
                 jumpObstacle = new ObstacleSkin { model = SavePiece("Obstacle_Clockwork_Axle", AxleMesh(), brass, ModelFolder) },
-                slideObstacle = new ObstacleSkin { model = SavePiece("Obstacle_Clockwork_Frame", GearFrameMesh(), brass, ModelFolder) },
+                slideObstacle = new ObstacleSkin { model = SavePiece("Obstacle_Clockwork_GearRack", GearRackMesh(), brass, ModelFolder) },
             };
         }
 
@@ -494,19 +498,6 @@ namespace Deadline4Sec.Editor
             }
         }
 
-        // Lane Blocker (1.5 x 2 x 1): a great gear standing in a frame.
-        private static Mesh GearBlockMesh()
-        {
-            MeshBuilder b = new MeshBuilder();
-            b.Box(new Vector3(-0.75f, 0f, -0.5f), new Vector3(0.75f, 0.2f, 0.5f), BrassDarkModel);
-            b.Box(new Vector3(-0.75f, 1.86f, -0.5f), new Vector3(0.75f, 2f, 0.5f), BrassDarkModel);
-            foreach (float s in new[] { -1f, 1f })
-                b.Box(new Vector3(s * 0.67f - 0.08f, 0.2f, -0.5f), new Vector3(s * 0.67f + 0.08f, 1.86f, 0.5f), BrassDarkModel);
-            b.Box(new Vector3(-0.59f, 0.2f, -0.2f), new Vector3(0.59f, 1.86f, 0.3f), BrassDarkModel);
-            GearFace(b, new Vector3(0f, 1.03f, -0.22f), 0.74f, 12, BrassLightModel, AmberGlow);
-            return b.Build("Obstacle_Clockwork_Gear");
-        }
-
         // Jump Obstacle (1.5 x 0.8 x 1): a low shaft between two wheels.
         private static Mesh AxleMesh()
         {
@@ -521,38 +512,30 @@ namespace Deadline4Sec.Editor
                 GearFace(b, new Vector3(s * 0.62f, 0.47f, -0.33f), 0.13f * 2f, 8, BrassLightModel, AmberGlow);
             }
             b.Box(new Vector3(-0.49f, 0.68f, -0.23f), new Vector3(0.49f, 0.72f, -0.2f), AmberGlow);
+            // Glowing collars at the shaft's ends and the base's edge (2026-11-22).
+            foreach (float x in new[] { -0.42f, 0.42f })
+                b.Box(new Vector3(x - 0.04f, 0.26f, -0.25f), new Vector3(x + 0.04f, 0.7f, -0.23f), AmberGlow);
+            b.Box(new Vector3(-0.75f, 0.11f, -0.52f), new Vector3(0.75f, 0.14f, -0.5f), AmberGlow * 0.8f);
             return b.Build("Obstacle_Clockwork_Axle");
-        }
-
-        // Slide Obstacle (1.5 x 2.5 x thin): a gear frame hung over the track, its
-        // lower edge marked.
-        private static Mesh GearFrameMesh()
-        {
-            MeshBuilder b = new MeshBuilder();
-            b.Box(new Vector3(-0.75f, 0f, -0.1f), new Vector3(0.75f, 2.5f, 0.1f), BrassDarkModel);
-            b.Box(new Vector3(-0.75f, 0f, -0.12f), new Vector3(0.75f, 0.2f, 0.12f), BrassLightModel);
-            b.Box(new Vector3(-0.75f, 0f, -0.13f), new Vector3(0.75f, 0.05f, -0.12f), AmberGlow);
-            foreach (float s in new[] { -1f, 1f })
-                GearFace(b, new Vector3(s * 0.36f, 1.25f + s * 0.4f, -0.11f), 0.38f, 9, BrassLightModel, AmberGlow);
-            return b.Build("Obstacle_Clockwork_Frame");
         }
 
         // ---------- cathedral obstacle models ----------
         // Same hazard boxes: ObstacleVisual stretches each model to its collider.
 
         private static readonly Color RedGlow = new Color(1f, 0.2f, 0.16f) * 2.2f;
-        private static readonly Color VioletGlass = new Color(0.6f, 0.2f, 1f) * 1.8f;
         private static readonly Color CathedralStoneLight = new Color(0.25f, 0.17f, 0.2f);
         private static readonly Color CathedralStoneDark = new Color(0.11f, 0.07f, 0.09f);
 
         private static ObstacleSkinSet CathedralSkins()
         {
-            Material stone = Material("CathedralStone", Color.white, new Color(0.7f, 0.18f, 0.14f), 4.5f);
+            // Lit like the railway's obstacles (2026-11-22), in the cathedral's red.
+            Material stone = Material("CathedralStone", new Color(1.25f, 1.12f, 1.18f), new Color(1.8f, 0.36f, 0.3f, 1.6f), 2f);
+            stone.SetColor("_EmissionColor", new Color(0.14f, 0.03f, 0.03f));
             return new ObstacleSkinSet
             {
                 laneBlocker = new ObstacleSkin { model = SavePiece("Obstacle_Cathedral_Statue", StatueMesh(), stone, ModelFolder) },
                 jumpObstacle = new ObstacleSkin { model = SavePiece("Obstacle_Cathedral_Rubble", RubbleMesh(), stone, ModelFolder) },
-                slideObstacle = new ObstacleSkin { model = SavePiece("Obstacle_Cathedral_BrokenArch", BrokenArchMesh(), stone, ModelFolder) },
+                slideObstacle = new ObstacleSkin { model = SavePiece("Obstacle_Cathedral_HangingLintel", HangingLintelMesh(), stone, ModelFolder) },
             };
         }
 
@@ -567,6 +550,10 @@ namespace Deadline4Sec.Editor
             b.Box(new Vector3(-0.48f, 1.3f, -0.32f), new Vector3(0.48f, 1.56f, 0.32f), CathedralStoneLight);
             b.Box(new Vector3(-0.18f, 1.56f, -0.19f), new Vector3(0.18f, 2f, 0.19f), CathedralStoneLight * 1.6f);
             b.Box(new Vector3(-0.11f, 1.76f, -0.205f), new Vector3(0.11f, 1.82f, -0.19f), RedGlow);
+            // Glow accents (2026-11-22): a halo, the plinth's edge, a lit fold.
+            b.Ring(new Vector3(0f, 1.8f, -0.23f), 0.2f, 0.26f, 24, RedGlow);
+            b.Box(new Vector3(-0.75f, 0.28f, -0.52f), new Vector3(0.75f, 0.33f, -0.5f), RedGlow);
+            b.Box(new Vector3(-0.03f, 0.4f, -0.34f), new Vector3(0.03f, 1.15f, -0.33f), RedGlow * 0.7f);
             foreach (float s in new[] { -1f, 1f })
                 for (int i = 0; i < 4; i++)
                 {
@@ -589,26 +576,12 @@ namespace Deadline4Sec.Editor
             b.Box(new Vector3(0.28f, 0f, 0.14f), new Vector3(0.75f, 0.42f, 0.5f), CathedralStoneDark);
             b.Box(new Vector3(-0.14f, 0.5f, -0.1f), new Vector3(0.24f, 0.8f, 0.2f), CathedralStoneLight);
             b.Box(new Vector3(-0.75f, 0.5f, -0.37f), new Vector3(0.75f, 0.54f, -0.36f), RedGlow);
+            // Red light through the cracks (2026-11-22).
+            b.Box(new Vector3(-0.32f, 0.12f, -0.39f), new Vector3(-0.26f, 0.42f, -0.38f), RedGlow * 0.8f);
+            b.Box(new Vector3(0.24f, 0.08f, -0.39f), new Vector3(0.3f, 0.34f, -0.38f), RedGlow * 0.8f);
+            b.Box(new Vector3(-0.7f, 0.64f, -0.21f), new Vector3(0.7f, 0.67f, -0.2f), RedGlow);
             return b.Build("Obstacle_Cathedral_Rubble");
         }
 
-        // Slide Obstacle (1.5 x 2.5 x thin): the fallen crown of an arch, with a
-        // lit window in it and its lower edge marked.
-        private static Mesh BrokenArchMesh()
-        {
-            MeshBuilder b = new MeshBuilder();
-            b.Box(new Vector3(-0.75f, 0f, -0.1f), new Vector3(0.75f, 2.5f, 0.1f), CathedralStoneDark);
-            b.Box(new Vector3(-0.75f, 0f, -0.12f), new Vector3(0.75f, 0.22f, 0.12f), CathedralStoneLight);
-            b.Box(new Vector3(-0.75f, 0f, -0.13f), new Vector3(0.75f, 0.05f, -0.12f), RedGlow);
-            foreach (float x in new[] { -0.6f, 0.6f })
-                b.Box(new Vector3(x - 0.15f, 0.22f, -0.12f), new Vector3(x + 0.15f, 2.5f, 0.12f), CathedralStoneLight);
-            b.Box(new Vector3(-0.26f, 0.55f, -0.11f), new Vector3(0.26f, 1.7f, -0.1f), VioletGlass);
-            for (int i = 0; i < 3; i++)
-            {
-                float half = 0.26f - i * 0.08f, y = 1.7f + i * 0.12f;
-                b.Box(new Vector3(-half, y, -0.11f), new Vector3(half, y + 0.12f, -0.1f), VioletGlass);
-            }
-            return b.Build("Obstacle_Cathedral_BrokenArch");
-        }
     }
 }

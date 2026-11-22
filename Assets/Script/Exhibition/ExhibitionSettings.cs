@@ -32,6 +32,8 @@ namespace Deadline4Sec
         [Min(5f)] public float autoFinishIdleSeconds = 45f;
         [Tooltip("ONE MORE CHANCE waits this long, then the run ends.")]
         [Min(3f)] public float revivePromptSeconds = 10f;
+        [Tooltip("The result summary shows this long before the nickname entry / ranking (s).")]
+        [Range(1f, 4f)] public float resultToNicknameSeconds = 1.8f;
 
         // Admin (Windows exhibition): Ctrl + Shift + Delete opens the reset panel.
     }

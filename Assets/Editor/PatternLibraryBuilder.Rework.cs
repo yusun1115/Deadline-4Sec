@@ -97,23 +97,26 @@ namespace Deadline4Sec.Editor
             // z + 14 + RampLength puts its ramp right where the roof ends.
             // A ground Soul only 12 m+ past the last roof: coming down (often
             // high after an air kill) is not landing next to it.
+            // And none beside a ramp (2026-11-22, playtest): its side attack
+            // reaches the ramp lane, so the ramp that invites you up was a
+            // trap. The first Soul is above the roof.
             const float Next = TrainLength + RampLength;
             return new List<Spec>
             {
                 // Introduction: ramp → roof → ground. The side lanes stay open.
                 P("Pattern_TrainRamp_Simple", 46, E, train)
-                    .Enemy(-1, 7).RampTrain(0, 14).Air(0, roof + 2.4f, 21).Enemy(1, 40)
+                    .RampTrain(0, 14).Air(0, roof + 2.4f, 21).Enemy(1, 40)
                     .RampCoins(0, 14).Coins(0, roofCoin, 15, 4, 1.6f).Gift(0, 25, roofCoin),
                 // Two cars: the second ramp bridges the gap after the first roof.
                 P("Pattern_TrainRamp_DoubleTrain", 66, M, train)
-                    .Enemy(-1, 6).RampTrain(0, 14).Air(0, roof + 2.4f, 21)
+                    .RampTrain(0, 14).Air(0, roof + 2.4f, 21)
                     .RampTrain(0, 14 + Next).Air(0, roof + 2.4f, 14 + Next + 7.5f).Enemy(1, 62)
                     .RampCoins(0, 14).Coins(0, roofCoin, 15, 3, 1.6f)
                     .RampCoins(0, 14 + Next).Coins(0, roofCoin, 14 + Next + 1f, 3, 1.6f),
                 // One action on the roof: a hurdle on the first car (landing on
                 // the next ramp), a Soul above the second.
                 P("Pattern_TrainRoof_Jump", 66, M, train)
-                    .Enemy(-1, 6).RampTrain(0, 14).RoofJump(0, 22)
+                    .RampTrain(0, 14).RoofJump(0, 22)
                     .RampTrain(0, 14 + Next).Air(0, roof + 2.4f, 14 + Next + 7.5f).Enemy(1, 62)
                     // No Souls up this ramp: in line with the hurdle they hid it
                     // from the ramp (checked in the camera).
@@ -121,7 +124,7 @@ namespace Deadline4Sec.Editor
                     .RampCoins(0, 14 + Next).Coins(0, roofCoin, 14 + Next + 1f, 3, 1.6f),
                 // Three cars for the second half of a run.
                 P("Pattern_TrainRamp_Triple", 88, H, train)
-                    .Enemy(-1, 6).RampTrain(0, 14).Air(0, roof + 2.4f, 21)
+                    .RampTrain(0, 14).Air(0, roof + 2.4f, 21)
                     .RampTrain(0, 14 + Next).RoofJump(0, 14 + Next + 8f)
                     .RampTrain(0, 14 + Next * 2).Air(0, roof + 2.4f, 14 + Next * 2 + 7f).Enemy(0, 83)
                     .RampCoins(0, 14).RampCoins(0, 14 + Next * 2) // none before the roof hurdle
