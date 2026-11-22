@@ -62557,6 +62557,8 @@ MonoBehaviour:
   groundOffset: -0.2
   hood: {fileID: 2859604885517219424}
   headBoundHood: {fileID: 4300000, guid: a01d628264e974a449d4b4e1d307fe46, type: 2}
+  body: {fileID: 4408632028553709115}
+  hairTuckedBody: {fileID: 4300000, guid: f84a66736b477074898896988130bea1, type: 2}
   capePhysics: 1
   stiffness: 0.18
   damping: 0.14

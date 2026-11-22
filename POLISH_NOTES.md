@@ -232,6 +232,11 @@
 - **Slide Obstacle 직전 슬라이드 Near Miss(2026-11-22)**: 직전에 슬라이드로 빠져나가도 발동하지 않던 문제. 원인 2가지 — ① 슬라이드는 누르는 순간 판정 높이가 2m→약 0.5m로 줄어 빔(1.3m 위) 아래로 내려가므로, 장애물 2.6m 안에서 "서서 부딪힐 코스"였던 순간이 거의 없음(최고 속도 0.16초). ② 낮게 미끄러지는 판정이 빔 아래 Near 구역(빔 하단 −0.65m)보다 더 아래를 지나감. 수정: Slide 장애물만 "부딪힐 코스" 거리 `slideLastMomentDistance`(5m, 프리팹에 저장), Near 구역은 빔 아래 바닥까지. 5m보다 일찍 미끄러지면 여전히 Near Miss 아님. 테스트 `SlideNearMissAcceptanceTests`(실제 씬: 1.5m·4m 직전 슬라이드 = Near Miss, 9m = 아님).
 - **Ground Slam 반동 제거**: 충격파 판정 후 튀어 오르지 않고 바로 착지해 계속 달림(`groundSlamBouncePower` 삭제, 씬에 남은 값은 무시됨). 공중 콤보 상태도 해제.
 
+## 타이틀 Idle 머리카락이 후드를 뚫는 문제 (2026-11-22)
+
+- 타이틀 Idle에서 뒤돌 때 뒷머리(몸통 메시 일부)가 후드 위로 튀어나옴. 휴식 자세에선 후드 안쪽이지만, 뒷머리가 목 본에도 일부 묶여 있어 고개를 돌리면 머리에 붙은 후드만큼 따라가지 못해서 뚫고 나왔음.
+- `ReaperHairTuckSetup`(메뉴 `Character/Tuck Hair Under Hood`): Idle 클립을 0.1초마다 샘플링(애니메이션 모드, 씬 변경 없음)해 머리 본 후드(실제 플레이에서 쓰는 사본) 표면 밖으로 나오는 뒤·위쪽 머리카락 정점을 찾아 후드 안쪽 2cm까지 넣은 몸통 메시 사본 `Generated/Body_HairTucked.asset`(783개 정점). 얼굴·앞머리(정면 방향)는 건드리지 않음. `ReaperRig.hairTuckedBody`로 실행 시 교체(세 게임 씬).
+
 ## 장애물 모양 구별 / 경사로 옆 적 (2026-11-22, 플레이 피드백)
 
 - **Monolith 방향**: Lane Blocker 프리팹의 `ObstacleVisual.modelEuler`가 (0,180,0)이라 묘비의 앞면(십자가)이 왼쪽을 향했음 → (0,−90,0). 모델은 `ObstacleVisual`이 회전을 `modelEuler`로 덮어쓰므로 `Obstacle_Monolith` 프리팹 루트 회전은 인게임에 영향 없음.

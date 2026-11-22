@@ -5020,6 +5020,7 @@ MonoBehaviour:
   obstacleType: 1
   nearMissMargin: {x: 0.95, y: 0.65, z: 1.25}
   lastMomentDistance: 2.6
+  slideLastMomentDistance: 5
 --- !u!65 &163227758
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -11122,6 +11123,11 @@ MonoBehaviour:
   normalKillHitStop: 0.04
   homingKillHitStop: 0.045
   stompHitStop: 0.06
+  reviveShake:
+    intensity: 0.05
+    duration: 0.18
+  reviveFovKick: -2
+  reviveFovDuration: 0.3
   groundSlamHitStop: 0.075
   groundSlamShake:
     intensity: 0.2
@@ -11653,6 +11659,12 @@ MonoBehaviour:
   spireSpan: 320
   clockTowerOffset: {x: 34, y: -8, z: 230}
   cloudSeaY: -9
+  midCount: 10
+  midDistanceX: {x: 14, y: 24}
+  midSpan: 260
+  farDistance: 285
+  lowFogSheets: 4
+  lowFogClearHalfWidth: 4.6
 --- !u!1 &353348962
 GameObject:
   m_ObjectHideFlags: 0
@@ -17864,6 +17876,8 @@ MonoBehaviour:
   baseForwardSpeed: 10.2
   maxForwardSpeed: 16
   speedIncreasePerSecond: 0.06
+  reviveSpeedRampSeconds: 1.3
+  reviveSpeedRampStartFraction: 0.3
 --- !u!114 &576882185
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20423,6 +20437,7 @@ MonoBehaviour:
   obstacleType: 2
   nearMissMargin: {x: 0.95, y: 0.65, z: 1.25}
   lastMomentDistance: 2.6
+  slideLastMomentDistance: 5
 --- !u!65 &663363517
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -37534,6 +37549,7 @@ MonoBehaviour:
   obstacleType: 0
   nearMissMargin: {x: 0.95, y: 0.65, z: 1.25}
   lastMomentDistance: 2.6
+  slideLastMomentDistance: 5
 --- !u!65 &1349289548
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -39618,6 +39634,7 @@ MonoBehaviour:
   obstacleType: 1
   nearMissMargin: {x: 0.95, y: 0.65, z: 1.25}
   lastMomentDistance: 2.6
+  slideLastMomentDistance: 5
 --- !u!65 &1429085764
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -43232,6 +43249,8 @@ MonoBehaviour:
   resultOvershootScale: 1.03
   scoreCountDuration: 0.65
   stepDelay: 0.08
+  rewardCountDuration: 0.4
+  exhibitionScoreSize: 104
   gameOver: {fileID: 691117671}
   scoreBlock:
   - {fileID: 2053983259}
@@ -63505,6 +63524,8 @@ MonoBehaviour:
   groundOffset: -0.2
   hood: {fileID: 576088037572018183}
   headBoundHood: {fileID: 4300000, guid: a01d628264e974a449d4b4e1d307fe46, type: 2}
+  body: {fileID: 2125537405954306140}
+  hairTuckedBody: {fileID: 4300000, guid: f84a66736b477074898896988130bea1, type: 2}
   capePhysics: 1
   stiffness: 0.18
   damping: 0.14

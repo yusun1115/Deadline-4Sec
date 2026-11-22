@@ -13,7 +13,10 @@ namespace Deadline4Sec
     //  - weapon grip: the scythe's shaft runs through the right fist (along the
     //    knuckle line, through the hollow of the fingers) instead of past it,
     //  - off hand: when an animation brings the left hand near the shaft, it
-    //    closes onto the shaft (two-bone IK, blended by distance).
+    //    closes onto the shaft (two-bone IK, blended by distance),
+    //  - hair (2026-11-22): a copy of the body mesh whose back hair is drawn
+    //    in under the hood (it poked through when the title idle turns her
+    //    back to the camera); see ReaperHairTuckSetup.
     // Runs after the Animator and PlayerCharacterAnimator (LateUpdate).
     [DefaultExecutionOrder(500)]
     [RequireComponent(typeof(Animator))]
@@ -25,6 +28,10 @@ namespace Deadline4Sec
         [Header("Hood (head-bound copy of the hood mesh)")]
         [SerializeField] private SkinnedMeshRenderer hood;
         [SerializeField] private Mesh headBoundHood;
+
+        [Header("Hair under the hood (body mesh copy)")]
+        [SerializeField] private SkinnedMeshRenderer body;
+        [SerializeField] private Mesh hairTuckedBody;
 
         [Header("Cape physics")]
         [SerializeField] private bool capePhysics = true;
@@ -83,6 +90,8 @@ namespace Deadline4Sec
             transform.localPosition += Vector3.up * groundOffset;
             if (hood != null && headBoundHood != null)
                 hood.sharedMesh = headBoundHood;
+            if (body != null && hairTuckedBody != null)
+                body.sharedMesh = hairTuckedBody;
             PlayerController player = GetComponentInParent<PlayerController>();
             root = player != null ? player.transform : transform;
 
