@@ -19,6 +19,7 @@ namespace Deadline4Sec
         {
             () => Vignette, () => Frost, () => Glow, () => Ring, () => Shard, () => Crack,
             () => ChainLink, () => Padlock, () => EdgeGlow, () => Streak, () => EdgeGlowBox, () => RoundedBox, () => Reticle, () => ReticleOutline,
+            () => ReticleGlow, () => Exclaim, () => ExclaimOutline, () => ExclaimGlow,
         };
 
         public static Sprite Vignette => Get("fx_vignette", 256, 256, VignetteAlpha);
@@ -29,6 +30,15 @@ namespace Deadline4Sec
         public static Sprite Reticle => Get("fx_reticle", 256, 256, ReticleAlpha);
         // The same shape, thicker: a dark edge so the marker reads on pink enemies.
         public static Sprite ReticleOutline => Get("fx_reticle_outline", 256, 256, ReticleOutlineAlpha);
+        // Neon halo around the same shape (2026-11-26). Drawn GlowSpan times the
+        // marker's size: the halo reaches past the tick ends.
+        public const float ReticleGlowSpan = 1.3f;
+        public static Sprite ReticleGlow => Get("fx_reticle_glow", 256, 256, ReticleGlowAlpha);
+        // "!" over an enemy about to strike (2026-11-26): the mark, its dark
+        // edge and its halo, all the same size so they stack.
+        public static Sprite Exclaim => Get("fx_exclaim", 160, 256, (u, v) => ExclaimShape(u, v, 0f));
+        public static Sprite ExclaimOutline => Get("fx_exclaim_outline", 160, 256, (u, v) => ExclaimShape(u, v, 0.03f));
+        public static Sprite ExclaimGlow => Get("fx_exclaim_glow", 160, 256, ExclaimGlowAlpha);
         public static Sprite Shard => Get("fx_shard", 64, 128, ShardAlpha);
         public static Sprite Crack => Get("fx_crack", 256, 128, null, CrackPixels);
         public static Sprite ChainLink => Get("fx_chain_link", 96, 48, LinkAlpha);
@@ -148,6 +158,45 @@ namespace Deadline4Sec
             float tick = along > from && along < to ? Mathf.Clamp01(1f - across / tickHalf) : 0f;
             tick *= Mathf.Clamp01((to - along) / 0.03f) * Mathf.Clamp01((along - from) / 0.03f);
             return Mathf.Max(ring, Mathf.Clamp01(tick * 1.6f));
+        }
+
+        // Soft falloff from the reticle's ring and ticks.
+        private static float ReticleGlowAlpha(float u, float v)
+        {
+            float x = (u * 2f - 1f) * ReticleGlowSpan, y = (v * 2f - 1f) * ReticleGlowSpan;
+            float d = Mathf.Sqrt(x * x + y * y);
+            float ring = Mathf.Abs(d - 0.74f);
+            float along = Mathf.Max(Mathf.Abs(x), Mathf.Abs(y));
+            float across = Mathf.Min(Mathf.Abs(x), Mathf.Abs(y));
+            float past = Mathf.Max(0f, Mathf.Max(0.56f - along, along - 0.94f));
+            float tick = Mathf.Sqrt(across * across + past * past);
+            float dist = Mathf.Min(ring, tick);
+            float halo = Mathf.Exp(-(dist * dist) / (0.11f * 0.11f));
+            // Fade to nothing at the texture edge.
+            float edge = Mathf.Clamp01((1f - Mathf.Max(Mathf.Abs(u * 2f - 1f), Mathf.Abs(v * 2f - 1f))) / 0.06f);
+            return halo * edge;
+        }
+
+        // Signed distance to a "!" in texture-height units: a bar widening upward
+        // over a round dot. x runs ±0.3125 (160 x 256 texture), y 0..1.
+        private static float ExclaimDistance(float u, float v)
+        {
+            float x = (u - 0.5f) * 0.625f, y = v;
+            float t = Mathf.Clamp01((y - 0.42f) / (0.8f - 0.42f));
+            float along = Mathf.Lerp(0.42f, 0.8f, t);
+            float bar = Mathf.Sqrt(x * x + (y - along) * (y - along)) - Mathf.Lerp(0.06f, 0.095f, t);
+            float dot = Mathf.Sqrt(x * x + (y - 0.235f) * (y - 0.235f)) - 0.075f;
+            return Mathf.Min(bar, dot);
+        }
+
+        private static float ExclaimShape(float u, float v, float grow) =>
+            Mathf.Clamp01(0.5f - (ExclaimDistance(u, v) - grow) * 256f);
+
+        private static float ExclaimGlowAlpha(float u, float v)
+        {
+            float d = Mathf.Max(0f, ExclaimDistance(u, v));
+            float edge = Mathf.Clamp01(Mathf.Min(Mathf.Min(u, 1f - u), Mathf.Min(v, 1f - v)) / 0.05f);
+            return Mathf.Exp(-(d * d) / (0.075f * 0.075f)) * edge;
         }
 
         private static float RingAlpha(float u, float v)

@@ -13,9 +13,17 @@ namespace Deadline4Sec
 
         private float ForwardSpeedNow => runForwardSpeed >= 0f ? runForwardSpeed : forwardSpeed;
 
-        public bool TryGetKillWindow(Enemy enemy, out float secondsUntilOpen)
+        public bool TryGetKillWindow(Enemy enemy, out float secondsUntilOpen) =>
+            TryGetKillWindowSpan(enemy, out secondsUntilOpen, out _);
+
+        // As above, and how soon the window shuts (2026-11-26, the "!" over the
+        // enemy): its near end is where the enemy's own attack reaches the runner,
+        // so this is how long until the runner walks into it. 0 when it can't be
+        // told ahead (already up in the air, a slam).
+        public bool TryGetKillWindowSpan(Enemy enemy, out float secondsUntilOpen, out float secondsUntilClosed)
         {
             secondsUntilOpen = 0f;
+            secondsUntilClosed = 0f;
             if (enemy == null || enemy.IsKilled || !CanReceiveInput || characterController == null ||
                 movementState == MovementState.WallRun)
                 return false;
@@ -24,15 +32,17 @@ namespace Deadline4Sec
                 return false;
             Bounds target = body.bounds;
             return enemy.Type == Enemy.EnemyType.Air
-                ? AirKillWindow(enemy, target, out secondsUntilOpen)
-                : GroundKillWindow(enemy, target, out secondsUntilOpen);
+                ? AirKillWindow(enemy, target, out secondsUntilOpen, out secondsUntilClosed)
+                : GroundKillWindow(enemy, target, out secondsUntilOpen, out secondsUntilClosed);
         }
 
-        private bool AirKillWindow(Enemy enemy, Bounds target, out float secondsUntilOpen)
+        private bool AirKillWindow(Enemy enemy, Bounds target, out float secondsUntilOpen, out float secondsUntilClosed)
         {
             secondsUntilOpen = 0f;
+            secondsUntilClosed = 0f;
             if (isHomingDash)
             {
+                secondsUntilClosed = ContactSeconds(target);
                 return airDashTarget == enemy;
             }
             Bounds self = characterController.bounds;
@@ -41,6 +51,7 @@ namespace Deadline4Sec
                 // Up in the air: an up swipe homes onto the best air target.
                 if (Time.time - lastAirJumpTime < airJumpMinInterval || FindAirTarget(0, true) != enemy)
                     return false;
+                secondsUntilClosed = ContactSeconds(target);
                 return true;
             }
 
@@ -67,12 +78,13 @@ namespace Deadline4Sec
             // Running in under it, its down attack reaches the runner first.
             near = Mathf.Max(near, ZoneLimit(enemy, EnemyAttackZone.AttackZoneType.AirDown, target, self));
             float far = jumpAttackForwardOffset + jumpAttackBoxSize.z * 0.5f + target.extents.z + speed * lastTime;
-            return InWindow(target.center.z - self.center.z, near, far, speed, out secondsUntilOpen);
+            return InWindow(target.center.z - self.center.z, near, far, speed, out secondsUntilOpen, out secondsUntilClosed);
         }
 
-        private bool GroundKillWindow(Enemy enemy, Bounds target, out float secondsUntilOpen)
+        private bool GroundKillWindow(Enemy enemy, Bounds target, out float secondsUntilOpen, out float secondsUntilClosed)
         {
             secondsUntilOpen = 0f;
+            secondsUntilClosed = 0f;
             Bounds self = characterController.bounds;
             float speed = ForwardSpeedNow;
             float dz = target.center.z - transform.position.z;
@@ -88,12 +100,13 @@ namespace Deadline4Sec
                 {
                     Vector2 impact = new Vector2(transform.position.x, transform.position.z + landing);
                     float reach = Vector2.Distance(impact, new Vector2(target.center.x, target.center.z));
+                    secondsUntilClosed = ContactSeconds(target);
                     return reach <= groundSlamRadius;
                 }
                 if (Mathf.Abs(target.center.x - transform.position.x) > target.extents.x + characterController.radius * 0.6f)
                     return false;
                 float footprint = (target.extents.z + characterController.radius) * 0.8f;
-                return InWindow(dz, landing - footprint, landing + footprint, speed, out secondsUntilOpen);
+                return InWindow(dz, landing - footprint, landing + footprint, speed, out secondsUntilOpen, out secondsUntilClosed);
             }
 
             // Beside it: a swipe toward it attacks the next lane while moving there.
@@ -106,7 +119,7 @@ namespace Deadline4Sec
             float farEdge = attackForwardOffset + attackBoxSize.z * 0.5f + target.extents.z + speed * attackTime;
             // Its side attack reaches the runner first when left too late.
             nearEdge = Mathf.Max(nearEdge, ZoneLimit(enemy, EnemyAttackZone.AttackZoneType.GroundSide, target, self));
-            return InWindow(dz, nearEdge, farEdge, speed, out secondsUntilOpen);
+            return InWindow(dz, nearEdge, farEdge, speed, out secondsUntilOpen, out secondsUntilClosed);
         }
 
         // How close (enemy centre ahead of the runner) before that attack zone,
@@ -126,10 +139,19 @@ namespace Deadline4Sec
             return limit;
         }
 
+        // Where the window's end can't be told ahead: how soon the runner meets it.
+        private float ContactSeconds(Bounds target)
+        {
+            float gap = target.min.z - (transform.position.z + characterController.radius);
+            return Mathf.Max(0f, gap) / Mathf.Max(0.1f, ForwardSpeedNow);
+        }
+
         // Open, or still ahead (then: how soon). Past it: closed for good.
-        private static bool InWindow(float distance, float near, float far, float speed, out float secondsUntilOpen)
+        private static bool InWindow(float distance, float near, float far, float speed,
+            out float secondsUntilOpen, out float secondsUntilClosed)
         {
             secondsUntilOpen = 0f;
+            secondsUntilClosed = 0f;
             // A frame or so inside each end: "now" must really be now.
             near += speed * 0.02f;
             far -= speed * 0.01f;
@@ -137,6 +159,7 @@ namespace Deadline4Sec
                 return false;
             if (distance > far)
                 secondsUntilOpen = (distance - far) / Mathf.Max(0.1f, speed);
+            secondsUntilClosed = (distance - near) / Mathf.Max(0.1f, speed);
             return true;
         }
     }
