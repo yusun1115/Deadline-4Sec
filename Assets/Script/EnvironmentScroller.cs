@@ -229,6 +229,7 @@ namespace Deadline4Sec
                 DestroyBackdrop(prepared);
             if (Atmosphere != null)
                 Destroy(Atmosphere.gameObject);
+            DestroyMainMenuBackdrop();
         }
 
         private void Build(float startZ)
@@ -275,6 +276,7 @@ namespace Deadline4Sec
 
         private void LateUpdate()
         {
+            UpdateMainMenuBackdrop();
             if (followTarget == null || current == null)
                 return;
             float z = followTarget.position.z;

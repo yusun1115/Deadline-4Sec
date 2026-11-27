@@ -39,6 +39,15 @@ namespace Deadline4Sec
         private float moteDebt, sparkDebt;
         private readonly AreaVisualProfile shown = new AreaVisualProfile();
 
+        // Main menu (2026-11-27): the title camera looks back down the line (-Z),
+        // where the fog and the motes, laid out ahead of the camera, are not. While
+        // on, a second copy of the fog sheets (same mesh and material) lies behind,
+        // and the motes rise there, fewer.
+        private Transform backFog;
+        private bool backView;
+        public bool BackView => backView;
+        public bool BackFogVisible => backFog != null && backFog.gameObject.activeInHierarchy;
+
         public AreaVisualProfile Shown => shown;
         public bool LowFogVisible => fog != null && fog.gameObject.activeInHierarchy && shown.lowFogAlpha > 0.001f;
         public int ParticleCount => (motes != null ? motes.particleCount : 0) + (sparks != null ? sparks.particleCount : 0);
@@ -146,6 +155,8 @@ namespace Deadline4Sec
                 fogMaterial.SetFloat(TrackXId, trackX);
                 fogMaterial.SetFloat(ClearHalfWidthId, clearHalfWidth);
                 fog.gameObject.SetActive(shown.lowFogAlpha > 0.001f);
+                if (backFog != null)
+                    backFog.gameObject.SetActive(backView && fog.gameObject.activeSelf);
             }
         }
 
@@ -164,7 +175,32 @@ namespace Deadline4Sec
                 fog.position = new Vector3(trackX, shown.lowFogBottom, at.z);
                 fog.localScale = new Vector3(1f, Mathf.Max(0.01f, shown.lowFogTop - shown.lowFogBottom), 1f);
             }
+            if (backFog != null && backFog.gameObject.activeSelf)
+            {
+                backFog.position = new Vector3(trackX, shown.lowFogBottom, at.z);
+                backFog.localScale = fog.localScale;
+            }
             EmitAmbient(at, Time.deltaTime);
+        }
+
+        // On while the menu shows the line behind the start.
+        public void SetBackView(bool on)
+        {
+            backView = on;
+            if (on && backFog == null && fog != null)
+            {
+                GameObject go = new GameObject("Low Fog (Menu, behind)");
+                go.transform.SetParent(transform, false);
+                go.transform.rotation = Quaternion.Euler(0f, 180f, 0f);
+                go.AddComponent<MeshFilter>().sharedMesh = fogMesh;
+                MeshRenderer r = go.AddComponent<MeshRenderer>();
+                r.sharedMaterial = fogMaterial;
+                r.shadowCastingMode = ShadowCastingMode.Off;
+                r.receiveShadows = false;
+                backFog = go.transform;
+            }
+            if (backFog != null)
+                backFog.gameObject.SetActive(on && fog != null && fog.gameObject.activeSelf);
         }
 
         private void EmitAmbient(Vector3 at, float dt)
@@ -172,6 +208,14 @@ namespace Deadline4Sec
             if (motes == null || dt <= 0f)
                 return;
             float rate = shown.particleRate;
+            if (backView)
+            {
+                // A few souls rising slowly far behind the Reaper, nothing ahead.
+                moteDebt += rate * MenuMoteShare * dt;
+                while (moteDebt >= 1f) { moteDebt -= 1f; EmitMenuSoul(at); }
+                sparkDebt = 0f;
+                return;
+            }
             switch (shown.particleStyle)
             {
                 case AmbientParticleStyle.Ash:
@@ -216,6 +260,24 @@ namespace Deadline4Sec
                 velocity = new Vector3(Range(-0.35f, 0.35f), Range(0.05f, 0.45f), Range(-0.3f, 0.3f)),
                 startSize = Range(0.1f, 0.24f),
                 startLifetime = Range(3.5f, 6f),
+                startColor = Pick(),
+            };
+            motes.Emit(p, 1);
+        }
+
+        // Menu: share of the area's mote rate, and where they rise (behind the
+        // start, mostly off the centre, background distance).
+        private const float MenuMoteShare = 0.3f;
+
+        private void EmitMenuSoul(Vector3 at)
+        {
+            float x = Range(1.5f, 16f) * (Value01 < 0.5f ? -1f : 1f);
+            var p = new ParticleSystem.EmitParams
+            {
+                position = new Vector3(trackX + x, Range(-1f, 7f), at.z - Range(14f, 60f)),
+                velocity = new Vector3(Range(-0.15f, 0.15f), Range(0.18f, 0.5f), 0f),
+                startSize = Range(0.14f, 0.3f),
+                startLifetime = Range(4.5f, 7.5f),
                 startColor = Pick(),
             };
             motes.Emit(p, 1);

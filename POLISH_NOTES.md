@@ -318,6 +318,14 @@
 - 위치: `RunAssistGuide`(GameFlowManager에 자동 부착, 튜토리얼에서는 꺼짐), 표시 그림 `FxSprites.Reticle`/`ReticleOutline`(Resources/HUD/fx_reticle.png를 넣으면 그 그림 사용). 테스트: `RunAssistAcceptanceTests`(표시 첫/중간/마지막 프레임 스와이프는 처치, 직전은 빗나감), 코스 리플레이(10마리, 첫 Wall Run 안내).
 - **잘 안 보인다는 피드백 (2026-11-26)**: 타겟이 몸 크기의 2.6배 → 1.05배(전 2.1 → 0.85)로 더 크게 시작하고, 300° 회전하며 조여들어 처치 가능 순간에 정자세로 멈춤. 외곽선에 핑크 네온 글로우(`FxSprites.ReticleGlow`, 처치 순간엔 깜빡이며 링 중심이 살짝 하얗게). 같은 적 머리 위에 노란 "!"(`Exclaim`/`ExclaimOutline`/`ExclaimGlow`)가 적의 공격이 닿기 0.45초 전(`TryGetKillWindowSpan`의 닫힘까지 남은 시간)부터 튀어 오르듯 나타나 처치/통과까지 유지. 공중·슬램처럼 닫힘을 미리 알 수 없는 경우는 몸이 닿기까지의 시간으로 판단. 옆 레인 적은 처치 구간이 0.13초 정도라 "!"가 구간이 열리기 약 0.3초 전에 먼저 뜨고, 타겟이 정자세로 맞춰지는 순간이 스와이프 타이밍. 테스트: "!"가 처치 구간이 닫히기 전에, 0.45초보다 이르지 않게 떠서 닫힐 때까지 유지되는지 실제 이동 시뮬레이션으로 확인.
 
+## 메인화면 3D 배경 (2026-11-27, Main Menu 3D Background Visual Polish.md)
+
+- 원인: 타이틀 카메라(`TitleShowcaseCamera`)는 리퍼 앞에서 -Z(출발점 뒤)를 보는데, 그쪽엔 30m `Start Floor` 한 장뿐이고 인게임 배경·낮은 안개·파티클은 모두 +Z(달리는 방향)에 카메라를 따라 만들어짐 → 레일이 화면 중간에서 끝나고 뒤는 스카이박스(보라 벽).
+- `EnvironmentScroller.MainMenu.cs`: 시작 시 한 번, 인게임 Soul Railway 생성 함수·재질로 `MainMenu_Background_3D`(씬 루트, 180° 돌린 좌표계)를 만듦. `Rail_Extension`(Start Floor 메시·재질 복제 11장, 330m, 콜라이더 없음, 안개 끝(270m) 너머까지), `Midground`(트랙 옆 기둥+체인 10개, 고딕 블록·레일 아치·고가 철로 7개, 좌우 비대칭, 중경 재질), `ClockTower`(인게임 시계탑, 소실점 위·로고 아래·후드 위에 문자판, 메뉴 전용 재질 1개로 어둡고(Tint 0.5/0.44/0.58) 발광 약하게(Glow 0.85) 안개 많이(0.9), 분침 -6°/s·시침 -0.5°/s), `FarBackground`(첨탑 8개, 원경 도시 스카이라인, 구름바다). 메뉴 상태(Title/Settings/Upgrades/Skins)와 시작 후 카메라가 도는 1.6초 동안만 표시.
+- `AreaAtmosphere.SetBackView`: 메뉴 동안 같은 낮은 안개 메시·재질을 뒤쪽에 한 장 더(레일 중앙은 기존처럼 비움, 셰이더 Drift로 천천히 흐름), 파티클은 앞쪽 대신 뒤쪽 배경에 영역 비율의 30%로 천천히 떠오르는 영혼 입자. 거리 안개는 기존 영역 값(28~270m) 그대로.
+- 비용: 렌더러 41개, 삼각형 약 9.4k, 재질 5종(새 인스턴스는 시계탑 1개), 콜라이더 0, 실시간 라이트 추가 없음. 2D UI·카메라·게임플레이 코드는 건드리지 않음.
+- Inspector(Environment > EnvironmentScroller, "Main menu backdrop"): 켜기, 레일 길이, 기둥 거리/시작/개수, 시계탑 위치/크기/Tint/Glow/Fog, 시곗바늘 속도, 첨탑 수, 원경 거리. 테스트: `MainMenuBackdropAcceptanceTests`.
+
 ## Area / Biome (2026-11-06, AreaBiome,Pacing.md)
 
 - **현재 단계**: Phase 1~5 완료(Area 데이터, Soul Railway 등록, Transition, Broken Cathedral + Wall Run, Clockwork Abyss + Air Route). 순서는 철도 → 성당 → 심연 → 철도 순환. Phase 6~8(Intensity, Pacing Block, 후보 필터링)도 적용.
